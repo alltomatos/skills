@@ -1,5 +1,5 @@
 {
-  "name": "mattpocock-skills",
+  "name": "alltomatos-skills",
   "skills": [
     "./skills/engineering/diagnose",
     "./skills/engineering/grill-with-docs",
@@ -14,6 +14,7 @@
     "./skills/productivity/caveman",
     "./skills/productivity/grill-me",
     "./skills/productivity/handoff",
-    "./skills/productivity/write-a-skill"
+    "./skills/productivity/write-a-skill",
+    "./skills/productivity/localize-pt-br"
   ]
 }
