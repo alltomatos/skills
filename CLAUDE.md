@@ -1,14 +1,33 @@
-Skills are organized into bucket folders under `skills/`:
+# Governança de Skills
 
-- `engineering/` — daily code work
-- `productivity/` — daily non-code workflow tools
-- `misc/` — kept around but rarely used
-- `personal/` — tied to my own setup, not promoted
-- `in-progress/` — drafts not yet ready to ship
-- `deprecated/` — no longer used
+Skills são organizadas em pastas de buckets sob `skills/`:
 
-Every skill in `engineering/`, `productivity/`, or `misc/` must have a reference in the top-level `README.md` and an entry in `.claude-plugin/plugin.json`. Skills in `personal/`, `in-progress/`, and `deprecated/` must not appear in either.
+- `engineering/` — trabalho diário de código
+- `productivity/` — ferramentas para workflow não relacionadas a código
+- `misc/` — mantidas mas raramente usadas
+- `personal/` — vinculadas ao setup pessoal, não promovidas
+- `in-progress/` — rascunhos não prontos para distribuição
+- `deprecated/` — não utilizadas
 
-Each skill entry in the top-level `README.md` must link the skill name to its `SKILL.md`.
+Toda skill em `engineering/`, `productivity/` ou `misc/` deve ter referência no `README.md` raiz e entrada em `.claude-plugin/plugin.json`. Skills em `personal/`, `in-progress/` e `deprecated/` não devem aparecer em ambos.
 
-Each bucket folder has a `README.md` that lists every skill in the bucket with a one-line description, with the skill name linked to its `SKILL.md`.
+## Protocolo de Agentic Workflow (/orchestrator)
+
+Este repositório utiliza um modelo de delegação hierárquica focado em conformidade:
+
+1. **Entrada**: `/orchestrator` audita o ambiente (fases 1-4).
+2. **Delegação**: O `orchestrator` atua como Arquiteto (não executa código pesado).
+3. **Execução**: Delega para skills especializadas (`diagnose`, `tdd`, etc.).
+4. **Expansão**: Gargalos não mapeados → invocação automática do `/write-a-skill`.
+
+## Arquitetura do Sistema
+
+```mermaid
+graph TD
+    User[/Usuário/] -->|1. Inicia| Orchestrator[/Orchestrator - Mestra/]
+    Orchestrator -->|2. Audita/Repara| SetupSkills[/setup-skills/]
+    Orchestrator -->|3. Delega Trabalho| Specialized[Skills Especializadas]
+    Specialized -->|4. Resolve| Codebase[Base de Código]
+    Specialized -->|Se gargalo| WriteSkill[/write-a-skill/]
+    WriteSkill -->|Nova Skill| Specialized
+```
