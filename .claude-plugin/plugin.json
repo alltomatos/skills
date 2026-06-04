@@ -15,6 +15,7 @@
     "./skills/productivity/grill-me",
     "./skills/productivity/handoff",
     "./skills/productivity/write-a-skill",
-    "./skills/productivity/localize-pt-br"
+    "./skills/productivity/localize-pt-br",
+    "./skills/engineering/orchestrator"
   ]
 }

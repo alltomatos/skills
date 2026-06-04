@@ -1,0 +1,140 @@
+---
+name: orchestrator
+description: Master orchestration skill. Analyzes repository state, enforces skill infrastructure compliance, delegates work to specialized skills, and creates new skills for unmapped bottlenecks. Use when starting a new project, auditing an existing codebase, or when you need the agent to self-organize its workflow. Triggers: "orchestrate", "audit repo", "check compliance", "setup project", "initialize repo".
+disable-model-invocation: true
+---
+
+# Orchestrator
+
+> **Crédito**: Arquitetura de skills baseada no trabalho de Matt Pocock ([mattpocock/skills](https://github.com/mattpocock/skills)). Conceito de orquestração extendido no fork alltomatos/skills.
+
+O Orchestrator é o ponto de entrada da governança de agentes. Ele avalia o repositório e garante que o ambiente de skills esteja pronto antes de qualquer trabalho de engenharia.
+
+## Filosofia
+
+O Orchestrator é um **Arquiteto**, não um operário. Ele:
+- **Observa** → diagnostica o estado do repositório
+- **Delega** → invoca a skill especializada correta
+- **Expande** → cria novas skills quando encontra gargalos não mapeados
+
+Nunca execute trabalho pesado diretamente. Delegue sempre.
+
+## Fluxo de Execução
+
+### Fase 1 — Auditoria de Infraestrutura
+
+Execute esta checklist em sequência. Para cada item, registre ✅ (presente) ou ❌ (ausente).
+
+```checklist
+[ ] CLAUDE.md existe na raiz do repositório
+[ ] CONTEXT.md existe na raiz (ou CONTEXT-MAP.md para multi-context)
+[ ] docs/adr/ existe e contém pelo menos 1 ADR
+[ ] docs/agents/ existe
+[ ] docs/agents/issue-tracker.md existe
+[ ] docs/agents/triage-labels.md existe
+[ ] docs/agents/domain.md existe
+[ ] CLAUDE.md contém bloco "## Agent skills"
+[ ] .claude/skills/ existe e contém symlinks válidos
+[ ] Git remote configurado (origin)
+```
+
+**Resultado da Fase 1:**
+
+- **0–3 itens** → Repositório **novo/vazio** → ir para Fase 2A
+- **4–7 itens** → Repositório **parcialmente configurado** → ir para Fase 2B
+- **8–10 itens** → Repositório **em conformidade** → ir para Fase 3
+
+### Fase 2A — Inicialização de Repositório Novo
+
+Repositório vazio ou sem infraestrutura. O Orchestrator deve:
+
+1. **Invocar `/setup-skills`** para criar a configuração base:
+   - Issue tracker
+   - Triage labels
+   - Domain docs layout
+
+2. **Invocar `/grill-with-docs`** para construir o `CONTEXT.md` inicial:
+   - Perguntar ao usuário sobre o domínio do projeto
+   - Estabelecer a linguagem compartilhada
+   - Criar o primeiro ADR se houver decisão arquitetural
+
+3. **Avaliar a necessidade de `/tdd`**:
+   - Se o projeto terá código testável, sugerir configuração do loop red-green-refactor
+
+4. **Relatório final**: Listar o que foi criado e quais skills estão prontas para uso.
+
+### Fase 2B — Reparo de Repositório Parcial
+
+Repositório com alguma infraestrutura, mas fora de conformidade. O Orchestrator deve:
+
+1. **Para cada item ❌ na checklist**, determinar a skill responsável:
+   - `CONTEXT.md` ausente → `/grill-with-docs`
+   - `docs/agents/*` ausentes → `/setup-skills`
+   - `## Agent skills` ausente no CLAUDE.md → `/setup-skills`
+   - `.claude/skills/` vazio → instruir o usuário a rodar `npx skills@latest add alltomatos/skills`
+
+2. **Invocar as skills na ordem de dependência**:
+   - Primeiro `/setup-skills` (cria `docs/agents/`)
+   - Depois `/grill-with-docs` (preenche `CONTEXT.md` e ADRs)
+
+3. **Re-executar a checklist** após cada reparo para confirmar progresso.
+
+4. **Relatório de conformidade**: Mostrar antes/depois.
+
+### Fase 3 — Análise de Conformidade do Codebase
+
+Repositório com infraestrutura completa. O Orchestrator agora avalia a **saúde do código**:
+
+1. **Invocar `/zoom-out`** para obter visão arquitetural do sistema.
+
+2. **Invocar `/improve-codebase-architecture`** para identificar:
+   - Módulos rasos que precisam de aprofundamento
+   - Violações da linguagem de domínio em `CONTEXT.md`
+   - ADRs conflitantes com a implementação atual
+
+3. **Avaliar gaps de testes**:
+   - Se o código não tem testes → sugerir `/tdd` para setup inicial
+   - Se testes existem mas são frágeis → sugerir `/diagnose`
+
+4. **Verificar alinhamento entre `CONTEXT.md` e o código**:
+   - Termos no `CONTEXT.md` que não aparecem no código → linguagem morta
+   - Conceitos no código que não estão no `CONTEXT.md` → gap de vocabulário
+
+### Fase 4 — Geração Emergente de Skills
+
+Se durante qualquer fase o Orchestrator identificar um gargalo **sem skill existente**:
+
+1. **Documentar o gargalo**: O que é, onde aparece, qual o impacto.
+
+2. **Invocar `/write-a-skill`** para criar uma sub-skill especializada:
+   - Exemplo: repositório com muitas migrações de DB sem controle → criar skill `/migrate-safely`
+   - Exemplo: código com padrões repetitivos de validação → criar skill `/validate-schema`
+
+3. **Registrar a nova skill**:
+   - Adicionar ao bucket correto (`engineering/`, `productivity/`, `misc/`)
+   - Atualizar `plugin.json`
+   - Atualizar `README.md` do bucket
+   - Atualizar `README.md` raiz
+
+4. **Criar ADR** documentando por que a skill foi necessária.
+
+## Regras de Delegação
+
+| Problema detectado | Skill a invocar |
+|---|---|
+| Infraestrutura ausente | `/setup-skills` |
+| Linguagem de domínio ausente ou imprecisa | `/grill-with-docs` |
+| Arquitetura degradada | `/improve-codebase-architecture` |
+| Bug difícil ou regressão | `/diagnose` |
+| Código sem testes | `/tdd` |
+| Falta de contexto sobre o código | `/zoom-out` |
+| Gargalo não mapeado | `/write-a-skill` |
+| Alinhamento antes de mudança | `/grill-me` |
+| Handoff para outro agent | `/handoff` |
+
+## Restrições
+
+- **Nunca** modifique código de produção diretamente. Delegue para a skill especializada.
+- **Nunca** pule a Fase 1. A auditoria é obrigatória em toda invocação.
+- **Sempre** apresente o plano de ação ao usuário antes de delegar. O Orchestrator propõe, o usuário aprova.
+- **Sempre** re-execute a checklist após reparos para confirmar conformidade.

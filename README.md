@@ -55,6 +55,73 @@ bash scripts/link-skills.sh
 
 Isso cria symlinks em `~/.claude/skills/` apontando para cada skill do repositório local.
 
+## Primeiros Passos
+
+Após instalar as skills, o ponto de entrada recomendado é o `/orchestrator`. Ele avalia o estado do seu repositório e garante que tudo está pronto para o trabalho.
+
+### Repositório novo (sem código)
+
+1. Execute `/orchestrator` no seu agent
+2. Ele detecta que o repositório está vazio e invoca automaticamente:
+   - `/setup-skills` → configura issue tracker, labels e docs de domínio
+   - `/grill-with-docs` → constrói a linguagem compartilhada (`CONTEXT.md`)
+3. Ao final, seu repositório estará com toda a infraestrutura de governança pronta
+
+### Repositório existente (com código)
+
+1. Execute `/orchestrator` no seu agent
+2. Ele audita a infraestrutura e identifica gaps
+3. Para cada gap, delega para a skill especializada:
+   - Falta `CONTEXT.md` → `/grill-with-docs`
+   - Falta `docs/agents/` → `/setup-skills`
+   - Arquitetura degradada → `/improve-codebase-architecture`
+   - Código sem testes → `/tdd`
+4. Gera um relatório de conformidade antes/depois
+
+### Ativando respostas em Português do Brasil
+
+Este fork inclui suporte nativo a pt-BR. Ative com:
+
+```text
+/localize-pt-br
+```
+
+O agent passará a responder em português em todas as interações seguintes. Desative com "stop localize".
+
+## O Orchestrator
+
+O `/orchestrator` é a **Skill Mestra** deste fork — um conceito que não existe no repositório original. Ele implementa um **Agentic Workflow**: avalia, delega e expande.
+
+### Como funciona
+
+O Orchestrator opera em 4 fases:
+
+| Fase | Ação | Quando |
+| --- | --- | --- |
+| **1 — Auditoria** | Executa checklist de 10 itens na infraestrutura | Sempre (obrigatório) |
+| **2A — Inicialização** | Configura repositório novo/vazio do zero | 0–3 itens na checklist |
+| **2B — Reparo** | Corrige gaps em repositório parcial | 4–7 itens na checklist |
+| **3 — Conformidade** | Analisa saúde do código e alinhamento com `CONTEXT.md` | 8–10 itens na checklist |
+| **4 — Expansão** | Cria novas sub-skills para gargalos não mapeados | Quando detecta padrão sem skill |
+
+### Regra de ouro
+
+O Orchestrator **nunca** executa trabalho pesado diretamente. Ele é um arquiteto: identifica o problema e delega para a skill correta. Se não existe skill para o gargalo, ele invoca `/write-a-skill` para criá-la.
+
+### Tabela de delegação
+
+| Problema | Skill |
+| --- | --- |
+| Infraestrutura ausente | `/setup-skills` |
+| Linguagem de domínio ausente | `/grill-with-docs` |
+| Arquitetura degradada | `/improve-codebase-architecture` |
+| Bug difícil ou regressão | `/diagnose` |
+| Código sem testes | `/tdd` |
+| Falta de contexto | `/zoom-out` |
+| Gargalo não mapeado | `/write-a-skill` |
+| Alinhamento antes de mudança | `/grill-me` |
+| Handoff para outro agent | `/handoff` |
+
 ## Por Que Essas Skills Existem
 
 Eu construí essas skills como forma de corrigir modos de falha comuns que vejo no Claude Code, Codex e outros coding agents.
@@ -172,6 +239,7 @@ Skills que uso diariamente para trabalho com código.
 - **[to-prd](./skills/engineering/to-prd/SKILL.md)** — Transforma o contexto da conversa atual em um PRD e o submete como issue do GitHub. Sem entrevista — apenas sintetiza o que você já discutiu.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Diz ao agent para zoom out e dar contexto mais amplo ou uma perspectiva de alto nível sobre uma seção de código desconhecida.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Constrói um protótipo descartável para explorar um design — seja um app de terminal executável para questões de estado/lógica de negócio, ou várias variações radicais de UI ativáveis a partir de uma rota.
+- **[orchestrator](./skills/engineering/orchestrator/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade da infraestrutura de skills, delega tarefas e gera novas sub-skills para gargalos não mapeados.
 
 ### Productivity
 
