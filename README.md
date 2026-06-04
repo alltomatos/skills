@@ -34,9 +34,9 @@ Se quiser acompanhar mudanças nessas skills e as novas que eu criar, você pode
 npx skills@latest add alltomatos/skills
 ```
 
-2. Escolha as skills que quer, e em quais coding agents quer instalá-las. **Certifique-se de selecionar `/setup-matt-pocock-skills`**.
+2. Escolha as skills que quer, e em quais coding agents quer instalá-las. **Certifique-se de selecionar `/setup-skills`**.
 
-3. Execute `/setup-matt-pocock-skills` no seu agent. Ele vai:
+3. Execute `/setup-skills` no seu agent. Ele vai:
 - Perguntar qual issue tracker você quer usar (GitHub, Linear ou arquivos locais)
 - Perguntar quais labels você aplica aos tickets quando faz triagem (`/triage` usa labels)
 - Perguntar onde quer salvar os documentos que criarmos
@@ -166,7 +166,7 @@ Skills que uso diariamente para trabalho com código.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Sessão de interrogatório que desafia seu plano contra o modelo de domínio existente, afia terminologia e atualiza `CONTEXT.md` e ADRs inline.
 - **[triage](./skills/engineering/triage/SKILL.md)** — Triagem de issues através de uma máquina de estados de papéis de triagem.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Encontra oportunidades de aprofundamento na base de código, informado pela linguagem de domínio em `CONTEXT.md` e pelas decisões em `docs/adr/`.
-- **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)** — Scaffolding da configuração por repositório (issue tracker, vocabulário de labels de triagem, layout de docs de domínio) que as outras skills de engineering consomem. Rode uma vez por repo antes de usar `to-issues`, `to-prd`, `triage`, `diagnose`, `tdd`, `improve-codebase-architecture` ou `zoom-out`.
+- **[setup-skills](./skills/engineering/setup-skills/SKILL.md)** — Scaffolding da configuração por repositório (issue tracker, vocabulário de labels de triagem, layout de docs de domínio) que as outras skills de engineering consomem. Rode uma vez por repo antes de usar `to-issues`, `to-prd`, `triage`, `diagnose`, `tdd`, `improve-codebase-architecture` ou `zoom-out`.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Desenvolvimento orientado a testes com loop red-green-refactor. Constrói features ou corrige bugs um slice vertical por vez.
 - **[to-issues](./skills/engineering/to-issues/SKILL.md)** — Decompõe qualquer plano, spec ou PRD em issues do GitHub independentes usando slices verticais.
 - **[to-prd](./skills/engineering/to-prd/SKILL.md)** — Transforma o contexto da conversa atual em um PRD e o submete como issue do GitHub. Sem entrevista — apenas sintetiza o que você já discutiu.
