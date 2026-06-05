@@ -13,6 +13,18 @@ If a question can be answered by exploring the codebase, explore the codebase in
 
 </what-to-do>
 
+### Agentic Workflow (Self-Delegation)
+Se, durante a sessão, o plano exigir investigação técnica profunda, refatoração estrutural ou criação de componentes, o `/grill-with-docs` deve delegar tarefas:
+1. **Identificar a Skill**: Escolha a skill especializada correta (ex: `/diagnose`, `/tdd`, `/improve-codebase-architecture`).
+2. **Contrato de Delegação**: Formalize a tarefa em um prompt claro (Objetivo, Restrições Arquiteturais, Formato de Output).
+3. **Execução e Verificação**: Após a sub-tarefa, retome o interrogatório cruzando o resultado obtido com o modelo de domínio.
+
+### Emergência de Novas Skills (Evolução)
+Se identificar gargalos na documentação ou padrões sem automação:
+1. **Protocolo de Criação**: Formalize a necessidade de uma nova skill.
+2. **Invocação**: Use `/write-a-skill` para estruturar a ferramenta.
+3. **Compliance**: Toda skill criada deve seguir os protocolos do `/orchestrator` (Anti-Laziness, DI Pura).
+
 <supporting-info>
 
 ## Domain awareness
