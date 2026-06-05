@@ -118,7 +118,20 @@ Se durante qualquer fase o Orchestrator identificar um gargalo **sem skill exist
 
 4. **Criar ADR** documentando por que a skill foi necessária.
 
-## Regras de Delegação
+## File Size Management & Anti-Loop Protocol (Divide and Conquer)
+
+1. **LIMITE DE ARQUIVO (Modularity First):** Arquivos muito extensos causam "cegueira de contexto" e falhas na ferramenta de edição. Sempre prefira dividir estruturas em múltiplos módulos dentro do mesmo contexto lógico. Se um arquivo ultrapassar ~250 linhas, sugira proativamente o seu desmembramento.
+2. **O PODER DA MODULARIZAÇÃO:** Dividir arquivos em pequenas partes lógicas melhora a manutenibilidade e não quebra referências. Use a modularidade da linguagem a nosso favor.
+3. **LEITURA COM OFFSET (Targeted Reads):** Ao editar arquivos que ainda são grandes, NUNCA faça edições cegas baseadas na memória. Use obrigatoriamente a ferramenta `Read` delimitando linhas precisas (`offset` e `limit`) para capturar o estado real do código antes de disparar o `Edit`.
+4. **QUEBRA DE LOOP (Human Takeover):** Se um `Edit failed` ocorrer duas vezes seguidas, ou se a compilação/linting/testes acusarem erros de sintaxe estrutural repetidamente: PARE IMEDIATAMENTE. Não tente adivinhar. Alerte o desenvolvedor para realizar uma intervenção manual no IDE e aguarde a confirmação de que o arquivo foi corrigido visualmente.
+
+## Anti-Laziness & Strict Editing Rules
+
+1. **ZERO PSEUDOCÓDIGO (No Code Laziness):** É estritamente proibido o uso de omissões textuais como `// ...`, `// resto do código aqui`, ou `// rotas anteriores` ao utilizar a ferramenta de `Edit` ou `Write`. Você deve fornecer o código real, completo e funcional em todas as substituições.
+2. **EDIÇÕES CIRÚRGICAS (Atomic Edits):** Ao utilizar a ferramenta `Edit`, o bloco `old_string` deve ser o menor possível para isolar a mudança. Nunca inclua uma função inteira no `old_string` se você só precisa alterar a assinatura ou uma única linha interna. Isso evita a deleção acidental de blocos inteiros de código.
+3. **PROIBIDO INVENTAR CONTEXTO:** Nunca tente adivinhar o conteúdo de um bloco `old_string`. Se o compilador apontar um erro, utilize obrigatoriamente a ferramenta `Read` nas linhas específicas do erro ANTES de tentar aplicar um `Edit`.
+4. **DI PURA (Injeção via Construtor):** É proibido criar ou utilizar *Service Locators*, Containers Globais ou Singletons para Injeção de Dependência. Todas as dependências devem ser instanciadas no ponto raiz de entrada da aplicação e injetadas explicitamente via parâmetros em rotas, serviços ou construtores de classe. Isso garante testabilidade e visibilidade total do grafo de dependências.ra realizar uma intervenção manual no IDE e aguarde a confirmação de que o arquivo foi corrigido visualmente.
+
 
 | Problema detectado | Skill a invocar |
 |---|---|
