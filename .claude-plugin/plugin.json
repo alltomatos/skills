@@ -17,5 +17,12 @@
     "./skills/productivity/write-a-skill",
     "./skills/productivity/localize-pt-br",
     "./skills/engineering/orchestrator"
+  ],
+  "plugins": [
+    {
+      "name": "scaffold-mvp",
+      "description": "Initialize a new project with an agile, high-productivity MVP stack (e.g., Next.js + Tailwind + shadcn/ui). Use when starting a new project in an empty repository.",
+      "path": "../skills/engineering/scaffold-mvp"
+    }
   ]
 }

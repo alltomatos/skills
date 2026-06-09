@@ -237,7 +237,9 @@ Skills que uso diariamente para trabalho com código.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Desenvolvimento orientado a testes com loop red-green-refactor. Constrói features ou corrige bugs um slice vertical por vez.
 - **[to-issues](./skills/engineering/to-issues/SKILL.md)** — Decompõe qualquer plano, spec ou PRD em issues do GitHub independentes usando slices verticais.
 - **[to-prd](./skills/engineering/to-prd/SKILL.md)** — Transforma o contexto da conversa atual em um PRD e o submete como issue do GitHub. Sem entrevista — apenas sintetiza o que você já discutiu.
+- **[scaffold-mvp](./skills/engineering/scaffold-mvp/SKILL.md)** — Executa o bootstrap técnico rápido de um novo repositório (ex: Next.js + Tailwind + shadcn/ui) baseado no domínio levantado pelo grill-with-docs. Prioriza bibliotecas de alta produtividade e proíbe invenção de código do zero.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Diz ao agent para zoom out e dar contexto mais amplo ou uma perspectiva de alto nível sobre uma seção de código desconhecida.
+- **[scaffold-mvp](./skills/engineering/scaffold-mvp/SKILL.md)** — Executador tecnológico para repositórios vazios. Realiza bootstrap ágil (ex: Next.js + Tailwind + shadcn) imediatamente após a definição do domínio, focando em reuso de ecossistema e máxima produtividade.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Constrói um protótipo descartável para explorar um design — seja um app de terminal executável para questões de estado/lógica de negócio, ou várias variações radicais de UI ativáveis a partir de uma rota.
 - **[orchestrator](./skills/engineering/orchestrator/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade da infraestrutura de skills, delega tarefas e gera novas sub-skills para gargalos não mapeados.
 
