@@ -93,13 +93,17 @@ O Orchestrator opera em modo de alta autonomia, utilizando uma DAG (Grafo Acícl
 
 ### Regra de ouro
 
-O Orchestrator **nunca** executa trabalho pesado diretamente. Ele é um arquiteto: identifica o problema e delega para a skill correta. Se não existe skill para o gargalo, ele invoca `/write-a-skill` para criá-la.
+O Orquestrador **nunca** executa trabalho pesado diretamente. Ele é um arquiteto: identifica o problema e delega para a skill correta. Se não existe skill para o gargalo, ele invoca `/write-a-skill` para criá-la.
+
+**Regra de Ouro do Roadmap:**
+O Orquestrador deve validar toda tarefa delegada contra o `/roadmap`. Se uma tarefa não estiver mapeada em uma Milestone ativa, o Orquestrador deve pausar e invocar o `/grill-with-docs` para alinhar a estratégia.
 
 ### Tabela de delegação
 
 | Problema | Skill |
 | --- | --- |
 | Governança & Orquestração | `/orchestrator` |
+| Bússola Estratégica (Roadmap) | `/roadmap` |
 | Versionamento & PRs | `/git-flow-pr-standard` |
 | Infraestrutura ausente | `/setup-skills` |
 | Linguagem de domínio ausente | `/grill-with-docs` |

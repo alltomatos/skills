@@ -68,6 +68,25 @@ O Orchestrator identifica tarefas elegíveis (dependências resolvidas) e pode d
 
 O Orchestrator **nunca** gerencia tarefas apenas na memória curta. O estado persistido é rei.
 
+### Guia de Delegação Rápida
+O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação:
+
+| Problema | Skill |
+| --- | --- |
+| Governança & Orquestração | `/orchestrator` |
+| Versionamento & PRs | `/git-flow-pr-standard` |
+| Infraestrutura ausente | `/setup-skills` |
+| Linguagem de domínio ausente | `/grill-with-docs` |
+| Arquitetura degradada | `/improve-codebase-architecture` |
+| Bug difícil ou regressão | `/diagnose` |
+| Código sem testes | `/tdd` |
+| Falta de contexto | `/zoom-out` |
+| Gargalo não mapeado | `/write-a-skill` |
+| Alinhamento antes de mudança | `/grill-me` |
+| Handoff para outro agent | `/handoff` |
+
+---
+
 ### Ciclo de Execução do Gestor de Operações:
 
 1. **Atualiza Estado**: O Orchestrator lê de/escreve em `.claude/ESTADO_ORCHESTRATOR.md` a cada tarefa concluída.
