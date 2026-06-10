@@ -57,26 +57,14 @@ Isso cria symlinks em `~/.claude/skills/` apontando para cada skill do repositó
 
 ## Primeiros Passos
 
-Após instalar as skills, o ponto de entrada recomendado é o `/orchestrator`. Ele avalia o estado do seu repositório e garante que tudo está pronto para o trabalho.
+Após instalar as skills, o ponto de entrada recomendado é o `/orchestrator`. Ele assume o controle do repositório, define a bússola estratégica via `/roadmap` e executa o ciclo de engenharia de forma autônoma.
 
-### Repositório novo (sem código)
+### Fluxo de Trabalho (Engenharia de Ciclo Fechado)
 
-1. Execute `/orchestrator` no seu agent
-2. Ele detecta que o repositório está vazio e invoca automaticamente:
-   - `/setup-skills` → configura issue tracker, labels e docs de domínio
-   - `/grill-with-docs` → constrói a linguagem compartilhada (`CONTEXT.md`)
-3. Ao final, seu repositório estará com toda a infraestrutura de governança pronta
-
-### Repositório existente (com código)
-
-1. Execute `/orchestrator` no seu agent
-2. Ele audita a infraestrutura e identifica gaps
-3. Para cada gap, delega para a skill especializada:
-   - Falta `CONTEXT.md` → `/grill-with-docs`
-   - Falta `docs/agents/` → `/setup-skills`
-   - Arquitetura degradada → `/improve-codebase-architecture`
-   - Código sem testes → `/tdd`
-4. Gera um relatório de conformidade antes/depois
+1. **Estratégia**: Execute `/orchestrator`. Ele auditará o repositório e, se não houver um `ORCHESTRATOR-ROADMAP.md`, invocará o `/roadmap` para definir as Epics e Milestones com você.
+2. **Execução Autônoma**: Com as Milestones definidas, o Orquestrador cria um grafo de tarefas (DAG), delega tarefas para subagentes em paralelo e monitora a execução.
+3. **Qualidade (TDD)**: O agente é obrigado a usar `/tdd` para cada tarefa, garantindo que o código nunca saia do estado GREEN.
+4. **Integridade (Git Flow)**: Ao encerrar cada Milestone ou tarefa, o `/git-flow-pr-standard` é invocado obrigatoriamente para registrar o versionamento e abrir o PR.
 
 
 ## O Orchestrator
@@ -192,25 +180,19 @@ Eu construí uma **skill de [`/tdd`](./skills/engineering/tdd/SKILL.md)** que vo
 Para depuração, eu também construí uma skill de **[`/diagnose`](./skills/engineering/diagnose/SKILL.md)** que empacota as melhores práticas de debugging em um loop simples.
 
 ### #4: Construímos Uma Bola de Lama
-
-> "Invista no design do sistema _todo dia_."
+### #4: Construímos Uma Bola de Lama
+> "Invista no design do sistema todo dia."
 >
 > Kent Beck, [Extreme Programming Explained](https://www.amazon.co.uk/Extreme-Programming-Explained-Embrace-Change/dp/0321278658)
 
-> "Os melhores módulos são profundos. Eles permitem que muita funcionalidade seja acessada através de uma interface simples."
->
-> John Ousterhout, [A Philosophy Of Software Design](https://www.amazon.co.uk/Philosophy-Software-Design-2nd/dp/173210221X)
+**O Problema**: Aceleração da entropia. Como agents aceleram a codificação, eles aceleram a desordem.
 
-**O Problema**: A maioria dos apps construídos com agents são complexos e difíceis de mudar. Como agents podem acelerar radicalmente a codificação, eles também aceleram a entropia de software. Bases de código ficam mais complexas a uma taxa sem precedentes.
+**A Solução**: Design contínuo via `/improve-codebase-architecture` e guardrails arquiteturais.
 
-**A Solução** para isso é uma abordagem radical para desenvolvimento com IA: se importar com o design do código.
+### #5: O Risco do Desenvolvimento Autônomo
+**O Problema**: Agentes autônomos sem bússola (Roadmap) e sem fiscalização (Git Flow) tendem a "viajar" no escopo, criando soluções complexas para problemas inexistentes.
 
-Isso está embutido em todas as camadas dessas skills:
-
-- [`/to-prd`](./skills/engineering/to-prd/SKILL.md) te questiona sobre quais módulos você está modificando antes de criar um PRD
-- [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) diz ao agent para explicar o código no contexto do sistema inteiro
-
-E crucialmente, [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) ajuda você a resgatar uma base de código que se tornou uma bola de lama. Eu recomendo rodá-lo na sua base de código a cada poucos dias.
+**A Solução**: Governança em ciclo fechado. O Orquestrador só executa o que está no `/roadmap` e só finaliza o que é validado pelo `/git-flow-pr-standard`.
 
 ### Resumo
 
