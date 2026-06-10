@@ -1,7 +1,6 @@
 ---
 name: orchestrator
 description: Master orchestration skill. Analyzes repository state, enforces skill infrastructure compliance, mentors on best practices, fragments work into atomic delegable tasks, and creates new skills for unmapped bottlenecks. Uses light heuristics to gauge task complexity, breaks large tasks into <10min slices, requires explicit approval before any action, and audits tests at the end of the task queue. Use when starting a new project, auditing an existing codebase, or when you need the agent to self-organize its workflow. Triggers: "orchestrate", "audit repo", "check compliance", "setup project", "initialize repo".
-disable-model-invocation: true
 ---
 
 # Orchestrator
