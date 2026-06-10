@@ -55,10 +55,10 @@ Execute esta checklist em sequência. Para cada item, registre ✅ (presente) ou
 
 Repositório vazio ou sem infraestrutura. O Orchestrator deve:
 
-1. **Invocar `/setup-skills`** para criar a configuração base (Governança):
-   - Issue tracker
-   - Triage labels
-   - Domain docs layout
+58|1. **Invocar `/setup-skills` (modo silencioso)** para criar a configuração base (Governança):
+59|   - Issue tracker (Padrão: GitHub)
+60|   - Triage labels (Padrão: Canais)
+61|   - Domain docs layout (Padrão: Single-context)
 
 2. **Invocar `/grill-with-docs`** para construir o `CONTEXT.md` inicial (Descoberta do Domínio):
    - Perguntar ao usuário sobre o domínio do projeto ("O que vamos construir?")
