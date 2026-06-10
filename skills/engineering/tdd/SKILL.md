@@ -98,12 +98,22 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 
 **Never refactor while RED.** Get to GREEN first.
 
-## Checklist Per Cycle
+101|## Checklist Per Cycle
+102|
+103|```
+104|[ ] Test describes behavior, not implementation
+105|[ ] Test uses public interface only
+106|[ ] Test would survive internal refactor
+107|[ ] Code is minimal for this test
+108|[ ] No speculative features added
+109|```
+110|
+111|## Protocolo de Fechamento (Mandatário)
+112|
+113|Após completar o ciclo de Refactor e garantir que todos os testes estão passando (GREEN), o ciclo não está encerrado.
+114|
+115|O agente **DEVE** invocar a skill `git-flow-pr-standard` para registrar a alteração de forma segura:
+116|- [ ] Commit semântico (feat/fix/refactor/etc.)
+117|- [ ] Branch padronizada
+118|- [ ] Template de PR preenchido e validado
 
-```
-[ ] Test describes behavior, not implementation
-[ ] Test uses public interface only
-[ ] Test would survive internal refactor
-[ ] Code is minimal for this test
-[ ] No speculative features added
-```

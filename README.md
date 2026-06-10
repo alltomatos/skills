@@ -78,31 +78,18 @@ Após instalar as skills, o ponto de entrada recomendado é o `/orchestrator`. E
    - Código sem testes → `/tdd`
 4. Gera um relatório de conformidade antes/depois
 
-### Ativando respostas em Português do Brasil
-
-Este fork inclui suporte nativo a pt-BR. Ative com:
-
-```text
-/localize-pt-br
-```
-
-O agent passará a responder em português em todas as interações seguintes. Desative com "stop localize".
 
 ## O Orchestrator
+### O Orchestrator
 
-O `/orchestrator` é a **Skill Mestra** deste fork — um conceito que não existe no repositório original. Ele implementa um **Agentic Workflow**: avalia, delega e expande.
+O `/orchestrator` é a **Skill Mestra** deste fork — um conceito que não existe no repositório original. Ele implementa um **Agentic Workflow Autônomo**: avalia, delega (concorrentemente), fiscaliza e expande.
 
 ### Como funciona
+O Orchestrator opera em modo de alta autonomia, utilizando uma DAG (Grafo Acíclico Direcionado) para delegar tarefas a subagentes de forma paralela e validar resultados via integração TDD + Git-Flow.
 
-O Orchestrator opera em 4 fases:
-
-| Fase | Ação | Quando |
-| --- | --- | --- |
-| **1 — Auditoria** | Executa checklist de 10 itens na infraestrutura | Sempre (obrigatório) |
-| **2A — Inicialização** | Configura repositório novo/vazio do zero | 0–3 itens na checklist |
-| **2B — Reparo** | Corrige gaps em repositório parcial | 4–7 itens na checklist |
-| **3 — Conformidade** | Analisa saúde do código e alinhamento com `CONTEXT.md` | 8–10 itens na checklist |
-| **4 — Expansão** | Cria novas sub-skills para gargalos não mapeados | Quando detecta padrão sem skill |
+- **Autonomia de Tier**: Tarefas de Tier 1 e 2 são executadas e monitoradas sem interrupção humana.
+- **Fechamento de Ciclo**: Nenhum trabalho de código é considerado concluído sem passar pelo protocolo `git-flow-pr-standard`.
+- **Fiscalização**: Auditoria contínua de testes e conformidade.
 
 ### Regra de ouro
 
@@ -230,6 +217,7 @@ Fundamentos de engenharia de software importam mais do que nunca. Essas skills s
 Skills que uso diariamente para trabalho com código.
 
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Loop de diagnóstico disciplinado para bugs difíceis e regressões de performance: reproduzir → minimizar → hipotetizar → instrumentar → corrigir → teste de regressão.
+- **[git-flow-pr-standard](./skills/engineering/git-flow-pr-standard/SKILL.md)** — Protocolo obrigatório para versionamento, commits semânticos e abertura de PRs. Integrado automaticamente às skills de engenharia.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Sessão de interrogatório que desafia seu plano contra o modelo de domínio existente, afia terminologia e atualiza `CONTEXT.md` e ADRs inline.
 - **[triage](./skills/engineering/triage/SKILL.md)** — Triagem de issues através de uma máquina de estados de papéis de triagem.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Encontra oportunidades de aprofundamento na base de código, informado pela linguagem de domínio em `CONTEXT.md` e pelas decisões em `docs/adr/`.
@@ -251,7 +239,6 @@ Ferramentas de workflow gerais, não específicas de código.
 - **[grill-me](./skills/productivity/grill-me/SKILL.md)** — Seja interrogado implacavelmente sobre um plano ou design até que cada branch da árvore de decisão esteja resolvido.
 - **[handoff](./skills/productivity/handoff/SKILL.md)** — Compacta a conversa atual em um documento de handoff para outro agent continuar o trabalho.
 - **[write-a-skill](./skills/productivity/write-a-skill/SKILL.md)** — Cria novas skills com estrutura adequada, disclosure progressivo e recursos empacotados.
-- **[localize-pt-br](./skills/productivity/localize-pt-br/SKILL.md)** — Configura o agent para responder em Português do Brasil, adaptando terminologia e mantendo precisão técnica total.
 
 ### Misc
 

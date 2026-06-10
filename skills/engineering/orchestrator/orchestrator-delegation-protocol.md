@@ -31,17 +31,24 @@ Para cada **GAP** identificado, o Orchestrator deve emitir o seguinte bloco estr
 
 ## Gatilho de Aprovação por Risco
 
-Se houver ações de **Tier 3 (Risco Alto)**, o Orchestrator DEVE interromper a execução e perguntar:
-
-> **"Você aprova as tarefas de Tier 3 propostas? (sim / não / parcialmente)"**
-
-Para tarefas de **Tier 1 (Baixo)** ou **Tier 2 (Médio)** executadas de forma automatizada ou agrupadas, o Orchestrator reporta no início da fase e solicita confirmação apenas como resumo formal de entrega final (Fase 4.3).
+O Orquestrador possui autonomia de execução para tarefas Tiers 1 e 2. 
+- **Tier 1 e 2:** Execução contínua. O Orquestrador agrupa o resultado e reporta apenas ao finalizar o bloco de trabalho ou se detectar falhas.
+- **Tier 3 (Risco Alto):** O Orquestrador tentará a execução apenas se:
+  1. O suite de testes (TDD) passar totalmente.
+  2. A análise estática de tipos não reportar quebra de contrato.
+  Caso ambos sejam verdadeiros, o Orquestrador assume o risco e prossegue, logando a decisão no `ESTADO_ORQUESTRATOR.md` como "DECISÃO AUTÔNOMA". Se houver falha, ele interrompe e solicita intervenção.
 
 ---
 
 ## Regras de Fragmentação (DAG & Atomização)
 
-> **Regra de Ouro**: Uma tarefa atômica não deve durar mais que 10-15 minutos ou alterar mais do que 3 arquivos. Cada tarefa deve expor explicitamente suas dependências.
+> **Regra de Ouro**: A autonomia é total. O Orquestrador fragmenta o plano macro em tarefas atômicas e identifica nós independentes no DAG.
+
+### Delegação Paralela (Concorrência)
+O Orquestrador pode delegar tarefas simultâneas desde que:
+1. Sejam nós independentes no DAG (não dependam um do outro).
+2. Não alterem o mesmo arquivo simultaneamente (evitar Race Conditions).
+O limite de concorrência é gerenciado dinamicamente para manter a performance do ambiente sem corromper o contexto.
 
 ### Estrutura de Declaração de DAG (Grafo de Dependências):
 Ao fragmentar o plano macro, o Orchestrator monta e persiste a modelagem no arquivo local `.claude/ESTADO_ORCHESTRATOR.md` seguindo o formato:
@@ -52,8 +59,8 @@ Ao fragmentar o plano macro, o Orchestrator monta e persiste a modelagem no arqu
 - [ ] T2: Implementar validador de domínio (Tier 2) | depends_on: [T1]
 - [ ] T3: Alteração de schema Crítico (Tier 3) | depends_on: [T2]
 ```
-
-O Orchestrator está livre para delegar tarefas com dependências resolvidas (ex: `depends_on: []` ou cujos pais estejam com status `completed`).
+O Orchestrator identifica tarefas elegíveis (dependências resolvidas) e pode disparar subagentes concorrentemente.
+---
 
 ---
 
@@ -97,7 +104,15 @@ Após a última tarefa da DAG passar para `completed`, executa a fiscalização 
 [ ] Nenhuma credencial/secreto foi exposta em arquivos de teste ou fixtures?
 ```
 - Opcional: Gerar um resumo de impacto das mudanças.
+
+### 3. Protocolo de PR e Fechamento de Ciclo (Mandatário)
+Para toda tarefa que resultar em alteração de código, o ciclo de conclusão **não** termina com o teste. O Orchestrator deve invocar obrigatoriamente a skill `git-flow-pr-standard` para garantir que as alterações sejam versionadas corretamente:
+- [ ] O commit segue Conventional Commits?
+- [ ] A branch seguiu o padrão `tipo/issue-descricao`?
+- [ ] O template de PR foi preenchido?
+- [ ] Nenhuma credencial/secreto foi exposta?
 ---
+
 
 ## Referência Rápida: Mapeamento GAP → Skill
 

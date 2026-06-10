@@ -16,7 +16,8 @@
     "./skills/productivity/handoff",
     "./skills/productivity/write-a-skill",
     "./skills/productivity/localize-pt-br",
-    "./skills/engineering/orchestrator"
+    "./skills/engineering/orchestrator",
+    "./skills/engineering/git-flow-pr-standard"
   ],
   "plugins": [
     {
