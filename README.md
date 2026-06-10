@@ -99,6 +99,8 @@ O Orchestrator **nunca** executa trabalho pesado diretamente. Ele é um arquitet
 
 | Problema | Skill |
 | --- | --- |
+| Governança & Orquestração | `/orchestrator` |
+| Versionamento & PRs | `/git-flow-pr-standard` |
 | Infraestrutura ausente | `/setup-skills` |
 | Linguagem de domínio ausente | `/grill-with-docs` |
 | Arquitetura degradada | `/improve-codebase-architecture` |
