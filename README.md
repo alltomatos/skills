@@ -172,7 +172,7 @@ Eu construí uma **skill de [`/tdd`](./skills/engineering/tdd/SKILL.md)** que vo
 
 Para depuração, eu também construí uma skill de **[`/diagnose`](./skills/engineering/diagnose/SKILL.md)** que empacota as melhores práticas de debugging em um loop simples.
 
-### #4: Construímos Uma Bola de Lama
+
 ### #4: Construímos Uma Bola de Lama
 > "Invista no design do sistema todo dia."
 >

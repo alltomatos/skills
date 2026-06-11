@@ -20,37 +20,33 @@ echo ""
 
 DEST_PATHS=("$HOME/.claude/skills" "$HOME/.hermes/skills")
 
+COUNT=0
 for DEST in "${DEST_PATHS[@]}"; do
     if [ -d "$(dirname "$DEST")" ]; then
         mkdir -p "$DEST"
         echo "🔗 Linkando skills para $DEST"
-        # ... resto do loop de linkagem ...
+
+        # Same exclusion policy as plugin.json: skip deprecated, personal, in-progress
+        find "$REPO/skills" -name SKILL.md \
+            -not -path '*/node_modules/*' \
+            -not -path '*/deprecated/*' \
+            -not -path '*/personal/*' \
+            -not -path '*/in-progress/*' \
+            -print0 | \
+        while IFS= read -r -d '' skill_md; do
+                src="$(dirname "$skill_md")"
+                name="$(basename "$src")"
+                target="$DEST/$name"
+
+                if [ -e "$target" ] && [ ! -L "$target" ]; then
+                    rm -rf "$target"
+                fi
+
+                ln -sfn "$src" "$target"
+                echo "  ✅ $name"
+                COUNT=$((COUNT + 1))
+            done
     fi
-done
-echo ""
-
-COUNT=0
-
-# Same exclusion policy as plugin.json: skip deprecated, personal, in-progress
-find "$REPO/skills" -name SKILL.md \
-    -not -path '*/node_modules/*' \
-    -not -path '*/deprecated/*' \
-    -not -path '*/personal/*' \
-    -not -path '*/in-progress/*' \
-    -print0 | \
-while IFS= read -r -d '' skill_md; do
-        src="$(dirname "$skill_md")"
-        name="$(basename "$src")"
-        target="$DEST/$name"
-
-        if [ -e "$target" ] && [ ! -L "$target" ]; then
-            rm -rf "$target"
-        fi
-
-        ln -sfn "$src" "$target"
-        echo "  ✅ $name"
-        ((COUNT++))
-    done
 done
 
 echo ""
