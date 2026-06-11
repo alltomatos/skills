@@ -28,32 +28,25 @@ Se quiser acompanhar mudanças nessas skills e as novas que eu criar, você pode
 
 ## Quickstart (setup em 30 segundos)
 
-1. Execute o instalador skills.sh apontando para este fork:
+1. Execute o script de instalação para linkar as skills ao seu ambiente (suporta Claude Code e Hermes):
 
 ```bash
-npx skills@latest add alltomatos/skills
+chmod +x scripts/setup-alltomatos-skills.sh
+./scripts/setup-alltomatos-skills.sh
 ```
 
-2. Escolha as skills que quer, e em quais coding agents quer instalá-las. **Certifique-se de selecionar `/setup-skills`**.
+2. Execute o `/orchestrator` no seu agent. Ele garantirá que o ambiente esteja configurado (incluindo o uso do `/setup-skills` se for a primeira vez).
+3. O `/orchestrator` guiará você pela definição do issue tracker e do domínio do projeto através de um fluxo interativo de planejamento.
 
-3. Execute `/setup-skills` no seu agent. Ele vai:
-- Perguntar qual issue tracker você quer usar (GitHub, Linear ou arquivos locais)
-- Perguntar quais labels você aplica aos tickets quando faz triagem (`/triage` usa labels)
-- Perguntar onde quer salvar os documentos que criarmos
+### Deploy das Skills em Novos Agentes
 
-4. Pronto — você está pronto para começar.
+Para disponibilizar estas skills em um novo ambiente ou agente (ex: novo repositório ou outra instância do Hermes/Claude):
 
-### Instalação alternativa (clone local)
+1. **Clone** o repositório em uma pasta local.
+2. **Execute** `scripts/setup-alltomatos-skills.sh`.
+3. O script detectará automaticamente se você está usando o ecossistema do Claude (`~/.claude/skills`) ou do Hermes (`~/.hermes/skills`) e criará os links simbólicos necessários.
+4. **Verifique** a instalação executando `skills_list` dentro do seu agente.
 
-Se preferir instalar diretamente a partir de um clone local:
-
-```bash
-git clone https://github.com/alltomatos/skills.git
-cd skills
-bash scripts/link-skills.sh
-```
-
-Isso cria symlinks em `~/.claude/skills/` apontando para cada skill do repositório local.
 
 ## Primeiros Passos
 

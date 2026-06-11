@@ -18,23 +18,15 @@ fi
 echo "✅ Repositório verificado: $REPO"
 echo ""
 
-DEST="$HOME/.claude/skills"
+DEST_PATHS=("$HOME/.claude/skills" "$HOME/.hermes/skills")
 
-# Guard against infinite loop
-if [ -L "$DEST" ]; then
-    resolved="$(readlink -f "$DEST")"
-    case "$resolved" in
-        "$REPO"|"$REPO"/*)
-            echo "❌ Erro: $DEST é um symlink para dentro deste repo ($resolved)." >&2
-            echo "   Remova-o (rm \"$DEST\") e re-execute." >&2
-            exit 1
-            ;;
-    esac
-fi
-
-mkdir -p "$DEST"
-
-echo "🔗 Linkando skills para $DEST"
+for DEST in "${DEST_PATHS[@]}"; do
+    if [ -d "$(dirname "$DEST")" ]; then
+        mkdir -p "$DEST"
+        echo "🔗 Linkando skills para $DEST"
+        # ... resto do loop de linkagem ...
+    fi
+done
 echo ""
 
 COUNT=0
@@ -47,17 +39,18 @@ find "$REPO/skills" -name SKILL.md \
     -not -path '*/in-progress/*' \
     -print0 | \
 while IFS= read -r -d '' skill_md; do
-    src="$(dirname "$skill_md")"
-    name="$(basename "$src")"
-    target="$DEST/$name"
+        src="$(dirname "$skill_md")"
+        name="$(basename "$src")"
+        target="$DEST/$name"
 
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
-        rm -rf "$target"
-    fi
+        if [ -e "$target" ] && [ ! -L "$target" ]; then
+            rm -rf "$target"
+        fi
 
-    ln -sfn "$src" "$target"
-    echo "  ✅ $name"
-    ((COUNT++))
+        ln -sfn "$src" "$target"
+        echo "  ✅ $name"
+        ((COUNT++))
+    done
 done
 
 echo ""

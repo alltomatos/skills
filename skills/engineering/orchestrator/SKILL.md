@@ -27,21 +27,19 @@ Nunca execute trabalho pesado diretamente. Delegue sempre.
 
 ## Fluxo de Execução
 
-### Fase 1 — Auditoria de Infraestrutura
+### Fase 0 — Auto-Provisionamento (Zero-Touch)
+Se o repositório estiver vazio ou sem a infraestrutura base (`CLAUDE.md` ou `docs/agents/` ausentes):
+1. **Invocar `/setup-skills --silent`**: O Orquestrador provisiona automaticamente a governança base.
+2. **Confirmar**: Após o provisionamento, ele prossegue para a Fase 1.
 
-Execute esta checklist em sequência. Para cada item, registre ✅ (presente) ou ❌ (ausente).
+### Fase 1 — Auditoria de Infraestrutura
+Execute esta checklist em sequência. Se a Fase 0 foi necessária, o Orquestrador re-audita aqui para garantir que os arquivos foram criados.
 
 ```checklist
 [ ] CLAUDE.md existe na raiz do repositório
-[ ] CONTEXT.md existe na raiz (ou CONTEXT-MAP.md para multi-context)
-[ ] docs/adr/ existe e contém pelo menos 1 ADR
-[ ] docs/agents/ existe
-[ ] docs/agents/issue-tracker.md existe
-[ ] docs/agents/triage-labels.md existe
-[ ] docs/agents/domain.md existe
-[ ] CLAUDE.md contém bloco "## Agent skills"
-[ ] .claude/skills/ existe e contém symlinks válidos
-[ ] Git remote configurado (origin)
+[ ] docs/agents/ existe e contém os arquivos necessários
+[ ] ORCHESTRATOR-ROADMAP.md existe na raiz
+[ ] Git remote configurado
 ```
 
 **Resultado da Fase 1:**
@@ -54,17 +52,9 @@ Execute esta checklist em sequência. Para cada item, registre ✅ (presente) ou
 
 Repositório vazio ou sem infraestrutura. O Orchestrator deve:
 
-58|1. **Invocar `/setup-skills` (modo silencioso)** para criar a configuração base (Governança):
-59|   - Issue tracker (Padrão: GitHub)
-60|   - Triage labels (Padrão: Canais)
-61|   - Domain docs layout (Padrão: Single-context)
-
-2. **Invocar `/grill-with-docs`** para construir o `CONTEXT.md` inicial (Descoberta do Domínio):
-   - Perguntar ao usuário sobre o domínio do projeto ("O que vamos construir?")
-   - Estabelecer a linguagem compartilhada
-   - Criar o primeiro ADR se houver decisão arquitetural
-
-3. **Invocar `/scaffold-mvp`** para estabelecer a base técnica ágil (Bootstrap Técnico parametrizado pelas descobertas do Passo 2).
+1. **Invocar `/roadmap`** para inicializar o `ORCHESTRATOR-ROADMAP.md` e definir as primeiras Epics/Milestones.
+2. **Invocar `/grill-with-docs`** para construir o `CONTEXT.md` inicial e alinhamento de linguagem.
+3. **Invocar `/scaffold-mvp`** para estabelecer a base técnica ágil (Bootstrap).
 
 4. **Avaliar a necessidade de `/tdd`**:
    - Se o projeto terá código testável, sugerir configuração do loop red-green-refactor
