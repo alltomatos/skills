@@ -111,6 +111,7 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 2. **Abordagem de Falha**: Se a verificação falhar, o Orquestrador **deve abortar** a cadeia de delegação, invocar o `/diagnose` para identificar o motivo da falha de persistência e solicitar intervenção humana.
 3. **Deploy Automático**: Caso o projeto não possua a infraestrutura de skills (link simbólico), o Orquestrador deve invocar o script `scripts/setup-alltomatos-skills.sh` automaticamente na Fase 0 (Auditoria).
 4. **Gatilho de Validação**: Após a execução da `setup-skills`, o Orquestrador deve verificar se os artefatos de integração (ex: `docs/agents/issue-tracker.md`) foram validados e criados em disco. Se não, deve invocar `/diagnose`.
+5. **Governança de Setup**: O Orquestrador **nunca** deve invocar a `setup-skills` com flags de modo silencioso (`--silent` ou similares). O setup deve ser sempre uma experiência interativa e validada pelo usuário.
 ---
 
 ## Template: Fiscalização de Testes (Durante e Pós-Fila)
