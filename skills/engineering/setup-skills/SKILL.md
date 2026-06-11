@@ -40,8 +40,11 @@ Siga o fluxo abaixo:
    - **GitHub**: O agente deve executar `gh repo view` para garantir que o repositório está clonado e autenticado.
    - **GitLab**: O agente deve testar a conexão com o repositório remoto via `git remote`.
    - **Local**: O agente deve garantir que a pasta `.scratch/` existe e é gravável.
-2. **Confirmação de Execução**: Se o teste falhar, o agente deve interromper o setup e oferecer o `/diagnose` para corrigir a autenticação ou o acesso.
-3. **Escrita de Artefatos**: Somente após o teste positivo, o agente deve gravar os arquivos de configuração em `docs/agents/`.
+2. **Provisionamento de Ferramentas (Deploy)**:
+   - **Skills do Projeto**: O agente deve rodar obrigatoriamente `./scripts/setup-alltomatos-skills.sh` para garantir que o projeto tenha todas as skills necessárias.
+   - **Context7**: O agente deve rodar `npx ctx7 setup` para garantir a inteligência contextual do projeto.
+3. **Confirmação de Execução**: Se qualquer passo falhar, o agente deve interromper o setup e oferecer o `/diagnose`.
+4. **Escrita de Artefatos**: Somente após o teste positivo, o agente deve gravar os arquivos de configuração em `docs/agents/`.
 
 Assume the user does not know what these terms mean. Each section starts with a short explainer (what it is, why these skills need it, what changes if they pick differently). Then show the choices and the default.
 
