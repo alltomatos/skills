@@ -36,7 +36,7 @@ chmod +x scripts/setup-alltomatos-skills.sh
 ```
 
 2. Execute o `/orchestrator` no seu agent. Ele garantirá que o ambiente esteja configurado (incluindo o uso do `/setup-skills` se for a primeira vez).
-3. O `/orchestrator` guiará você pela definição do issue tracker e do domínio do projeto através de um fluxo interativo de planejamento.
+3. O `/orchestrator` guiará você pelo planejamento interativo (Roadmap, PRD e Domínio) antes de iniciar o desenvolvimento.
 
 ### Deploy das Skills em Novos Agentes
 
