@@ -109,7 +109,8 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 
 1. **Auditoria de Existência**: Antes de qualquer delegação (ex: de `setup-skills` para `grill-with-docs`), o Orquestrador **deve** realizar uma verificação de arquivos (ex: `test -f CONTEXT.md && test -s CONTEXT.md`).
 2. **Abordagem de Falha**: Se a verificação falhar, o Orquestrador **deve abortar** a cadeia de delegação, invocar o `/diagnose` para identificar o motivo da falha de persistência e solicitar intervenção humana.
-3. **Deploy Automático**: Caso o projeto não possua a infraestrutura de skills (link simbólico), o Orquestrador deve invocar o script `scripts/setup-alltomatos-skills.sh` automaticamente na Fase 0 (Auditoria) antes de qualquer planejamento. Isso garante que o repositório esteja sempre funcional.
+3. **Deploy Automático**: Caso o projeto não possua a infraestrutura de skills (link simbólico), o Orquestrador deve invocar o script `scripts/setup-alltomatos-skills.sh` automaticamente na Fase 0 (Auditoria).
+4. **Gatilho de Validação**: Após a execução da `setup-skills`, o Orquestrador deve verificar se os artefatos de integração (ex: `docs/agents/issue-tracker.md`) foram validados e criados em disco. Se não, deve invocar `/diagnose`.
 ---
 
 ## Template: Fiscalização de Testes (Durante e Pós-Fila)

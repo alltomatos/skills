@@ -31,9 +31,17 @@ Siga o fluxo abaixo:
 
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 
-### 2. Present findings and ask
+### 3. Validação e Inicialização (Protocolo de Execução)
 
-Summarise what's present and what's missing. Then walk the user through the three decisions **one at a time** — present a section, get the user's answer, then move to the next. Don't dump all three at once.
+**Regra de Ouro**: A escolha do tracker não é apenas teórica. Após o usuário escolher o Issue Tracker (GitHub, GitLab ou Local), a skill **deve** validar a integração.
+
+#### Fluxo de Execução Obrigatório:
+1. **Teste de Conectividade**:
+   - **GitHub**: O agente deve executar `gh repo view` para garantir que o repositório está clonado e autenticado.
+   - **GitLab**: O agente deve testar a conexão com o repositório remoto via `git remote`.
+   - **Local**: O agente deve garantir que a pasta `.scratch/` existe e é gravável.
+2. **Confirmação de Execução**: Se o teste falhar, o agente deve interromper o setup e oferecer o `/diagnose` para corrigir a autenticação ou o acesso.
+3. **Escrita de Artefatos**: Somente após o teste positivo, o agente deve gravar os arquivos de configuração em `docs/agents/`.
 
 Assume the user does not know what these terms mean. Each section starts with a short explainer (what it is, why these skills need it, what changes if they pick differently). Then show the choices and the default.
 
