@@ -80,17 +80,16 @@ Show the user a draft of:
 
 Let them edit before writing.
 
-### 4. Write
+### 4. Write & Verify (Protocolo de Verificação Obrigatório)
 
-**Pick the file to edit:**
+**Regra de Ouro**: Nenhuma etapa do setup é considerada concluída até que o arquivo seja validado em disco.
 
-- If `CLAUDE.md` exists, edit it.
-- Else if `AGENTS.md` exists, edit it.
-- If neither exists, ask the user which one to create — don't pick for them.
+Após cada operação de `write` ou `patch`:
+1. **Verificação de Existência**: Execute imediatamente um `ls -la` no arquivo criado/editado.
+2. **Validação de Conteúdo**: Execute um `cat` ou `read_file` para garantir que o conteúdo não está vazio ou corrompido.
+3. **Abordagem de Falha (Fail-Fast)**: Se o arquivo não existir ou estiver vazio, **PARE O SETUP IMEDIATAMENTE** e reporte o erro. Não prossiga para o próximo passo se a fundação falhou.
 
-Never create `AGENTS.md` when `CLAUDE.md` already exists (or vice versa) — always edit the one that's already there.
-
-If an `## Agent skills` block already exists in the chosen file, update its contents in-place rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
+O Orquestrador deve ser instruído a verificar o `ESTADO_ORQUESTRATOR.md` após o setup: se os arquivos em `docs/agents/` estiverem ausentes, o Orquestrador deve recusar o início de qualquer trabalho e reinvocar o setup.
 
 The block:
 

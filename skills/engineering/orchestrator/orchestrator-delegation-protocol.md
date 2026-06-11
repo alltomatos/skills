@@ -105,6 +105,13 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 
 ---
 
+## Protocolo de Segurança (Fail-Fast)
+
+1. **Auditoria de Existência**: Antes de qualquer delegação (ex: de `setup-skills` para `grill-with-docs`), o Orquestrador **deve** realizar uma verificação de arquivos (ex: `test -f CONTEXT.md && test -s CONTEXT.md`).
+2. **Abordagem de Falha**: Se a verificação falhar, o Orquestrador **deve abortar** a cadeia de delegação, invocar o `/diagnose` para identificar o motivo da falha de persistência e solicitar intervenção humana.
+3. **Deploy Automático**: Caso o projeto não possua a infraestrutura de skills (link simbólico), o Orquestrador deve invocar o script `scripts/setup-alltomatos-skills.sh` automaticamente na Fase 0 (Auditoria) antes de qualquer planejamento. Isso garante que o repositório esteja sempre funcional.
+---
+
 ## Template: Fiscalização de Testes (Durante e Pós-Fila)
 
 ### 1. Checkpoint de Fila (Após cada tarefa que altere código)
