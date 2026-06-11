@@ -105,13 +105,16 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 
 ---
 
-## Protocolo de Segurança (Fail-Fast)
+## Protocolo de Operação: Modo Eficiência (Qualidade e Validação)
 
-1. **Auditoria de Existência**: Antes de qualquer delegação (ex: de `setup-skills` para `grill-with-docs`), o Orquestrador **deve** realizar uma verificação de arquivos (ex: `test -f CONTEXT.md && test -s CONTEXT.md`).
-2. **Abordagem de Falha**: Se a verificação falhar, o Orquestrador **deve abortar** a cadeia de delegação, invocar o `/diagnose` para identificar o motivo da falha de persistência e solicitar intervenção humana.
-3. **Deploy Automático**: Caso o projeto não possua a infraestrutura de skills (link simbólico), o Orquestrador deve invocar o script `scripts/setup-alltomatos-skills.sh` automaticamente na Fase 0 (Auditoria).
-4. **Gatilho de Validação**: Após a execução da `setup-skills`, o Orquestrador deve verificar se os artefatos de integração (ex: `docs/agents/issue-tracker.md`) foram validados e criados em disco. Se não, deve invocar `/diagnose`.
-5. **Governança de Setup**: O Orquestrador **nunca** deve invocar a `setup-skills` com flags de modo silencioso (`--silent` ou similares). O setup deve ser sempre uma experiência interativa e validada pelo usuário.
+A partir de agora, o Orquestrador opera em **Modo Eficiência**. O objetivo é zero retrabalho.
+
+1. **Atraso Deliberado (The "Wait-and-Validate" Principle)**: Em vez de disparar delegações em paralelo, o Orquestrador deve esperar a confirmação completa da skill anterior (ex: `setup-skills`) antes de cogitar a próxima (ex: `grill-with-docs`).
+2. **Qualidade em Tiers**:
+   - **Fase de Setup**: Interatividade total. Nenhum comando é automatizado sem feedback positivo.
+   - **Fase de Planejamento**: Obrigatório o uso do `roadmap` e `plan`. Nenhuma delegação de código ocorre sem o plano estar aprovado no `ORCHESTRATOR-ROADMAP.md`.
+   - **Fase de Execução**: O foco é em atomicidade. Se uma tarefa complexa surgir, ela **deve** ser fatiada antes da execução.
+3. **Paciência Estratégica**: É preferível perder 5 minutos a mais no setup do que ter que deletar e reconstruir arquivos por causa de falhas de contexto.
 ---
 
 ## Template: Fiscalização de Testes (Durante e Pós-Fila)
