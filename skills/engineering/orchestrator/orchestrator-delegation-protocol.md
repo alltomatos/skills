@@ -5,29 +5,27 @@
 
 ---
 
-## Template: Modo Mentoria e Matriz de Risco
+## Matriz de Autonomia de Delegação
 
-Para cada **GAP** identificado, o Orchestrator deve emitir o seguinte bloco estruturado:
+O Orquestrador opera com base em **Tiers de Risco**. A autonomia é concedida conforme a natureza da tarefa:
 
-```
-🚨 GAP: [Nome descritivo e conciso do problema]
-│
-├── 📉 Impacto Negativo
-│   └── [Risco técnico ou de negócio: ex: Quebra silenciosa de regras fiscais]
-│
-├── 💡 Melhor Prática da Indústria
-│   └── [Prática de mercado recomendada: ex: TDD / Injeção via Construtor]
-│
-├── 🗺️ Plano de Ação Macro
-│   └── [Objetivo final claro para o GAP]
-│
-└── 📋 Matriz de Resolução Proposta (Tiers de Risco)
-    ├── [ ] Ação de Risco Alto (Tier 3) -> [x] REQUER APROVAÇÃO IMEDIATA
-    ├── [ ] Ação de Risco Médio (Tier 2) -> [x] Batchado (Confirmação ao final)
-    └── [ ] Ação de Risco Baixo (Tier 1) -> [x] Auto-Aplicável (Somente Logger)
-```
+### Tier 1 & 2: Autonomia de "Higiene" (Execução Total)
+O Orquestrador possui autorização total e **não deve questionar** o usuário para tarefas de padronização e infraestrutura padrão. Ele executa, registra e segue o fluxo.
+- **Configuração de ambiente**: Instalação de linters (`eslint`, `ruff`), formatadores (`prettier`, `black`), hooks de `pre-commit` e configuração de CI/CD padrão.
+- **Higiene de código**: Criação de estruturas de diretórios, mover arquivos para organizar pacotes, correção de permissões e limpeza de arquivos temporários.
+- **Ferramentas de Suporte**: Atualização de documentação técnica (ADRs, CONTEXT.md) baseada em decisões pré-aprovadas.
+- **Ação**: Executa silenciosamente → Loga no `ESTADO_ORQUESTRATOR.md` → Segue para próxima tarefa atômica.
+
+### Tier 3: Governança Estratégica (Interativa Obrigatória)
+Para decisões que impactam o domínio do projeto, a autonomia é **suspensa**. O Orquestrador deve pausar, apresentar o plano e aguardar o "Go" humano.
+- **Mudanças de Domínio**: Definição de modelos de dados, novas funcionalidades, mudanças de arquitetura macro (ex: mudar de Monólito para Microserviços).
+- **Roadmap**: Qualquer alteração na direção estratégica, priorização de Epics ou definição de prazos.
+- **Regras de Negócio**: Qualquer modificação que altere o comportamento da aplicação conforme a regra do usuário.
+- **Ação**: Para o fluxo → Apresenta PRD/Roadmap → Aguarda aprovação do usuário.
 
 ---
+
+
 
 ## Gatilho de Aprovação por Risco
 
