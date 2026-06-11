@@ -15,24 +15,20 @@ Scaffold the per-repo configuration that the engineering skills assume:
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
-## Process
+## Processo
 
-### 0. Modo Silencioso (Autônomo)
-Se esta skill for invocada pelo `/orchestrator` ou com a flag `--silent` (ou `AUTO_SETUP=true` no contexto), ela não deve realizar entrevistas. Ela deve:
-1. Assumir os padrões: **GitHub** (issue tracker), **Labels padrão**, **Single-context** (domain docs).
-2. Verificar a existência de `CLAUDE.md` ou `AGENTS.md`. Se nenhum existir, criar `CLAUDE.md`.
-3. Criar os arquivos em `docs/agents/` sem solicitar entrada.
-4. Finalizar silenciosamente logando o sucesso no `ESTADO_ORQUESTRATOR.md`.
+### 1. Explore (Modo Interativo Obrigatório)
+Esta skill opera exclusivamente no modo interativo para garantir que o planejamento e o alinhamento de contexto sejam validados pelo usuário. O modo silencioso foi removido para evitar atropelamentos no fluxo de engenharia.
 
-### 1. Explore (Modo Interativo)
-Se não estiver no modo silencioso, siga o fluxo abaixo:
+Siga o fluxo abaixo:
 ...
-
 - `git remote -v` and `.git/config` — is this a GitHub repo? Which one?
 - `AGENTS.md` and `CLAUDE.md` at the repo root — does either exist? Is there already an `## Agent skills` section in either?
 - `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/` — does this skill's prior output already exist?
+- `.scratch/` — sign that a local-markdown issue tracker convention is already in use
+
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 
 ### 2. Present findings and ask
