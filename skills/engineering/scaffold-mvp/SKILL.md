@@ -1,6 +1,6 @@
 ---
 name: scaffold-mvp
-description: Initialize a new project with an agile, high-productivity MVP stack. Use when starting a new project in an empty repository immediately after /grill-with-docs has defined the domain context. Do not build UI components or infrastructure from scratch—always use shared components and mature libraries.
+description: Initialize a new project with an agile, high-productivity MVP stack. Focused on clean engineering boundaries, atomic configurations, and system stability without rush or architectural shortcuts. Use when starting a new project in an empty repository.
 ---
 
 # Scaffold MVP
@@ -11,6 +11,13 @@ Ativada **apenas** em repositórios novos, logo após a execução do `/grill-wi
 ## Regra de Ouro (Inviolável)
 **É expressamente proibido construir componentes de UI base ou infraestrutura do zero.** 
 O reuso de componentes compartilhados e de bibliotecas maduras focado em velocidade de prototipação é prioridade máxima e inegociável.
+
+## Estabilidade e Cadência Técnica (Anti-Atropelo)
+A velocidade de um MVP não pode gerar códigos instáveis ou atropelos estruturais. A integridade sintática e arquitetural do sistema é soberana. O agente deve cumprir disciplinadamente:
+1. **Verificação de Compilação Incremental**: Após instalar qualquer dependência ou criar um diretório estrutural base, execute o comando de compilação ou checagem de tipos local (ex: `npx tsc --noEmit`, `go build`, `cargo check`). Nunca acumule alterações sem certificar que o build atual passa.
+2. **Zero Pseudocódigo**: É expressamente proibido usar comentários de escape como `// ...` ou `// resto do código aqui` na criação das rotas ou arquivos do scaffold. Cada arquivo instanciado deve ser auto-contido e plenamente funcional comercialmente.
+3. **Setup de Dependências Seguro**: Defina as versões das bibliotecas de forma exata. Sempre rode a instalação explicitamente para garantir a atualização limpa dos lockfiles (`package-lock.json`, `go.sum`, `yarn.lock`).
+4. **Construção de Pontes e Contratos**: Se o MVP depender de serviços externos (como banco ou autenticação), forneça stubs/mocks utilizáveis localmente no scaffold. Evite que o app lance crashes não tratados na primeira inicialização.
 
 ## Fluxo de Trabalho
 

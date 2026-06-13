@@ -85,4 +85,12 @@ Only offer to create an ADR when all three are true:
 
 If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
 
+### Monitoramento e Efetividade do CONTEXT.md (Linguagem Ubíqua)
+
+Para garantir que o `CONTEXT.md` permaneça efetivo e atualizado, siga as diretrizes abaixo:
+1. **Prevenção de Atrito Semântico (Retrabalhos):** Se houver retrabalho de código recorrente sobre uma regra de negócio que já passou por interrogatório preliminar, identifique qual termo do domínio gerou confusão ou foi mal-entendido. Atualize o `CONTEXT.md` instantaneamente com exemplos contrastantes esclarecedores.
+2. **Prevenção de Linguagem Morta:** Ao final de cada sessão, verifique se os termos contidos no `CONTEXT.md` estão de fato refletidos em nomes de variáveis, funções, componentes ou pastas. Se encontrar termos que não são usados no código, alerte o usuário no relatório final:
+   - *"⚠️ O termo 'X' consta no CONTEXT.md mas não tem correspondência no código (Linguagem Morta). Propõe remover ou renomear entidades para manter o alinhamento?"*
+3. **Auditoria de Evolução Silenciosa:** Se um novo modelo, entidade ou serviço contendo novos conceitos de negócio for introduzido na base de código, exija a atualização correspondente dos termos do domínio no `CONTEXT.md` antes de dar a tarefa por fechada no `ESTADO_ORQUESTRATOR.md`.
+
 </supporting-info>

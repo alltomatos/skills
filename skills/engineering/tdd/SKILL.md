@@ -3,117 +3,55 @@ name: tdd
 description: Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions "red-green-refactor", wants integration tests, or asks for test-first development.
 ---
 
-# Test-Driven Development
+# TDD - Test Driven Development
 
-## Philosophy
+## PRINCÍPIO
+Testar comportamento via interfaces públicas. Não testar detalhes de implementação. Testes devem resistir a refatoraçoes.
+* **Bons testes (Integração)**: Exercitam fluxos por APIs públicas. Funcionam como especificação viva. 
+* **Bad tests**: Acoplados a métodos privados ou mocks internos. Quebram se código interno muda mesmo sem alteração de comportamento.
 
-**Core principle**: Tests should verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't.
+*Exemplos em [tests.md](tests.md) e regras de mock em [mocking.md](mocking.md).*
 
-**Good tests** are integration-style: they exercise real code paths through public APIs. They describe _what_ the system does, not _how_ it does it. A good test reads like a specification - "user can checkout with valid cart" tells you exactly what capability exists. These tests survive refactors because they don't care about internal structure.
+## ANTI-PATTERN: HORIZONTAL SLICES
+Proibido escrever todos os testes de uma vez antes de codificar.
+* **Razão**: Testes em lote adivinham comportamento, testando tipo/shape em vez de valor de negócio.
 
-**Bad tests** are coupled to implementation. They mock internal collaborators, test private methods, or verify through external means (like querying a database directly instead of using the interface). The warning sign: your test breaks when you refactor, but behavior hasn't changed. If you rename an internal function and tests fail, those tests were testing implementation, not behavior.
+## RITO DE EXECUÇÃO: VERTICAL SLICES
 
-See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
+### 1. Scope (Alinhamento)
+Mapear comportamentos críticos com usuário. Focar apenas em caminhos felizes e regras principais.
 
-## Anti-Pattern: Horizontal Slices
-
-**DO NOT write all tests first, then all implementation.** This is "horizontal slicing" - treating RED as "write all tests" and GREEN as "write all code."
-
-This produces **crap tests**:
-
-- Tests written in bulk test _imagined_ behavior, not _actual_ behavior
-- You end up testing the _shape_ of things (data structures, function signatures) rather than user-facing behavior
-- Tests become insensitive to real changes - they pass when behavior breaks, fail when behavior is fine
-- You outrun your headlights, committing to test structure before understanding the implementation
-
-**Correct approach**: Vertical slices via tracer bullets. One test → one implementation → repeat. Each test responds to what you learned from the previous cycle. Because you just wrote the code, you know exactly what behavior matters and how to verify it.
-
+### 2. Tracer Bullet (Primeiro Fluxo)
+Escrever UM teste para confirmar UM comportamento end-to-end:
 ```
-WRONG (horizontal):
-  RED:   test1, test2, test3, test4, test5
-  GREEN: impl1, impl2, impl3, impl4, impl5
-
-RIGHT (vertical):
-  RED→GREEN: test1→impl1
-  RED→GREEN: test2→impl2
-  RED→GREEN: test3→impl3
-  ...
+RED:   Escrever teste para fluxo 1 -> teste quebra
+GREEN: Código mínimo para passar -> teste passa
 ```
 
-## Workflow
-
-### 1. Planning
-
-When exploring the codebase, use the project's domain glossary so that test names and interface vocabulary match the project's language, and respect ADRs in the area you're touching.
-
-Before writing any code:
-
-- [ ] Confirm with user what interface changes are needed
-- [ ] Confirm with user which behaviors to test (prioritize)
-- [ ] Identify opportunities for [deep modules](deep-modules.md) (small interface, deep implementation)
-- [ ] Design interfaces for [testability](interface-design.md)
-- [ ] List the behaviors to test (not implementation steps)
-- [ ] Get user approval on the plan
-
-Ask: "What should the public interface look like? Which behaviors are most important to test?"
-
-**You can't test everything.** Confirm with the user exactly which behaviors matter most. Focus testing effort on critical paths and complex logic, not every possible edge case.
-
-### 2. Tracer Bullet
-
-Write ONE test that confirms ONE thing about the system:
-
+### 3. Loop Incremental
+Para os comportamentos seguintes:
 ```
-RED:   Write test for first behavior → test fails
-GREEN: Write minimal code to pass → test passes
+RED:   Novo teste -> quebra
+GREEN: Código mínimo -> passa
 ```
-
-This is your tracer bullet - proves the path works end-to-end.
-
-### 3. Incremental Loop
-
-For each remaining behavior:
-
-```
-RED:   Write next test → fails
-GREEN: Minimal code to pass → passes
-```
-
-Rules:
-
-- One test at a time
-- Only enough code to pass current test
-- Don't anticipate future tests
-- Keep tests focused on observable behavior
+* **Regras**: 1 teste por vez. Código apenas para passar teste atual. Não prever futuro.
 
 ### 4. Refactor
+Em GREEN (passando):
+* Eliminar duplicações.
+* Ocultar complexidade por interfaces simples.
+* Aplicar SOLID.
+* **Regra Ouro**: Proibido refatorar em RED.
 
-After all tests pass, look for [refactor candidates](refactoring.md):
+```checklist
+[ ] Teste valida comportamento por API pública
+[ ] Teste resiste a refatoramento interno
+[ ] Código é o mínimo para aprovar teste
+[ ] Sem features especulativas
+```
 
-- [ ] Extract duplication
-- [ ] Deepen modules (move complexity behind simple interfaces)
-- [ ] Apply SOLID principles where natural
-- [ ] Consider what new code reveals about existing code
-- [ ] Run tests after each refactor step
-
-**Never refactor while RED.** Get to GREEN first.
-
-101|## Checklist Per Cycle
-102|
-103|```
-104|[ ] Test describes behavior, not implementation
-105|[ ] Test uses public interface only
-106|[ ] Test would survive internal refactor
-107|[ ] Code is minimal for this test
-108|[ ] No speculative features added
-109|```
-110|
-111|## Protocolo de Fechamento (Mandatário)
-112|
-113|Após completar o ciclo de Refactor e garantir que todos os testes estão passando (GREEN), o ciclo não está encerrado.
-114|
-115|O agente **DEVE** invocar a skill `git-flow-pr-standard` para registrar a alteração de forma segura:
-116|- [ ] Commit semântico (feat/fix/refactor/etc.)
-117|- [ ] Branch padronizada
-118|- [ ] Template de PR preenchido e validado
-
+## FECHAMENTO OBRIGATÓRIO
+GREEN alcançado -> invocar `/git-flow-pr-standard` para:
+* Commit semântico (`feat:`, `fix:`, `refactor:`).
+* Branch organizada.
+* Template de PR preenchido.

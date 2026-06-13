@@ -9,12 +9,17 @@
 
 O Orquestrador opera com base em **Tiers de Risco**. A autonomia é concedida conforme a natureza da tarefa:
 
-### Tier 1 & 2: Autonomia de "Higiene" (Execução Total)
-O Orquestrador possui autorização total e **não deve questionar** o usuário para tarefas de padronização e infraestrutura padrão. Ele executa, registra e segue o fluxo.
-- **Configuração de ambiente**: Instalação de linters (`eslint`, `ruff`), formatadores (`prettier`, `black`), hooks de `pre-commit` e configuração de CI/CD padrão.
-- **Higiene de código**: Criação de estruturas de diretórios, mover arquivos para organizar pacotes, correção de permissões e limpeza de arquivos temporários.
-- **Ferramentas de Suporte**: Atualização de documentação técnica (ADRs, CONTEXT.md) baseada em decisões pré-aprovadas.
-- **Ação**: Executa silenciosamente → Loga no `ESTADO_ORQUESTRATOR.md` → Segue para próxima tarefa atômica.
+### Tier 1: Rota Direta ("Fast Path" - Risco Mínimo)
+O Orquestrador reconhece tarefas T1 (limpeza, documentações simples que não alteram lógica, refatorações safe e setups de ferramentas/linters) como elegíveis para o **Fast Path**:
+- **Bypass de Processo**: Pula obrigatoriamente a atualização/auditoria de Roadmap estratégico global e as sessões burocráticas/extensivas de interrogatório via `/grill-with-docs` ou `/grill-me`.
+- **Execução Atômica**: O Orquestrador planeja e executa a tarefa imediatamente de forma direta.
+- **Guardrails de Qualidade Mandatórios**: O fluxo deve honrar rigorosamente o rito de TDD para assegurar que nada foi quebrado e acionar a skill `/git-flow-pr-standard` para garantir commit semântico correto.
+- **Ação**: Executa silenciosamente → Loga no `ESTADO_ORQUESTRATOR.md` → Finaliza o PR da mudança atômica.
+
+### Tier 2: Execução em Batch (Risco Médio)
+- **Configuração de ambiente**: Instalação de linters e formatadores, instrumentação de cobertura de testes, criação de ADRs estruturais e melhorias de performance localizada sem breaking changes.
+- **Burocracia Reduzida**: Exige alinhamento com o `/roadmap` ativo antes de rodar os batches, mas permite agregação de commits.
+- **Ação**: Executa o lote sob guardrail do TDD → Loga no `ESTADO_ORQUESTRATOR.md` → Reporta no final do batch.
 
 ### Tier 3: Governança Estratégica (Interativa Obrigatória)
 Para decisões que impactam o domínio do projeto, a autonomia é **suspensa**. O Orquestrador deve pausar, apresentar o plano e aguardar o "Go" humano.
@@ -29,12 +34,13 @@ Para decisões que impactam o domínio do projeto, a autonomia é **suspensa**. 
 
 ## Gatilho de Aprovação por Risco
 
-O Orquestrador possui autonomia de execução para tarefas Tiers 1 e 2. 
-- **Tier 1 e 2:** Execução contínua. O Orquestrador agrupa o resultado e reporta apenas ao finalizar o bloco de trabalho ou se detectar falhas.
-- **Tier 3 (Risco Alto):** O Orquestrador tentará a execução apenas se:
+O Orquestrador possui autonomia diferenciada baseada na criticidade técnica:
+- **Tier 1 (Fast Path):** Execução sem interrupção humana. Pula as etapas de interrogatório/grill e auditoria do Roadmap. Execução atômica e direta, validando apenas o TDD local e commits semânticos no Git Flow.
+- **Tier 2 (Batchável):** Execução contínua do lote. O Orquestrador agrupa o resultado, requer verificação do Roadmap, e reporta apenas ao finalizar o bloco de tarefas ou se detectar falhas no TDD.
+- **Tier 3 (Risco Alto):** Requer aprovação explícita inicial do plano geral de tarefas. Para tarefas individuais na execução do DAG, o Orquestrador tentará prosseguir autonomamente após o "Go" inicial apenas se:
   1. O suite de testes (TDD) passar totalmente.
   2. A análise estática de tipos não reportar quebra de contrato.
-  Caso ambos sejam verdadeiros, o Orquestrador assume o risco e prossegue, logando a decisão no `ESTADO_ORQUESTRATOR.md` como "DECISÃO AUTÔNOMA". Se houver falha, ele interrompe e solicita intervenção.
+  Caso ambos sejam verdadeiros, o Orquestrador assume o risco e prossegue, logando a decisão no `ESTADO_ORQUESTRATOR.md` como "DECISÃO AUTÔNOMA". Se houver falha de validação, ele interrompe a execução do DAG imediatamente e solicita intervenção.
 
 ---
 
@@ -42,11 +48,13 @@ O Orquestrador possui autonomia de execução para tarefas Tiers 1 e 2.
 
 > **Regra de Ouro**: A autonomia é total. O Orquestrador fragmenta o plano macro em tarefas atômicas e identifica nós independentes no DAG.
 
-### Delegação Paralela (Concorrência)
-O Orquestrador pode delegar tarefas simultâneas desde que:
-1. Sejam nós independentes no DAG (não dependam um do outro).
-2. Não alterem o mesmo arquivo simultaneamente (evitar Race Conditions).
-O limite de concorrência é gerenciado dinamicamente para manter a performance do ambiente sem corromper o contexto.
+### Delegação Paralela e Isolamento (Concorrência via Git Worktrees)
+O Orquestrador pode e deve delegar tarefas simultâneas para otimizar o tempo de desenvolvimento, respeitando as seguintes diretrizes:
+
+1. **Paralelismo da DAG**: Identifique tarefas independentes com dependências resolvidas no grafo e despache-as concorrentemente acionando múltiplos agentes executores em paralelo (ex: 2 subagentes operando em direções distintas).
+2. **Uso de Git Worktree para Concorrência**: Sempre que a execução de tarefas paralelas for disparada, os subagentes associados **devem** rodar sob isolamento de worktree (`isolation: "worktree"`). Isso isola o ambiente de arquivos do usuário contra regressões sintáticas e conflitos no Git.
+3. **Uso de Git Worktree por Tamanho de Atividade**: Mesmo no caso de uma única tarefa, se o tamanho da atividade envolver refatoração pesada de infra, transição de esquemas ou desenvolvimento de novos módulos inteiros (ou seja, tarefas que excedam a escrita de um único arquivo isolado ou demandem mais de 10 minutos de computação contínua), **instancie o subagente em uma worktree dedicada** para preservar a segurança da ramificação de desenvolvimento ativa do desenvolvedor.
+4. **Resolução de Fusão (Merge)**: Ao finalizar as tarefas paralelas, o Orquestrador assume o papel de coletor das branches isoladas temporárias e executa a mesclagem estruturada (resolvendo conflitos se houverem) e valida a compilação geral da aplicação.
 
 ### Estrutura de Declaração de DAG (Grafo de Dependências):
 Ao fragmentar o plano macro, o Orchestrator monta e persiste a modelagem no arquivo local `.claude/ESTADO_ORCHESTRATOR.md` seguindo o formato:

@@ -55,22 +55,24 @@ Após instalar as skills, o ponto de entrada recomendado é o `/orchestrator`. E
 ### Fluxo de Trabalho (Engenharia de Ciclo Fechado)
 
 1. **Estratégia**: Execute `/orchestrator`. Ele auditará o repositório e, se não houver um `ORCHESTRATOR-ROADMAP.md`, invocará o `/roadmap` para definir as Epics e Milestones com você.
-2. **Execução Autônoma**: Com as Milestones definidas, o Orquestrador cria um grafo de tarefas (DAG), delega tarefas para subagentes em paralelo e monitora a execução.
-3. **Qualidade (TDD)**: O agente é obrigado a usar `/tdd` para cada tarefa, garantindo que o código nunca saia do estado GREEN.
-4. **Integridade (Git Flow)**: Ao encerrar cada Milestone ou tarefa, o `/git-flow-pr-standard` é invocado obrigatoriamente para registrar o versionamento e abrir o PR.
+2. **Execução Concorrente**: Com as Milestones definidas, o Orquestrador cria um grafo de tarefas (DAG) e despacha subagentes em paralelo com isolamento via **Git Worktrees** (`isolation: "worktree"`).
+3. **Mapeamento e Anti-Alucinação**: O Orquestrador e os executores usam o `/query-docs` (via Context7) para resolver assinaturas reais e atualizadas de terceiros (Next.js, Prisma, Tailwind), com suporte a fallback de leitura de tipagem local (`*.d.ts`) caso offline.
+4. **Qualidade (TDD) e Segurança**: O agente é obrigado a usar `/tdd` para codificação em ciclos RED/GREEN/REFACTOR e construir testes de ataque (`*.spec.sec.ts`) com o `/secure-e2e` (Playwright) para validação defensiva contra vulnerabilidades (OWASP).
+5. **Integridade (Git Flow)**: Ao encerrar cada Milestone ou tarefa, o `/git-flow-pr-standard` é invocado para consolidar as branches e registrar o commit semântico.
 
 
 ## O Orchestrator
-### O Orchestrator
 
-O `/orchestrator` é a **Skill Mestra** deste fork — um conceito que não existe no repositório original. Ele implementa um **Agentic Workflow Autônomo**: avalia, delega (concorrentemente), fiscaliza e expande.
+O `/orchestrator` é a **Skill Mestra** deste fork — um conceito que não existe no repositório original. Ele implementa um **Agentic Workflow Autônomo**: avalia, delega concorrentemente, fiscaliza e expande.
 
 ### Como funciona
-O Orchestrator opera em modo de alta autonomia, utilizando uma DAG (Grafo Acíclico Direcionado) para delegar tarefas a subagentes de forma paralela e validar resultados via integração TDD + Git-Flow.
+O Orchestrator opera em modo de alta autonomia, utilizando uma DAG (Grafo Acíclico Direcionado) para fragmentar tarefas em pacotes atômicos:
 
-- **Autonomia de Tier**: Tarefas de Tier 1 e 2 são executadas e monitoradas sem interrupção humana.
-- **Fechamento de Ciclo**: Nenhum trabalho de código é considerado concluído sem passar pelo protocolo `git-flow-pr-standard`.
-- **Fiscalização**: Auditoria contínua de testes e conformidade.
+- **Concorrência Segura (Worktrees)**: Despacha subagentes in paralelo para tarefas independentes sob isolamento de Git Worktree, defendendo a branch de trabalho local da máquina do usuário.
+- **Auto-Bootstrap de Configuração**: Cria de forma silenciosa e atômica a pasta `./.claude/` local com variáveis de ambiente e cache do Context7 se ausentes.
+- **Autonomia de Tier**: Tarefas de Tier 1 (Fast Path) e Tier 2 (Batch) são executadas sob validação local do TDD. Tier 3 (Bloqueante) exige consentimento pelo chat.
+- **Fechamento de Ciclo**: Nenhum incremento de código é dado como pronto sem passar pelos suites de testes unificados e pelo protocolo `git-flow-pr-standard`.
+- **Fiscalização**: Auditoria contínua de integridade estática e regressão.
 
 ### Regra de ouro
 
@@ -198,7 +200,6 @@ Fundamentos de engenharia de software importam mais do que nunca. Essas skills s
 Skills que uso diariamente para trabalho com código.
 
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Loop de diagnóstico disciplinado para bugs difíceis e regressões de performance: reproduzir → minimizar → hipotetizar → instrumentar → corrigir → teste de regressão.
-- **[git-flow-pr-standard](./skills/engineering/git-flow-pr-standard/SKILL.md)** — Protocolo obrigatório para versionamento, commits semânticos e abertura de PRs. Integrado automaticamente às skills de engenharia.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Sessão de interrogatório que desafia seu plano contra o modelo de domínio existente, afia terminologia e atualiza `CONTEXT.md` e ADRs inline.
 - **[triage](./skills/engineering/triage/SKILL.md)** — Triagem de issues através de uma máquina de estados de papéis de triagem.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Encontra oportunidades de aprofundamento na base de código, informado pela linguagem de domínio em `CONTEXT.md` e pelas decisões em `docs/adr/`.
@@ -206,10 +207,12 @@ Skills que uso diariamente para trabalho com código.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Desenvolvimento orientado a testes com loop red-green-refactor. Constrói features ou corrige bugs um slice vertical por vez.
 - **[to-issues](./skills/engineering/to-issues/SKILL.md)** — Decompõe qualquer plano, spec ou PRD em issues do GitHub independentes usando slices verticais.
 - **[to-prd](./skills/engineering/to-prd/SKILL.md)** — Transforma o contexto da conversa atual em um PRD e o submete como issue do GitHub. Sem entrevista — apenas sintetiza o que você já discutiu.
-- **[scaffold-mvp](./skills/engineering/scaffold-mvp/SKILL.md)** — Executa o bootstrap técnico rápido de um novo repositório (ex: Next.js + Tailwind + shadcn/ui) baseado no domínio levantado pelo grill-with-docs. Prioriza bibliotecas de alta produtividade e proíbe invenção de código do zero.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Diz ao agent para zoom out e dar contexto mais amplo ou uma perspectiva de alto nível sobre uma seção de código desconhecida.
 - **[scaffold-mvp](./skills/engineering/scaffold-mvp/SKILL.md)** — Executador tecnológico para repositórios vazios. Realiza bootstrap ágil (ex: Next.js + Tailwind + shadcn) imediatamente após a definição do domínio, focando em reuso de ecossistema e máxima produtividade.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Constrói um protótipo descartável para explorar um design — seja um app de terminal executável para questões de estado/lógica de negócio, ou várias variações radicais de UI ativáveis a partir de uma rota.
+- **[roadmap](./skills/engineering/roadmap/SKILL.md)** — Define e agenda as metas estratégicas e sprints em um plano macro de desenvolvimento de software (Milestones).
+- **[secure-e2e](./skills/engineering/secure-e2e/SKILL.md)** — Suíte de testes ponta a ponta (E2E) com Playwright focada em segurança. Simula e dispara ataques contra autenticação, injeções HTML/SQL e permissões dinâmicas (OWASP Top 10) sob testes negativos.
+- **[query-docs](./skills/engineering/query-docs/SKILL.md)** — Resolve a documentação ativa de bibliotecas e busca trechos de código autoritativos usando o Context7. Evita a alucinação de APIs desatualizadas no consumo de pacotes externos.
 - **[orchestrator](./skills/engineering/orchestrator/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade da infraestrutura de skills, delega tarefas e gera novas sub-skills para gargalos não mapeados.
 
 ### Productivity
