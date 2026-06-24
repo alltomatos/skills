@@ -90,6 +90,7 @@ O Orquestrador deve validar toda tarefa delegada contra o `/roadmap`. Se uma tar
 | Versionamento & PRs | `/git-flow-pr-standard` |
 | Infraestrutura ausente | `/setup-skills` |
 | Linguagem de domínio ausente | `/grill-with-docs` |
+| Trabalhar em módulo/feature específico | `/grill-feature-with-docs` |
 | Arquitetura degradada | `/improve-codebase-architecture` |
 | Bug difícil ou regressão | `/diagnose` |
 | Código sem testes | `/tdd` |
@@ -201,6 +202,7 @@ Skills que uso diariamente para trabalho com código.
 
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Loop de diagnóstico disciplinado para bugs difíceis e regressões de performance: reproduzir → minimizar → hipotetizar → instrumentar → corrigir → teste de regressão.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Sessão de interrogatório que desafia seu plano contra o modelo de domínio existente, afia terminologia e atualiza `CONTEXT.md` e ADRs inline.
+- **[grill-feature-with-docs](./skills/engineering/grill-feature-with-docs/SKILL.md)** — Mentoria de módulo/feature: lê o código existente, resume o que o módulo faz, conduz sessão de perguntas e gera documentação (CONTEXT.md, CLAUDE.md, ADRs, docs/agents/) com handoff para o orchestrator.
 - **[triage](./skills/engineering/triage/SKILL.md)** — Triagem de issues através de uma máquina de estados de papéis de triagem.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Encontra oportunidades de aprofundamento na base de código, informado pela linguagem de domínio em `CONTEXT.md` e pelas decisões em `docs/adr/`.
 - **[setup-skills](./skills/engineering/setup-skills/SKILL.md)** — Scaffolding da configuração por repositório (issue tracker, vocabulário de labels de triagem, layout de docs de domínio) que as outras skills de engineering consomem. Rode uma vez por repo antes de usar `to-issues`, `to-prd`, `triage`, `diagnose`, `tdd`, `improve-codebase-architecture` ou `zoom-out`.

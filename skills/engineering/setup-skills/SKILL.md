@@ -36,9 +36,9 @@ Perguntar escolhas ao usuário:
 
 ### 3. Validação e Deploy
 * **Conectividade**: Testar `gh repo view` (GitHub) ou `git remote` (GitLab). Caso local, garantir pasta `.scratch/` gravável.
-* **Provisionamento das Skills**: Rodar `./scripts/setup-alltomatos-skills.sh` no projeto client se scripts base ausentes.
+* **Provisionamento das Skills**: Verificar primeiro se `~/.claude/skills/` existe e contém ao menos `orchestrator` e `setup-skills`. Se já existirem, pular instalação — skills já estão no perfil do usuário. Somente se ausentes: localizar o repositório `alltomatos/skills` (ex: `~/dev/skills`) e rodar `./scripts/setup-alltomatos-skills.sh` a partir dele.
 * **Context7**: Iniciar Context7 via `npx ctx7 setup` e gerar `.claude/context7.json` com dependências preliminares descobertas.
-* **Health Check**: Executar `./scripts/verify-skills-integrity.sh`. Falhas -> Aborte setup -> redirecione para `/diagnose`.
+* **Health Check**: Verificar que `~/.claude/skills/` contém as skills esperadas (`ls ~/.claude/skills/`). Diretório ausente ou vazio -> redirecione para `/diagnose`.
 
 ### 4. Escrita dos Artefatos
 Criar e salvar os seguintes arquivos após validação em `docs/agents/`:

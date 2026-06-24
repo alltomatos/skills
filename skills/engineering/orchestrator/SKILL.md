@@ -18,6 +18,8 @@ Planeja, governa, audita e delega execução. Nunca resolva tarefas complexas di
 2. `CLAUDE.md` ou `docs/agents/` ausentes -> invocar `/setup-skills --silent` para criar a governança de docs.
 3. Confirmar arquivos -> ir para Fase 1.
 
+> **Skills já instaladas?** Antes de qualquer passo de instalação, verificar `~/.claude/skills/`. Se o diretório existir e contiver skills (ex: `orchestrator`, `setup-skills`), considerar skills instaladas — **não invocar instalação novamente**. O orchestrator pode estar rodando em um projeto cliente que não possui `scripts/` próprios; isso é normal e esperado.
+
 ### Fase 1 — Auditoria de Infraestrutura
 Verificar itens em sequência:
 ```checklist
@@ -26,7 +28,7 @@ Verificar itens em sequência:
 [ ] docs/agents/ contém arquivos mapeados do tracker/labels
 [ ] ORCHESTRATOR-ROADMAP.md criado na raiz
 [ ] Git remote configurado e ativo
-[ ] Health check de skills íntegro (scripts/verify-skills-integrity.sh)
+[ ] Skills instaladas no perfil do usuário (`~/.claude/skills/` contém ao menos `orchestrator` e `setup-skills`)
 ```
 * **0–3 passados** -> Repositório vazio -> Ir para Fase 2A.
 * **4 passados** -> Parcial -> Ir para Fase 2B.
