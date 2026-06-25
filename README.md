@@ -117,6 +117,7 @@ Na era da IA é a mesma coisa. Existe uma lacuna de comunicação entre você e 
 
 - [`/grill-me`](./skills/productivity/grill-me/SKILL.md) - para usos não-relacionados a código
 - [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md) - mesmo que [`/grill-me`](./skills/productivity/grill-me/SKILL.md), mas com recursos adicionais (veja abaixo)
+- [`/grill-feature-with-docs`](./skills/engineering/grill-feature-with-docs/SKILL.md) - para quando você quer trabalhar em um **módulo ou feature específico**: lê o código e a documentação existente, verifica se estão consistentes entre si, e conduz uma sessão de mentoria para definir a mudança antes de chamar o `/orchestrator`
 
 Essas são minhas skills mais populares. Elas ajudam você a se alinhar com o agent antes de começar, e a pensar profundamente sobre a mudança que está fazendo. Use _sempre_ que quiser fazer uma mudança.
 
