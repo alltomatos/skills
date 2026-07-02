@@ -215,6 +215,7 @@ Skills que uso diariamente para trabalho com código.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Constrói um protótipo descartável para explorar um design — seja um app de terminal executável para questões de estado/lógica de negócio, ou várias variações radicais de UI ativáveis a partir de uma rota.
 - **[roadmap](./skills/engineering/roadmap/SKILL.md)** — Define e agenda as metas estratégicas e sprints em um plano macro de desenvolvimento de software (Milestones).
 - **[secure-e2e](./skills/engineering/secure-e2e/SKILL.md)** — Suíte de testes ponta a ponta (E2E) com Playwright focada em segurança. Simula e dispara ataques contra autenticação, injeções HTML/SQL e permissões dinâmicas (OWASP Top 10) sob testes negativos.
+- **[qa-analyst](./skills/engineering/qa-analyst/SKILL.md)** — Analista de QA para o ciclo completo de qualidade: interroga requisitos antes do código, planeja e cria casos de teste (incluindo cenários de erro e comportamentos inesperados), executa testes, relata bugs com reprodução mínima e conduz análise de causa raiz para melhoria de processos.
 - **[query-docs](./skills/engineering/query-docs/SKILL.md)** — Resolve a documentação ativa de bibliotecas e busca trechos de código autoritativos usando o Context7. Evita a alucinação de APIs desatualizadas no consumo de pacotes externos.
 - **[orchestrator](./skills/engineering/orchestrator/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade da infraestrutura de skills, delega tarefas e gera novas sub-skills para gargalos não mapeados.
 

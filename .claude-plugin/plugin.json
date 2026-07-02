@@ -19,6 +19,7 @@
     "./skills/engineering/orchestrator",
     "./skills/engineering/roadmap",
     "./skills/engineering/secure-e2e",
+    "./skills/engineering/qa-analyst",
     "./skills/engineering/query-docs",
     "./skills/misc/migrate-to-shoehorn",
     "./skills/misc/setup-pre-commit",
