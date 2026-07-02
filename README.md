@@ -58,7 +58,8 @@ Após instalar as skills, o ponto de entrada recomendado é o `/orchestrator`. E
 2. **Execução Concorrente**: Com as Milestones definidas, o Orquestrador cria um grafo de tarefas (DAG) e despacha subagentes em paralelo com isolamento via **Git Worktrees** (`isolation: "worktree"`).
 3. **Mapeamento e Anti-Alucinação**: O Orquestrador e os executores usam o `/query-docs` (via Context7) para resolver assinaturas reais e atualizadas de terceiros (Next.js, Prisma, Tailwind), com suporte a fallback de leitura de tipagem local (`*.d.ts`) caso offline.
 4. **Qualidade (TDD) e Segurança**: O agente é obrigado a usar `/tdd` para codificação em ciclos RED/GREEN/REFACTOR e construir testes de ataque (`*.spec.sec.ts`) com o `/secure-e2e` (Playwright) para validação defensiva contra vulnerabilidades (OWASP).
-5. **Integridade (Git Flow)**: Ao encerrar cada Milestone ou tarefa, o `/git-flow-pr-standard` é invocado para consolidar as branches e registrar o commit semântico.
+5. **Portão de QA (obrigatório, sem exceção de Tier)**: Ao final de todo desenvolvimento — antes de qualquer PR — o `/qa-analyst` é invocado para analisar o código gerado, confrontar a implementação contra os requisitos originais e cobrir cenários de erro/comportamento inesperado. Bugs ou lacunas encontrados reabrem a DAG como novas tarefas.
+6. **Integridade (Git Flow)**: Somente após o Portão de QA aprovar, o `/git-flow-pr-standard` é invocado para consolidar as branches e registrar o commit semântico.
 
 
 ## O Orchestrator
@@ -217,7 +218,7 @@ Skills que uso diariamente para trabalho com código.
 - **[secure-e2e](./skills/engineering/secure-e2e/SKILL.md)** — Suíte de testes ponta a ponta (E2E) com Playwright focada em segurança. Simula e dispara ataques contra autenticação, injeções HTML/SQL e permissões dinâmicas (OWASP Top 10) sob testes negativos.
 - **[qa-analyst](./skills/engineering/qa-analyst/SKILL.md)** — Analista de QA para o ciclo completo de qualidade: interroga requisitos antes do código, planeja e cria casos de teste (incluindo cenários de erro e comportamentos inesperados), executa testes, relata bugs com reprodução mínima e conduz análise de causa raiz para melhoria de processos.
 - **[query-docs](./skills/engineering/query-docs/SKILL.md)** — Resolve a documentação ativa de bibliotecas e busca trechos de código autoritativos usando o Context7. Evita a alucinação de APIs desatualizadas no consumo de pacotes externos.
-- **[orchestrator](./skills/engineering/orchestrator/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade da infraestrutura de skills, delega tarefas e gera novas sub-skills para gargalos não mapeados.
+- **[orchestrator](./skills/engineering/orchestrator/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade da infraestrutura de skills, delega tarefas, gera novas sub-skills para gargalos não mapeados e força a invocação obrigatória do `/qa-analyst` ao final de todo desenvolvimento antes de qualquer PR.
 
 ### Productivity
 
