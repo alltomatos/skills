@@ -72,7 +72,7 @@ O Orchestrator opera em modo de alta autonomia, utilizando uma DAG (Grafo Acícl
 - **Concorrência Segura (Worktrees)**: Despacha subagentes in paralelo para tarefas independentes sob isolamento de Git Worktree, defendendo a branch de trabalho local da máquina do usuário.
 - **Auto-Bootstrap de Configuração**: Cria de forma silenciosa e atômica a pasta `./.claude/` local com variáveis de ambiente e cache do Context7 se ausentes.
 - **Autonomia de Tier**: Tarefas de Tier 1 (Fast Path) e Tier 2 (Batch) são executadas sob validação local do TDD. Tier 3 (Bloqueante) exige consentimento pelo chat.
-- **Fechamento de Ciclo**: Nenhum incremento de código é dado como pronto sem passar pelos suites de testes unificados e pelo protocolo `git-flow-pr-standard`.
+- **Fechamento de Ciclo**: Nenhum incremento de código é dado como pronto sem passar pelos suites de testes unificados, pelo Portão de QA obrigatório (`/qa-analyst`) e pelo protocolo `git-flow-pr-standard`.
 - **Fiscalização**: Auditoria contínua de integridade estática e regressão.
 
 ### Regra de ouro
@@ -88,6 +88,7 @@ O Orquestrador deve validar toda tarefa delegada contra o `/roadmap`. Se uma tar
 | --- | --- |
 | Governança & Orquestração | `/orchestrator` |
 | Bússola Estratégica (Roadmap) | `/roadmap` |
+| Análise de QA pós-desenvolvimento (obrigatório antes do PR, todos os Tiers) | `/qa-analyst` |
 | Versionamento & PRs | `/git-flow-pr-standard` |
 | Infraestrutura ausente | `/setup-skills` |
 | Linguagem de domínio ausente | `/grill-with-docs` |
@@ -190,7 +191,7 @@ Para depuração, eu também construí uma skill de **[`/diagnose`](./skills/eng
 ### #5: O Risco do Desenvolvimento Autônomo
 **O Problema**: Agentes autônomos sem bússola (Roadmap) e sem fiscalização (Git Flow) tendem a "viajar" no escopo, criando soluções complexas para problemas inexistentes.
 
-**A Solução**: Governança em ciclo fechado. O Orquestrador só executa o que está no `/roadmap` e só finaliza o que é validado pelo `/git-flow-pr-standard`.
+**A Solução**: Governança em ciclo fechado. O Orquestrador só executa o que está no `/roadmap`, passa obrigatoriamente pelo Portão de QA (`/qa-analyst`) ao final de todo desenvolvimento, e só finaliza o que é validado pelo `/git-flow-pr-standard`.
 
 ### Resumo
 
