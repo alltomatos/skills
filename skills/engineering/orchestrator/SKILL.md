@@ -106,4 +106,6 @@ Fila vazia -> Invocar **Agente Fiscal de Testes**:
 * Testes de segurança em arquivos `*.spec.sec.ts` acionados pelo `/secure-e2e`.
 * suite completo passar 100%.
 
-Sucesso -> Invocar `/git-flow-pr-standard` para conclusão e merge da branch.
+**Portão de QA obrigatório**: sucesso na suíte de testes -> invocar **obrigatoriamente** `/qa-analyst` para analisar o código gerado/alterado nesta DAG (requisitos vs. implementação, casos de teste faltantes, cenários de erro e comportamentos inesperados não cobertos). Isso **não é opcional e não é dispensável por Tier** — mesmo tarefas T1 (Fast Path) passam por este portão antes do PR. Bugs/gaps relatados pela `/qa-analyst` reabrem a DAG como novas tarefas antes de prosseguir.
+
+Sucesso na análise de QA -> Invocar `/git-flow-pr-standard` para conclusão e merge da branch.

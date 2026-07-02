@@ -86,6 +86,7 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 | Arquitetura degradada | `/improve-codebase-architecture` |
 | Bug difícil ou regressão | `/diagnose` |
 | Código sem testes | `/tdd` |
+| Análise de QA pós-desenvolvimento (obrigatório antes do PR) | `/qa-analyst` |
 | Falta de contexto | `/zoom-out` |
 | Gargalo não mapeado | `/write-a-skill` |
 | Alinhamento antes de mudança | `/grill-me` |
@@ -142,8 +143,17 @@ Após a última tarefa da DAG passar para `completed`, executa a fiscalização 
 ```
 - Opcional: Gerar um resumo de impacto das mudanças.
 
-### 3. Protocolo de PR e Fechamento de Ciclo (Mandatário)
-Para toda tarefa que resultar em alteração de código, o ciclo de conclusão **não** termina com o teste. O Orchestrator deve invocar obrigatoriamente a skill `git-flow-pr-standard` para garantir que as alterações sejam versionadas corretamente:
+### 3. Portão de QA (Mandatário, Pré-PR)
+Para toda tarefa que resultar em alteração de código, o ciclo de conclusão **não** avança para o PR sem passar pela análise da skill `/qa-analyst`. Isso vale para **todos os Tiers**, incluindo Fast Path (T1) — não há bypass.
+- [ ] `/qa-analyst` foi invocado sobre o diff/código gerado nesta tarefa?
+- [ ] Requisitos originais foram confrontados com a implementação (ambiguidades? lacunas?)
+- [ ] Casos de teste de erro/comportamento inesperado foram avaliados, não só o caminho feliz?
+- [ ] Bugs encontrados pela análise de QA foram registrados e resolvidos (ou reabertos como nova tarefa na DAG) antes de prosseguir?
+
+Falha neste portão -> **bloqueia** o avanço para o PR. O Orchestrator reabre a DAG com as tarefas de correção apontadas pela `/qa-analyst` e só prossegue após nova validação limpa.
+
+### 4. Protocolo de PR e Fechamento de Ciclo (Mandatário)
+Somente após o Portão de QA (item 3) ser aprovado, o Orchestrator deve invocar obrigatoriamente a skill `git-flow-pr-standard` para garantir que as alterações sejam versionadas corretamente:
 - [ ] O commit segue Conventional Commits?
 - [ ] A branch seguiu o padrão `tipo/issue-descricao`?
 - [ ] O template de PR foi preenchido?
@@ -156,6 +166,7 @@ Para toda tarefa que resultar em alteração de código, o ciclo de conclusão *
 | GAP Identificado | Skill Delegada | Tier de Risco |
 |------------------|----------------|---------------|
 | Testes ausentes ou frágeis | `/tdd` | Batch |
+| Fim de desenvolvimento — análise de QA obrigatória pré-PR | `/qa-analyst` | Mandatório (todos os Tiers) |
 | Arquitetura degradada/acoplada | `/improve-codebase-architecture` | Batch |
 | Bug/regressão | `/diagnose` | Block |
 | Linguagem de domínio desalinhada | `/grill-with-docs` | Auto |
