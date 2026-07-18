@@ -51,7 +51,7 @@ Em GREEN (passando):
 ```
 
 ## FECHAMENTO OBRIGATÓRIO
-GREEN alcançado -> invocar `/git-flow-pr-standard` para:
+GREEN alcançado -> registrar a evidencia e aguardar o portão obrigatório de `/qa-analyst`. Só depois da aprovação do QA orientar o fluxo de PR disponível no ambiente:
 * Commit semântico (`feat:`, `fix:`, `refactor:`).
 * Branch organizada.
 * Template de PR preenchido.

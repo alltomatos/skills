@@ -1,111 +1,109 @@
 ---
 name: orchestrator
-description: Master orchestrator. Audits repo health, builds roadmaps, manages DAGs of atomic tasks and spawns isolated parallel sub-agents (via Git Worktree) for execution. Use as the entry point for large tasks, refactoring sweeps, or milestone planning.
+description: Governa projetos com agentes, audita pre-condicoes, cria documentacao, transforma gaps em GitHub Issues e coordena execucao, testes e QA.
 ---
 
 # ORCHESTRATOR - Central de Controle
 
-Planeja, governa, audita e delega execução. Nunca resolva tarefas complexas diretamente.
+Planeja, governa, audita e delega execucao. Nao execute tarefas complexas diretamente quando uma skill especializada existir.
 
-*Protocolos adicionais em [`orchestrator-delegation-protocol.md`](./orchestrator-delegation-protocol.md).*
+## Fase - Atualizacao do framework
 
----
+Esta verificacao deve ocorrer no inicio de toda execucao do orchestrator, antes das pre-condicoes do projeto.
 
-## FLUXO OPERACIONAL
+1. Identifique de onde as skills foram instaladas. Para cada skill carregada, resolva o caminho real do link e procure o clone que contem `.claude-plugin/plugin.json` e `scripts/setup-alltomatos-skills.sh`.
+2. No clone encontrado, leia o remote `origin`, a branch atual e o commit local instalado.
+3. Consulte o remote do framework com `git fetch origin --quiet` ou mecanismo equivalente de leitura. Nunca faca `pull`, merge ou reset no clone do framework.
+4. Compare o commit local com `origin/<branch>` ou com a referencia remota equivalente.
+5. Se houver commits novos, informe imediatamente:
 
-### Fase 0 — Auto-Provisionamento (Zero-Touch)
-1. `.claude/config.json` ou `.claude/context7.json` ausentes -> crie silencioso e atômico.
-2. `CLAUDE.md` ou `docs/agents/` ausentes -> invocar `/setup-skills --silent` para criar a governança de docs.
-3. Confirmar arquivos -> ir para Fase 1.
-
-> **Skills já instaladas?** Antes de qualquer passo de instalação, verificar `~/.claude/skills/`. Se o diretório existir e contiver skills (ex: `orchestrator`, `setup-skills`), considerar skills instaladas — **não invocar instalação novamente**. O orchestrator pode estar rodando em um projeto cliente que não possui `scripts/` próprios; isso é normal e esperado.
-
-### Fase 1 — Auditoria de Infraestrutura
-Verificar itens em sequência:
-```checklist
-[ ] Pasta local ./.claude/ inicializada (.claude/config.json e .claude/context7.json criados)
-[ ] CLAUDE.md existe na raiz do projeto
-[ ] docs/agents/ contém arquivos mapeados do tracker/labels
-[ ] ORCHESTRATOR-ROADMAP.md criado na raiz
-[ ] Git remote configurado e ativo
-[ ] Skills instaladas no perfil do usuário (`~/.claude/skills/` contém ao menos `orchestrator` e `setup-skills`)
-```
-* **0–3 passados** -> Repositório vazio -> Ir para Fase 2A.
-* **4 passados** -> Parcial -> Ir para Fase 2B.
-* **5 passados** -> Conformidade -> Ir para Fase 3.
-
-### Fase 2A — Repositório Novo
-1. Invocará `/roadmap` -> inicializa `ORCHESTRATOR-ROADMAP.md` e Epics.
-2. Invocará `/grill-with-docs` -> gera `CONTEXT.md` base.
-3. Invocará `/scaffold-mvp` -> bootstraps estrutura do projeto.
-4. Passar para Fase 3.
-
-### Fase 2B — Repositório Parcial
-1. Iniciar arquivos de auditoria ausentes.
-2. Sincronizar branches locais.
-3. Passar para Fase 3.
-
-### Fase 3 — Auditoria Técnica (GAPs)
-Gerar diagnóstico dos principais problemas classificados por criticidade:
-
-* **P1 — Crítico (Segurança/Tipos)**: Falhas de build (`tsc`), brechas de rotas, chaves expostas no git.
-* **P2 — Alto (DDD/SRP)**: Arquivos monolíticos (>250 linhas), acoplamento, vazamento de persistência.
-* **P3 — Médio (Performance)**: Queries N+1, bundle pesado, chamadas síncronas bloqueantes.
-* **P4 — Baixo (Docs/Higiene)**: Código morto, dependências desatualizadas, sem testes unitários.
-
-*Heurística: Arquivos com >3 imports ou >2 exports de funções -> GAP P2 -> Invocar `/improve-codebase-architecture`.*
-
-#### Formato de GAP
-```
-🚨 GAP: [Descrição]
-├── 📉 Impacto: [Risco técnico/negócio]
-├── 💡 BOA PRÁTICA: [Solução padrão]
-├── 🗺️ PLANO AÇÃO: [Objetivo macro]
-├── 📋 TAREFAS: [Subtarefas atômicas]
-└── ⚠️ TIER RISCO: [T1 | T2 | T3]
+```text
+Atualizacao do framework disponivel
+- Framework: alltomatos/skills
+- Instalado: <commit ou data>
+- Disponivel: <commit ou data>
+- Novidades: <resumo dos commits ou arquivos alterados>
+- Acao: execute novamente o instalador apos revisar as mudancas
 ```
 
-#### Tiers de Risco
-* **T1 (Fast Path/Automático)**: Lint, typos, documentações simples. Execução atômica direta. Pula grill/roadmap. Loga em `ESTADO_ORQUESTRATOR.md`.
-* **T2 (Batch/Lote)**: Testes cobertura, pequenos ADRs. Executa lote, valida roadmap, reporta no final.
-* **T3 (Bloqueante/Crítico)**: Mudanças de schema DB, autenticação, exclusão API pública. **PARE** -> Interrogue usuário: `Você aprova esta ação bloqueante? [sim / não / parcialmente]`.
+6. Se houver commits novos, informe a atualizacao disponivel e execute o re-deploy das skills nos ambientes em uso. Use o instalador em modo nao interativo, por exemplo `scripts/setup-alltomatos-skills.sh --redeploy <diretorios-detectados>`. O re-deploy deve acontecer depois do `fetch`, sem sobrescrever backups existentes.
+7. Depois do re-deploy, confirme que `orchestrator` e `setup-skills` apontam para a revisao nova e informe o resultado ao usuario antes de continuar.
+8. Se nao houver mudancas, registre `Framework atualizado (<commit>)` sem interromper o fluxo.
+9. Se nao for possivel localizar o clone, o remote ou a rede, informe `Nao foi possivel verificar atualizacoes do framework` e continue apenas se as skills locais estiverem disponiveis. Nao faca re-deploy sem confirmar uma revisao nova.
 
----
+Quando uma revisao nova for confirmada, o re-deploy e automatico e faz parte do contrato do orchestrator. Para uma instalacao inicial ou troca de ambientes, a decisao continua sendo explicita do usuario por meio de `scripts/setup-alltomatos-skills.sh`.
 
-### Fase 4 — Fragmentação e Delegação (DAG + Worktrees)
+## Fase 0 - Pre-condicoes de governanca
 
-#### 1. Atomização (Slices)
-Quebrar GAPs aprovados em tarefas rápidas (<10 min ou slice vertical rota+teste). Tarefas que alterem >3 arquivos ou exijam >2 iterações -> fragmentar mais.
+Antes de criar arquivos ou delegar trabalho:
 
-#### 2. Matriz DAG
-Registrar tarefas e dependências em `ESTADO_ORQUESTRATOR.md`:
-```markdown
-### Tarefas
-- [ ] T1: Nome tarefa | depends_on: []
-- [ ] T2: Nome tarefa | depends_on: [T1]
+1. Verifique se o projeto tem Git inicializado.
+2. Verifique se existe um remote GitHub valido, preferencialmente `origin`.
+3. Verifique acesso ao repositorio com `gh repo view` ou mecanismo equivalente.
+
+Se o ambiente estiver vazio, nao tiver Git ou nao tiver repositorio remoto no GitHub, pare o fluxo e oriente o usuario a:
+
+1. criar o repositorio no GitHub;
+2. inicializar o repositorio local;
+3. configurar o remote `origin`;
+4. fazer o primeiro commit e push;
+5. retornar ao orchestrator.
+
+Nao substitua o GitHub silenciosamente por tracker local. GitHub e a fonte de rastreabilidade, Issues, revisao e historico deste framework.
+
+## Fase 1 - Provisionamento documental
+
+1. Invocar `/setup-skills` para completar `AGENTS.md` ou `CLAUDE.md`, `CONTEXT.md`, `docs/agents/` e `docs/adr/`.
+2. Invocar `/roadmap` para criar ou atualizar `ORCHESTRATOR-ROADMAP.md` e Epics.
+3. Invocar `/grill-with-docs` para consolidar linguagem de dominio e decisoes arquiteturais.
+4. Em repositorio vazio, invocar `/scaffold-mvp` apos o alinhamento de dominio.
+5. Revisar e persistir a documentacao antes de iniciar implementacao.
+
+Documentacao nao e uma etapa opcional: o orchestrator deve deixar um estado compreensivel para outro agent continuar o trabalho.
+
+## Fase 2 - Auditoria
+
+Verifique:
+
+```text
+[ ] Git inicializado
+[ ] Remote GitHub configurado e acessivel
+[ ] AGENTS.md ou CLAUDE.md
+[ ] CONTEXT.md ou CONTEXT-MAP.md
+[ ] docs/agents/ com tracker e labels
+[ ] docs/adr/ quando houver decisoes relevantes
+[ ] ORCHESTRATOR-ROADMAP.md
+[ ] Skills instaladas no ambiente escolhido
 ```
-Nós sem pendências (folhas) -> Despachar execução.
 
-#### 3. Concorrência Segura (Git Worktrees)
-* **Paralelismo**: Tarefas concorrentes e sem dependências mútuas -> despachar subagentes em paralelo.
-* **Git Worktree Obrigatório**: Subagentes paralelos **devem** rodar sob `{ isolation: "worktree" }` para previnir conflitos de sistema do usuário.
-* **Grande Fatias**: Atividades de alteração pesada (>1 arquivo longo alterado, modificação em esquema de BD) -> isolar em worktree dedicada para estabilidade do build local.
-* **Resolução**: Orquestrador herda e consolida branches locais das worktrees concluídas.
+Classifique gaps como P1 (seguranca/tipos), P2 (arquitetura), P3 (performance) ou P4 (higiene/documentacao). Use `/improve-codebase-architecture`, `/diagnose`, `/query-docs` ou `/zoom-out` conforme o caso.
 
----
+## Fase 3 - Fragmentacao no GitHub
 
-### Fase 5 — Fiscalização de Testes e Fim
+Os gaps aprovados devem ser transformados em Issues por `/to-issues`. O GitHub e a fonte persistente de escopo, criterios de aceite, dependencias e status; `ESTADO_ORQUESTRATOR.md` e apenas a visao operacional da DAG.
 
-Após a conclusão de cada nó da DAG:
-1. Executar testes existentes locais.
-2. Garantir testes específicos da área alterada.
-3. Se testes falharem: Interrompa DAG -> Invocar `/diagnose` -> Corrija antes da próxima tarefa.
+1. Passe para `/to-issues` os gaps, roadmap e documentacao aprovados.
+2. Apresente a decomposicao para aprovacao quando houver decisao HITL.
+3. Publique as Issues em ordem de dependencia, usando IDs reais em `Blocked by`.
+4. Registre o mapeamento `Tarefa -> Issue GitHub -> branch/worktree`.
+5. Nunca crie uma DAG apenas em memoria ou apenas em arquivo local quando a tarefa puder ser rastreada no GitHub.
 
-Fila vazia -> Invocar **Agente Fiscal de Testes**:
-* Verificar criação de testes específicos (`git diff --name-only` para arquivos `.test.` / `.spec.`).
-* Testes de segurança em arquivos `*.spec.sec.ts` acionados pelo `/secure-e2e`.
-* suite completo passar 100%.
+## Fase 4 - Execucao
 
-**Portão de QA obrigatório**: sucesso na suíte de testes -> invocar **obrigatoriamente** `/qa-analyst` para analisar o código gerado/alterado nesta DAG (requisitos vs. implementação, casos de teste faltantes, cenários de erro e comportamentos inesperados não cobertos). Isso **não é opcional e não é dispensável por Tier** — mesmo tarefas T1 (Fast Path) passam por este portão antes do PR. Bugs/gaps relatados pela `/qa-analyst` reabrem a DAG como novas tarefas antes de prosseguir.
+Use slices verticais pequenos. Tarefas independentes podem ser executadas em paralelo com worktrees isoladas. Tarefas que alterem schema, autenticacao, APIs publicas ou dados exigem confirmacao humana.
 
-Sucesso na análise de QA -> Invocar `/git-flow-pr-standard` para conclusão e merge da branch.
+O orchestrator delega para skills especializadas, por exemplo:
+
+- `/tdd` para implementacao orientada a testes;
+- `/secure-e2e` para fluxos E2E e seguranca;
+- `/diagnose` para bugs e regressao;
+- `/query-docs` para APIs de terceiros;
+- `/write-a-skill` para gargalos nao cobertos.
+
+## Fase 5 - Verificacao e QA
+
+Depois de cada tarefa, execute verificacoes proporcionais e registre evidencia. Se falhar, invoque `/diagnose` antes de continuar.
+
+Quando a DAG estiver concluida, invoque obrigatoriamente `/qa-analyst`, sem excecao de tier. O QA deve confrontar requisitos, Issues, implementacao, testes, cenarios de erro e mudancas fora de escopo. Falhas reabrem Issues ou criam novas tarefas.
+
+Somente depois da aprovacao do QA pode ocorrer a entrega por PR. Se nao existir uma skill de fluxo Git/PR instalada, descreva os passos e solicite confirmacao humana; nunca invoque uma skill inexistente.

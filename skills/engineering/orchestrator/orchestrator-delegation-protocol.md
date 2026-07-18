@@ -13,7 +13,7 @@ O Orquestrador opera com base em **Tiers de Risco**. A autonomia é concedida co
 O Orquestrador reconhece tarefas T1 (limpeza, documentações simples que não alteram lógica, refatorações safe e setups de ferramentas/linters) como elegíveis para o **Fast Path**:
 - **Bypass de Processo**: Pula obrigatoriamente a atualização/auditoria de Roadmap estratégico global e as sessões burocráticas/extensivas de interrogatório via `/grill-with-docs` ou `/grill-me`.
 - **Execução Atômica**: O Orquestrador planeja e executa a tarefa imediatamente de forma direta.
-- **Guardrails de Qualidade Mandatórios**: O fluxo deve honrar rigorosamente o rito de TDD para assegurar que nada foi quebrado e acionar a skill `/git-flow-pr-standard` para garantir commit semântico correto.
+- **Guardrails de Qualidade Mandatórios**: O fluxo deve honrar rigorosamente o rito de TDD e acionar `/qa-analyst` antes de qualquer PR. Se nao houver skill de PR disponivel, orientar o fluxo Git manualmente e pedir confirmacao humana.
 - **Ação**: Executa silenciosamente → Loga no `ESTADO_ORQUESTRATOR.md` → Finaliza o PR da mudança atômica.
 
 ### Tier 2: Execução em Batch (Risco Médio)
@@ -80,7 +80,7 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 | Problema | Skill |
 | --- | --- |
 | Governança & Orquestração | `/orchestrator` |
-| Versionamento & PRs | `/git-flow-pr-standard` |
+| Versionamento & PRs | Fluxo Git disponivel no ambiente, com confirmacao humana |
 | Infraestrutura ausente | `/setup-skills` |
 | Linguagem de domínio ausente | `/grill-with-docs` |
 | Arquitetura degradada | `/improve-codebase-architecture` |
@@ -153,7 +153,7 @@ Para toda tarefa que resultar em alteração de código, o ciclo de conclusão *
 Falha neste portão -> **bloqueia** o avanço para o PR. O Orchestrator reabre a DAG com as tarefas de correção apontadas pela `/qa-analyst` e só prossegue após nova validação limpa.
 
 ### 4. Protocolo de PR e Fechamento de Ciclo (Mandatário)
-Somente após o Portão de QA (item 3) ser aprovado, o Orchestrator deve invocar obrigatoriamente a skill `git-flow-pr-standard` para garantir que as alterações sejam versionadas corretamente:
+Somente após o Portão de QA ser aprovado, o Orchestrator pode iniciar o fluxo de PR disponível no ambiente. Nunca invoque uma skill de PR que nao esteja instalada:
 - [ ] O commit segue Conventional Commits?
 - [ ] A branch seguiu o padrão `tipo/issue-descricao`?
 - [ ] O template de PR foi preenchido?

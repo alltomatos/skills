@@ -1,51 +1,46 @@
 ---
 name: setup-skills
-description: Sets up an `## Agent skills` block in AGENTS.md/CLAUDE.md and `docs/agents/`. Run before first use of engineering skills.
+description: Provisiona a governanca documental do projeto e valida o GitHub como tracker obrigatorio antes do uso das skills de engenharia.
 ---
 
 # Setup Skills
 
-Provisionamento de configurações do agente por repositório.
+## Processo
 
-## PROCESSO DIRETO
+### 1. Explorar
 
-### 1. Explore (Pesquisa Inicial)
-Identificar o ambiente atual (obrigatório modo interativo):
-* `git remote -v` -> Repositório ativo e remoto correspondente.
-* `AGENTS.md` ou `CLAUDE.md` na raiz -> seção `## Agent skills` ativa?
-* `CONTEXT.md` ou `CONTEXT-MAP.md` na raiz.
-* Pastas públicas: `docs/adr/`, `src/*/docs/adr/`, `docs/agents/`.
-* Presença do diretório `.scratch/` (indicação de tracker local).
+Verifique `git status`, `git remote -v`, `AGENTS.md` ou `CLAUDE.md`, `CONTEXT.md`, `docs/adr/` e `docs/agents/`.
 
-### 2. Escolha
-Perguntar escolhas ao usuário:
-* **Issue Tracker**:
-  * GitHub: autenticar remotos.
-  * GitLab: obter configurações.
-  * Local markdown: usar arquivos sob `.scratch/<feature>/`.
-  * Outros (Jira/Linear): armazenar fluxo livre de texto.
-* **Triage Vociabulário** (Default se ausente):
-  * `needs-triage` (eval)
-  * `needs-info` (aguardando)
-  * `ready-for-agent` (pronto ia)
-  * `ready-for-human` (humano)
-  * `wontfix` (morto)
-* **Domain Layout**:
-  * Single-context: `CONTEXT.md` + `docs/adr/` na raiz.
-  * Multi-context: `CONTEXT-MAP.md` mapeando sub-pastas de contexto.
+### 2. Governanca GitHub
 
-### 3. Validação e Deploy
-* **Conectividade**: Testar `gh repo view` (GitHub) ou `git remote` (GitLab). Caso local, garantir pasta `.scratch/` gravável.
-* **Provisionamento das Skills**: Verificar primeiro se `~/.claude/skills/` existe e contém ao menos `orchestrator` e `setup-skills`. Se já existirem, pular instalação — skills já estão no perfil do usuário. Somente se ausentes: localizar o repositório `alltomatos/skills` (ex: `~/dev/skills`) e rodar `./scripts/setup-alltomatos-skills.sh` a partir dele.
-* **Context7**: Iniciar Context7 via `npx ctx7 setup` e gerar `.claude/context7.json` com dependências preliminares descobertas.
-* **Health Check**: Verificar que `~/.claude/skills/` contém as skills esperadas (`ls ~/.claude/skills/`). Diretório ausente ou vazio -> redirecione para `/diagnose`.
+Este framework usa GitHub como fonte de Issues, rastreabilidade e revisao.
 
-### 4. Escrita dos Artefatos
-Criar e salvar os seguintes arquivos após validação em `docs/agents/`:
-* `issue-tracker.md` (github, gitlab ou local)
-* `triage-labels.md`
-* `domain.md`
-Persistir configurações do projeto em `.claude/config.json` e o manifesto `.claude/context7.json` gerado.
+- Se nao houver Git, oriente a inicializacao local.
+- Se nao houver remote GitHub, oriente a criacao do repositorio e a configuracao de `origin`.
+- Valide acesso com `gh repo view` ou ferramenta equivalente.
+- Nao configure tracker local como fallback silencioso.
 
-### 5. Fim
-Confirmar setup completo. Registrar na raiz do projeto `CLAUDE.md` ou `AGENTS.md` o bloco correspondente de `## Agent skills`.
+### 3. Escolhas do projeto
+
+Pergunte apenas o que ainda nao puder ser descoberto:
+
+- vocabulario de triage, usando `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human` e `wontfix` como defaults;
+- layout de dominio: `CONTEXT.md` + `docs/adr/` ou `CONTEXT-MAP.md`;
+- convencoes de branches, testes e deploy.
+
+### 4. Artefatos
+
+Crie ou atualize, sem apagar conteudo existente:
+
+- `AGENTS.md` ou `CLAUDE.md` com a secao `## Agent skills`;
+- `CONTEXT.md` ou `CONTEXT-MAP.md`;
+- `docs/agents/issue-tracker.md`;
+- `docs/agents/triage-labels.md`;
+- `docs/agents/domain.md`;
+- `docs/adr/` quando houver decisoes arquiteturais.
+
+Registre o remote GitHub e as escolhas feitas. A instalacao das skills ocorre pelo script do framework e nao deve ser presumida neste projeto.
+
+### 5. Conclusao
+
+Informe os arquivos criados, a URL do GitHub, o tracker configurado e os proximos passos. Se a pre-condicao GitHub falhar, encerre com instrucoes de desbloqueio.
