@@ -51,7 +51,7 @@ done
 [[ ${#DESTS[@]} -gt 0 ]] || { echo "Nenhum ambiente selecionado." >&2; exit 1; }
 fi
 
-mapfile -t SKILL_DIRS < <(find "$REPO/skills" -mindepth 2 -maxdepth 2 -name SKILL.md \
+mapfile -t SKILL_DIRS < <(find "$REPO/skills" -mindepth 3 -maxdepth 3 -name SKILL.md \
   -not -path '*/deprecated/*' -not -path '*/personal/*' -not -path '*/in-progress/*' \
   -print | while IFS= read -r file; do dirname "$file"; done | sort)
 
