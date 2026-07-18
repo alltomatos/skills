@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || true)"
+REPO="$(cd "$SCRIPT_DIR/.." 2>/dev/null && pwd || true)"
 
+# Permite instalar sem clonar: curl baixa o script e ele baixa a release do framework.
 if [[ ! -f "$REPO/.claude-plugin/plugin.json" ]]; then
-  echo "Erro: execute este script a partir de um clone valido do framework." >&2
+  if [[ "${FRAMEWORK_BOOTSTRAPPED:-}" != "1" ]]; then
+    command -v curl >/dev/null || { echo "Erro: curl e necessario para instalacao sem clone." >&2; exit 1; }
+    command -v tar >/dev/null || { echo "Erro: tar e necessario para instalacao sem clone." >&2; exit 1; }
+    BOOTSTRAP_DIR="$(mktemp -d)"
+    trap 'rm -rf "$BOOTSTRAP_DIR"' EXIT
+    curl -fsSL "${SKILLS_FRAMEWORK_ARCHIVE_URL:-https://github.com/alltomatos/skills/archive/refs/heads/main.tar.gz}" | tar -xz -C "$BOOTSTRAP_DIR" --strip-components=1
+    FRAMEWORK_BOOTSTRAPPED=1 exec bash "$BOOTSTRAP_DIR/scripts/setup-alltomatos-skills.sh" "$@"
+  fi
+  echo "Erro: nao foi possivel localizar o framework." >&2
   exit 1
 fi
 
