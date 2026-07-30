@@ -61,6 +61,16 @@ Nao substitua o GitHub silenciosamente por tracker local. GitHub e a fonte de ra
 
 Documentacao nao e uma etapa opcional: o orchestrator deve deixar um estado compreensivel para outro agent continuar o trabalho.
 
+### Caso especial - projeto novo com apenas um PRD na pasta
+
+Quando o repositorio for inicializado a partir de uma pasta que contem somente um PRD (sem codigo):
+
+1. Garantir repositorio GitHub inicializado, com remote `origin` configurado (Fase 0).
+2. Criar e fazer checkout da branch `develop` a partir da branch padrao.
+3. Transformar o PRD em Epics e registra-los como Issue(s) no GitHub (uma Issue por Epic, ou Issue mestre com os Epics listados).
+4. Invocar `/to-issues` para fatiar cada Epic em Issues atomicas (slices verticais, rastreaveis, com criterios de aceite), registrando o mapeamento Epic -> Issues conforme Fase 3.
+5. Seguir para a Fase 4 usando o modo de fila sequencial descrito abaixo.
+
 ## Fase 2 - Auditoria
 
 Verifique:
@@ -99,6 +109,17 @@ O orchestrator delega para skills especializadas, por exemplo:
 - `/diagnose` para bugs e regressao;
 - `/query-docs` para APIs de terceiros;
 - `/write-a-skill` para gargalos nao cobertos.
+
+### Fila sequencial para Epics fatiados de um PRD
+
+Quando as Issues vierem do caso especial "projeto novo com apenas um PRD" (Fase 1), a execucao **nao** e paralela: despachar **um unico agente por vez**, na ordem de dependencia das Issues.
+
+1. Para o Epic atual, processar suas Issues fatiadas uma a uma: desenvolver -> QA (Fase 5) -> commit -> proxima Issue da fila. Repetir ate esgotar todas as Issues do Epic.
+2. Epic esgotado -> abrir PR da branch de trabalho para `develop`.
+   * PR verde (CI/testes passam) -> merge em `develop`.
+   * PR falhar -> corrigir os problemas, reexecutar a verificacao e so entao mergear.
+3. Apos o merge, voltar para a branch `develop` e avancar para o proximo Epic da fila, repetindo o loop ate que todos os Epics do PRD estejam finalizados.
+4. Ao concluir todos os Epics, abrir o merge final de `develop` para `main`.
 
 ## Fase 5 - Verificacao e QA
 
