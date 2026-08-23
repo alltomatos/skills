@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || true)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" 2>/dev/null && pwd || true)"
 REPO="$(cd "$SCRIPT_DIR/.." 2>/dev/null && pwd || true)"
+
+prompt_read() {
+  local prompt="$1"
+  local var_name="$2"
+  if [ ! -t 0 ] && { true </dev/tty; } 2>/dev/null; then
+    read -r -p "$prompt" "$var_name" </dev/tty
+  else
+    read -r -p "$prompt" "$var_name"
+  fi
+}
 
 # Permite instalar sem clonar: curl baixa o script e ele baixa a release do framework.
 if [[ ! -f "$REPO/.claude-plugin/plugin.json" ]]; then
@@ -36,29 +46,35 @@ fi
 if [[ "$REDEPLOY" == true ]]; then
   [[ ${#DESTS[@]} -gt 0 ]] || { echo "Nenhum ambiente instalado foi encontrado." >&2; exit 1; }
 else
-echo "Instalacao das skills do framework"
-echo "Selecione um ou mais ambientes separados por espaco:"
-echo "  1) Codex     (~/.codex/skills)"
-echo "  2) Claude    (~/.claude/skills)"
-echo "  3) Hermes    (~/.hermes/skills)"
-echo "  4) Outro     (informar caminho)"
-read -r -p "Ambientes [1 2 3]: " choices
+  if [[ -n "${SKILLS_ENVIRONMENTS:-}" ]]; then
+    choices="$SKILLS_ENVIRONMENTS"
+  elif [[ $# -gt 0 ]]; then
+    choices="$*"
+  else
+    echo "Instalacao das skills do framework"
+    echo "Selecione um ou mais ambientes separados por espaco:"
+    echo "  1) Codex     (~/.codex/skills)"
+    echo "  2) Claude    (~/.claude/skills)"
+    echo "  3) Hermes    (~/.hermes/skills)"
+    echo "  4) Outro     (informar caminho)"
+    prompt_read "Ambientes [1 2 3]: " choices
+  fi
 
-for choice in $choices; do
-  case "$choice" in
-    1) DESTS+=("${CODEX_SKILLS_DIR:-$HOME/.codex/skills}") ;;
-    2) DESTS+=("${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}") ;;
-    3) DESTS+=("${HERMES_SKILLS_DIR:-$HOME/.hermes/skills}") ;;
-    4)
-      read -r -p "Caminho da pasta de skills: " custom
-      [[ -n "$custom" ]] || { echo "Caminho vazio." >&2; exit 1; }
-      DESTS+=("${custom/#\~/$HOME}")
-      ;;
-    *) echo "Opcao invalida: $choice" >&2; exit 1 ;;
-  esac
-done
+  for choice in $choices; do
+    case "$choice" in
+      1) DESTS+=("${CODEX_SKILLS_DIR:-$HOME/.codex/skills}") ;;
+      2) DESTS+=("${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}") ;;
+      3) DESTS+=("${HERMES_SKILLS_DIR:-$HOME/.hermes/skills}") ;;
+      4)
+        prompt_read "Caminho da pasta de skills: " custom
+        [[ -n "$custom" ]] || { echo "Caminho vazio." >&2; exit 1; }
+        DESTS+=("${custom/#\~/$HOME}")
+        ;;
+      *) echo "Opcao invalida: $choice" >&2; exit 1 ;;
+    esac
+  done
 
-[[ ${#DESTS[@]} -gt 0 ]] || { echo "Nenhum ambiente selecionado." >&2; exit 1; }
+  [[ ${#DESTS[@]} -gt 0 ]] || { echo "Nenhum ambiente selecionado." >&2; exit 1; }
 fi
 
 declare -a SKILL_DIRS=()
