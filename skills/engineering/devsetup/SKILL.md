@@ -1,6 +1,6 @@
 ---
 name: devsetup
-description: Instala, via winget (e npm para o único caso que exige), o conjunto essencial de ferramentas pra deixar uma máquina Windows pronta pra programar com IA (Node LTS, Git, GitHub CLI, Go, uv, Windows Terminal, Chrome, Python, WinRAR, Notepad++, Sublime Text, OmniRoute) — sem rodar nenhum script de terceiros, tweak de sistema ou instalador externo. Ativada explicitamente via `/devsetup`, e também sempre que o usuário disser que formatou/reinstalou o Windows, está numa VM/máquina nova, pedir pra "preparar o ambiente", "configurar essa máquina do zero", "instalar tudo que preciso pra programar", ou mencionar WinUtil/scripts de bootstrap de ambiente — mesmo sem citar os nomes exatos dos programas.
+description: Instala, via winget (e npm para o único caso que exige), o conjunto essencial de ferramentas pra deixar uma máquina Windows pronta pra programar com IA (Node LTS, Git, GitHub CLI, Go, uv, Windows Terminal, Chrome, Python, 7-Zip, Notepad++, Sublime Text, OmniRoute) — sem rodar nenhum script de terceiros, tweak de sistema ou instalador externo. Ativada explicitamente via `/devsetup`, e também sempre que o usuário disser que formatou/reinstalou o Windows, está numa VM/máquina nova, pedir pra "preparar o ambiente", "configurar essa máquina do zero", "instalar tudo que preciso pra programar", ou mencionar WinUtil/scripts de bootstrap de ambiente — mesmo sem citar os nomes exatos dos programas.
 ---
 
 # Provisionar ambiente de desenvolvimento Windows (/devsetup)
@@ -31,7 +31,7 @@ Todos via `winget install --id <ID> -e` (o `-e` garante match exato do ID, evita
 | Windows Terminal | `Microsoft.WindowsTerminal` |
 | Google Chrome | `Google.Chrome` |
 | Python 3 | `Python.Python.3.14` |
-| WinRAR | `RARLab.WinRAR` |
+| 7-Zip | `7zip.7zip` |
 | Notepad++ | `Notepad++.Notepad++` |
 | Sublime Text | `SublimeHQ.SublimeText.4` |
 
@@ -55,7 +55,7 @@ E, via npm (depois do Node LTS acima):
    winget install --id Microsoft.WindowsTerminal -e --accept-package-agreements --accept-source-agreements
    winget install --id Google.Chrome -e --accept-package-agreements --accept-source-agreements
    winget install --id Python.Python.3.14 -e --accept-package-agreements --accept-source-agreements
-   winget install --id RARLab.WinRAR -e --accept-package-agreements --accept-source-agreements
+   winget install --id 7zip.7zip -e --accept-package-agreements --accept-source-agreements
    winget install --id Notepad++.Notepad++ -e --accept-package-agreements --accept-source-agreements
    winget install --id SublimeHQ.SublimeText.4 -e --accept-package-agreements --accept-source-agreements
    ```
