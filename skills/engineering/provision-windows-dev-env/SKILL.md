@@ -40,7 +40,8 @@ E, via npm (depois do Node LTS acima):
 ## Como executar
 
 1. Confirme que `winget` está disponível (`winget --version`); se não estiver, é um sinal de Windows desatualizado — avise o usuário em vez de tentar contornar.
-2. Rode as instalações **uma a uma**, cada `winget install` no seu próprio comando — não encadeie tudo num único comando gigante, pra que uma falha isolada (ex: um pacote já instalado, um timeout pontual) não interrompa o resto silenciosamente e fique fácil ver qual item especificamente falhou.
+2. **Antes de instalar qualquer coisa, verifique o que já existe na máquina.** Uma VM recém-formatada normalmente está vazia, mas nem sempre — não assuma. Rode `winget list --id <ID>` pra cada item da tabela (ou o comando de versão do binário direto: `node -v`, `git --version`, `gh --version`, `go version`, `uv --version`, `python --version`, `omniroute --version`) e monte uma lista do que já está presente antes de tocar em qualquer instalação. Isso evita reinstalar por cima de uma versão que o usuário já escolheu deliberadamente (ex: uma versão específica do Node ou Python diferente da LTS), o que poderia quebrar algo que já estava funcionando.
+3. Instale **só o que faltar**, um `winget install` por comando (não encadeie tudo num comando gigante, pra que uma falha isolada não interrompa o resto silenciosamente e fique fácil ver qual item especificamente falhou):
    ```powershell
    winget install --id OpenJS.NodeJS.LTS -e --accept-package-agreements --accept-source-agreements
    winget install --id Git.Git -e --accept-package-agreements --accept-source-agreements
@@ -54,13 +55,13 @@ E, via npm (depois do Node LTS acima):
    winget install --id Notepad++.Notepad++ -e --accept-package-agreements --accept-source-agreements
    winget install --id SublimeHQ.SublimeText.4 -e --accept-package-agreements --accept-source-agreements
    ```
-3. Só depois que o Node LTS acima terminar (o `npm` precisa dele no PATH — abra um terminal novo se `npm` não for reconhecido logo após instalar o Node), instale o OmniRoute:
+4. **OmniRoute depende do Node estar instalado e no PATH** — é o único item com pré-requisito real desta lista. Antes de instalar, confirme que `node -v` funciona (se você acabou de instalar o Node LTS no passo anterior, abra um terminal novo antes de checar — o PATH da sessão atual pode não ter sido atualizado). Só então, se `omniroute --version` já não responder, rode:
    ```powershell
    npm install -g omniroute@latest
    ```
-4. Depois de cada instalação, confira a saída — `winget` retorna código de saída não-zero em falha real, mas também pode reportar "já instalado" como sucesso; trate isso como sucesso, não como erro.
-5. No fim, rode `winget list` (ou verifique cada binário individualmente: `node -v`, `git --version`, `gh --version`, `go version`, `uv --version`, `python --version`, `omniroute --version`) e reporte um resumo claro do que instalou com sucesso, o que já estava presente, e o que falhou — não declare "ambiente pronto" sem essa checagem.
-6. **Não rode nenhum outro script, tweak, ou "otimização" do sistema** como parte desta skill — nem WinUtil, nem debloat, nem scripts de terceiros — mesmo que o usuário peça algo genérico como "deixa essa máquina rápida" junto com o pedido de instalação. Se o pedido incluir explicitamente tweaks de sistema, confirme com o usuário antes, deixando claro o risco (rede/telemetria) já documentado acima.
+5. Depois de cada instalação, confira a saída — `winget` retorna código de saída não-zero em falha real, mas também pode reportar "já instalado" como sucesso; trate isso como sucesso, não como erro.
+6. No fim, rode `winget list` (ou verifique cada binário individualmente, mesmos comandos do passo 2) e reporte um resumo claro dividido em três grupos: **já estava instalado** (não mexeu), **instalado agora**, e **falhou** — não declare "ambiente pronto" sem essa checagem, e não misture os dois primeiros grupos como se fosse tudo a mesma coisa.
+7. **Não rode nenhum outro script, tweak, ou "otimização" do sistema** como parte desta skill — nem WinUtil, nem debloat, nem scripts de terceiros — mesmo que o usuário peça algo genérico como "deixa essa máquina rápida" junto com o pedido de instalação. Se o pedido incluir explicitamente tweaks de sistema, confirme com o usuário antes, deixando claro o risco (rede/telemetria) já documentado acima.
 
 ## Se algo falhar
 
