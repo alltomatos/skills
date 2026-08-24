@@ -1,9 +1,13 @@
 ---
-name: provision-windows-dev-env
-description: Instala, via winget (e npm para o único caso que exige), o conjunto essencial de ferramentas pra deixar uma máquina Windows pronta pra programar com IA (Node LTS, Git, GitHub CLI, Go, uv, Windows Terminal, Chrome, Python, WinRAR, Notepad++, Sublime Text, OmniRoute) — sem rodar nenhum script de terceiros, tweak de sistema ou instalador externo. Use sempre que o usuário disser que formatou/reinstalou o Windows, está numa VM/máquina nova, pedir pra "preparar o ambiente", "configurar essa máquina do zero", "instalar tudo que preciso pra programar", ou mencionar WinUtil/scripts de bootstrap de ambiente — mesmo sem citar os nomes exatos dos programas.
+name: devsetup
+description: Instala, via winget (e npm para o único caso que exige), o conjunto essencial de ferramentas pra deixar uma máquina Windows pronta pra programar com IA (Node LTS, Git, GitHub CLI, Go, uv, Windows Terminal, Chrome, Python, WinRAR, Notepad++, Sublime Text, OmniRoute) — sem rodar nenhum script de terceiros, tweak de sistema ou instalador externo. Ativada explicitamente via `/devsetup`, e também sempre que o usuário disser que formatou/reinstalou o Windows, está numa VM/máquina nova, pedir pra "preparar o ambiente", "configurar essa máquina do zero", "instalar tudo que preciso pra programar", ou mencionar WinUtil/scripts de bootstrap de ambiente — mesmo sem citar os nomes exatos dos programas.
 ---
 
-# Provisionar ambiente de desenvolvimento Windows
+# Provisionar ambiente de desenvolvimento Windows (/devsetup)
+
+## Narre cada passo pro usuário
+
+Essa skill roda vários comandos em sequência, alguns demorados (download + instalação de ~10 programas). **Antes de cada ação (verificação ou instalação), diga em uma frase curta o que você está prestes a fazer** — não só ao final, e não em silêncio até o resumo. Por exemplo: "Verificando se o Git já está instalado...", "Git não encontrado — instalando via winget...", "Node.js LTS já está presente, pulando.". O usuário não tem como saber se o processo travou ou só está demorando sem esse feedback contínuo — o silêncio no meio de um provisionamento de vários minutos é o pior resultado possível aqui, mesmo que tudo dê certo no final.
 
 ## Por que isto existe
 
@@ -40,8 +44,8 @@ E, via npm (depois do Node LTS acima):
 ## Como executar
 
 1. Confirme que `winget` está disponível (`winget --version`); se não estiver, é um sinal de Windows desatualizado — avise o usuário em vez de tentar contornar.
-2. **Antes de instalar qualquer coisa, verifique o que já existe na máquina.** Uma VM recém-formatada normalmente está vazia, mas nem sempre — não assuma. Rode `winget list --id <ID>` pra cada item da tabela (ou o comando de versão do binário direto: `node -v`, `git --version`, `gh --version`, `go version`, `uv --version`, `python --version`, `omniroute --version`) e monte uma lista do que já está presente antes de tocar em qualquer instalação. Isso evita reinstalar por cima de uma versão que o usuário já escolheu deliberadamente (ex: uma versão específica do Node ou Python diferente da LTS), o que poderia quebrar algo que já estava funcionando.
-3. Instale **só o que faltar**, um `winget install` por comando (não encadeie tudo num comando gigante, pra que uma falha isolada não interrompa o resto silenciosamente e fique fácil ver qual item especificamente falhou):
+2. **Antes de instalar qualquer coisa, verifique o que já existe na máquina.** Uma VM recém-formatada normalmente está vazia, mas nem sempre — não assuma. Anuncie "Verificando o que já está instalado..." e rode `winget list --id <ID>` pra cada item da tabela (ou o comando de versão do binário direto: `node -v`, `git --version`, `gh --version`, `go version`, `uv --version`, `python --version`, `omniroute --version`) — diga o resultado de cada checagem conforme for rodando (ex: "Git: não encontrado", "Node.js LTS: já instalado"), não só no final. Isso evita reinstalar por cima de uma versão que o usuário já escolheu deliberadamente (ex: uma versão específica do Node ou Python diferente da LTS), o que poderia quebrar algo que já estava funcionando.
+3. Instale **só o que faltar**, um `winget install` por comando (não encadeie tudo num comando gigante, pra que uma falha isolada não interrompa o resto silenciosamente e fique fácil ver qual item especificamente falhou). Antes de cada instalação, diga qual programa está instalando agora (ex: "Instalando Git...") — o download+instalação de cada um pode levar bastante tempo, e o usuário precisa saber em qual item o processo está:
    ```powershell
    winget install --id OpenJS.NodeJS.LTS -e --accept-package-agreements --accept-source-agreements
    winget install --id Git.Git -e --accept-package-agreements --accept-source-agreements
