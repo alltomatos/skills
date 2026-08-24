@@ -59,10 +59,22 @@ E, via npm (depois do Node LTS acima):
    winget install --id Notepad++.Notepad++ -e --accept-package-agreements --accept-source-agreements
    winget install --id SublimeHQ.SublimeText.4 -e --accept-package-agreements --accept-source-agreements
    ```
-4. **OmniRoute depende do Node estar instalado e no PATH** — é o único item com pré-requisito real desta lista. Antes de instalar, confirme que `node -v` funciona (se você acabou de instalar o Node LTS no passo anterior, abra um terminal novo antes de checar — o PATH da sessão atual pode não ter sido atualizado). Só então, se `omniroute --version` já não responder, rode:
+4. **OmniRoute depende do Node estar instalado e no PATH** — é o único item com pré-requisito real desta lista. Antes de instalar, confirme que `node -v` funciona (se você acabou de instalar o Node LTS no passo anterior, abra um terminal novo antes de checar — o PATH da sessão atual pode não ter sido atualizado). Só então, se `omniroute --version` já não responder, instale.
+
+   **`omniroute` é um pacote npm grande (~1000 dependências transitivas)** — em rede lenta ou instável, um `npm install -g` direto facilmente estoura o tempo limite de uma única chamada de ferramenta (mesmo rodando "em background" com `&`, porque a chamada de shell ainda fica bloqueada esperando o processo terminar antes de devolver o controle). O sintoma é exatamente esse: a instalação trava/reinicia repetidas vezes no mesmo ponto, sem nunca reportar sucesso nem erro real. A causa não é o pacote estar quebrado — é o padrão de execução que está errado pra esse caso.
+
+   Em vez disso, desanexe o processo de verdade (ele sobrevive ao retorno do comando) e faça *polling* do log, ao invés de tentar esperar a instalação inteira dentro de uma chamada só:
    ```powershell
-   npm install -g omniroute@latest
+   $log = "$env:TEMP\omniroute-install.log"
+   Start-Process -FilePath "npm" -ArgumentList "install -g omniroute@latest --loglevel=error --no-audit --no-fund --fetch-retries=5 --fetch-retry-mintimeout=20000" `
+     -WindowStyle Hidden -RedirectStandardOutput $log -RedirectStandardError "$env:TEMP\omniroute-install.err.log"
    ```
+   Depois, avise o usuário que a instalação está rodando em segundo plano e vai levar alguns minutos, e **faça checagens curtas e espaçadas** (não continue tentando rodar o install inteiro de novo):
+   ```powershell
+   omniroute --version 2>$null
+   Get-Content "$env:TEMP\omniroute-install.log" -Tail 10 -ErrorAction SilentlyContinue
+   ```
+   Repita essa checagem a cada checagem espaçada até `omniroute --version` responder (sucesso) ou o log de erro indicar falha real (ex: erro de rede persistente, não apenas lentidão). Cada checagem individual é rápida — é a espera entre elas que cobre o tempo real da instalação, evitando o timeout que ocorre quando se tenta esperar tudo de uma vez numa única chamada.
 5. Depois de cada instalação, confira a saída — `winget` retorna código de saída não-zero em falha real, mas também pode reportar "já instalado" como sucesso; trate isso como sucesso, não como erro.
 6. No fim, rode `winget list` (ou verifique cada binário individualmente, mesmos comandos do passo 2) e reporte um resumo claro dividido em três grupos: **já estava instalado** (não mexeu), **instalado agora**, e **falhou** — não declare "ambiente pronto" sem essa checagem, e não misture os dois primeiros grupos como se fosse tudo a mesma coisa.
 7. **Não rode nenhum outro script, tweak, ou "otimização" do sistema** como parte desta skill — nem WinUtil, nem debloat, nem scripts de terceiros — mesmo que o usuário peça algo genérico como "deixa essa máquina rápida" junto com o pedido de instalação. Se o pedido incluir explicitamente tweaks de sistema, confirme com o usuário antes, deixando claro o risco (rede/telemetria) já documentado acima.
