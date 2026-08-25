@@ -11,6 +11,12 @@ Skills são organizadas em pastas de buckets sob `skills/`:
 
 Toda skill em `engineering/`, `productivity/` ou `misc/` deve ter referência no `README.md` raiz e entrada em `.claude-plugin/plugin.json`. Skills em `personal/`, `in-progress/` e `deprecated/` não devem aparecer em ambos.
 
+## Neutralidade de harness
+
+O conteúdo de uma skill (`SKILL.md` e arquivos de apoio) não deve nomear mecanismos exclusivos do Claude Code — por exemplo `Agent` tool, `subagent_type=Explore` ou `Task` tool. Descreva a forma da delegação (ex.: "spawn subagentes em paralelo", "subagente de exploração read-only") e deixe o mecanismo a cargo do harness em uso (Claude Code, Codex, Hermes).
+
+Toda skill distribuída deve ter `agents/openai.yaml` ao lado do `SKILL.md`, com `interface.display_name` e `interface.short_description` para o picker do Codex. Skills cujo `SKILL.md` tenha `disable-model-invocation: true` (ou que sejam inerentemente específicas de um harness, como `git-guardrails-claude-code`) devem espelhar isso com `policy.allow_implicit_invocation: false`.
+
 ## Protocolo de Agentic Workflow (/orchestrator)
 
 Este repositório utiliza um modelo de delegação hierárquica focado em conformidade:

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Git Guardrails (Claude Code)"
+  short_description: "Block dangerous git commands via hooks"
+policy:
+  allow_implicit_invocation: false

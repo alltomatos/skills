@@ -1,0 +1,3 @@
+interface:
+  display_name: "To Issues"
+  short_description: "Transforma planos/PRDs em GitHub Issues"

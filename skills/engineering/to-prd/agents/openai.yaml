@@ -1,0 +1,3 @@
+interface:
+  display_name: "To PRD"
+  short_description: "Turn conversation context into a PRD"

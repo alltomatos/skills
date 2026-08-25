@@ -1,0 +1,3 @@
+interface:
+  display_name: "Scaffold MVP"
+  short_description: "Initialize an agile, high-productivity MVP stack"

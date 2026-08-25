@@ -15,6 +15,12 @@ Skills sao organizadas sob `skills/`:
 
 Skills distribuidas devem ter `SKILL.md`, aparecer no `README.md` e estar no manifesto `.claude-plugin/plugin.json` quando aplicavel.
 
+## Neutralidade de harness
+
+Conteudo de skill nao deve nomear mecanismos exclusivos do Claude Code (ex.: `Agent` tool, `subagent_type=Explore`, `Task` tool). Descreva a forma da delegacao ("spawn subagentes em paralelo") e deixe o mecanismo a cargo do harness.
+
+Toda skill distribuida tem `agents/openai.yaml` ao lado do `SKILL.md`, com `interface.display_name` e `interface.short_description` para o picker do Codex. Skills com `disable-model-invocation: true` no `SKILL.md`, ou inerentemente especificas de um harness (ex.: `git-guardrails-claude-code`), espelham isso com `policy.allow_implicit_invocation: false`.
+
 ## Instalacao
 
 O script de instalacao pergunta onde instalar as skills e aceita Codex, Claude, Hermes ou caminho customizado. Uma instalacao pode atender mais de um agent CLI.

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Write A Skill"
+  short_description: "Create new agent skills with progressive disclosure"

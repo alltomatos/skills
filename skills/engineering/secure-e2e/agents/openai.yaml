@@ -1,0 +1,3 @@
+interface:
+  display_name: "Secure E2E"
+  short_description: "Security-first E2E tests with Playwright"

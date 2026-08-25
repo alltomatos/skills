@@ -1,0 +1,3 @@
+interface:
+  display_name: "Diagnose"
+  short_description: "Disciplined loop for hard bugs and regressions"

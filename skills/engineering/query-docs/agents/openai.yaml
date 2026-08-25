@@ -1,0 +1,3 @@
+interface:
+  display_name: "Query Docs"
+  short_description: "Resolve library docs via Context7"
