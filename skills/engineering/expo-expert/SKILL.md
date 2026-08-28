@@ -45,8 +45,10 @@ A doc do Expo é publicada num formato amigável a LLM. Use isto:
    - `https://docs.expo.dev/mcp.md` — MCP com Expo · `https://docs.expo.dev/skills.md` — Expo Skills
 
 **Fluxo padrão** quando a pergunta é sensível a versão, envolve config exata, ou você não tem
-certeza: `WebFetch(llms.txt)` para localizar a página → `WebFetch(<pagina>.md)` para o conteúdo →
-responda citando o que a doc diz. O mapa de URLs por domínio está em
+certeza: busque `llms.txt` para localizar a página → busque a URL `<pagina>.md` para o conteúdo →
+responda citando o que a doc diz. Use a ferramenta de acesso à web disponível no seu ambiente
+(fetch de URL, browser, ou `curl` via shell) — o mecanismo exato varia por harness, o método não.
+O mapa de URLs por domínio está em
 [references/doc-navigation.md](references/doc-navigation.md) — comece por lá para não precisar
 baixar o `llms.txt` toda vez.
 
