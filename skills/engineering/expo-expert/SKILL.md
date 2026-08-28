@@ -53,6 +53,17 @@ baixar o `llms.txt` toda vez.
 Quando o usuário estiver dentro de um projeto Expo, cheque a **versão de SDK** primeiro
 (`package.json` → `expo`), porque a resposta certa quase sempre depende dela.
 
+## Diagnostique a máquina antes de recomendar build ou run
+
+Antes de sugerir *como* buildar, rodar ou testar o app — não para perguntas puramente conceituais —
+faça um diagnóstico rápido do ambiente (SO, toolchain instalada, recursos livres) e só então
+recomende o caminho. Isso evita o erro clássico de sugerir `npx expo run:ios` para alguém no
+Windows, ou mandar instalar 10GB de Android Studio quando EAS Build na nuvem resolveria sem
+toolchain nenhuma. Regra rápida: **iOS local exige macOS, sem exceção**; os outros dois caminhos
+(Android local, EAS Build cloud) dependem do que já está instalado e dos recursos disponíveis.
+Método completo, checklist de comandos e matriz de decisão em
+[references/environment-diagnosis.md](references/environment-diagnosis.md).
+
 ## Mental model correto (não erre isto)
 
 Muita gente — e muito material antigo — ainda pensa no Expo pré-2022. Corrija ativamente:
@@ -98,6 +109,7 @@ comandos/config verbatim, gotchas de sênior e os links `.md` para aprofundar.
 
 | Se o assunto é… | Leia |
 |---|---|
+| Qual caminho de build/run usar dado o SO e a máquina do usuário | [references/environment-diagnosis.md](references/environment-diagnosis.md) |
 | Encontrar qualquer coisa na doc (mapa de URLs) | [references/doc-navigation.md](references/doc-navigation.md) |
 | CNG, `prebuild`, config plugins, mods, dangerous mods, dev build | [references/cng-config-plugins.md](references/cng-config-plugins.md) |
 | Módulos/views nativos custom (Swift/Kotlin, Expo Modules API) | [references/native-modules.md](references/native-modules.md) |

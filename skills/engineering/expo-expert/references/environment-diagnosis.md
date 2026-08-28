@@ -1,0 +1,85 @@
+# Diagnóstico de máquina antes de recomendar build
+
+Doc-âncora: `build/introduction.md`, `develop/development-builds/introduction.md`. Este arquivo não
+espelha uma página específica da doc — é o método para decidir **qual dos três caminhos de build**
+faz sentido *nesta* máquina, algo que a doc trata como dado (você escolhe) mas que na prática é
+limitado pelo SO, pelas ferramentas instaladas e pelos recursos disponíveis.
+
+## Quando rodar este diagnóstico
+
+**Sempre que a tarefa envolver decidir *como* buildar, rodar ou testar o app** — não para perguntas
+puramente conceituais (explicar o que é um config plugin não precisa disso). Gatilhos típicos: o
+usuário pede pra rodar `expo run:ios`/`run:android`, perguntar "como eu testo isso", pedir ajuda
+pra configurar o ambiente, ou você está prestes a recomendar um comando de build. Rode o
+diagnóstico **antes** de sugerir o comando, não depois — recomendar `expo run:ios` pra alguém no
+Windows e só descobrir o problema na execução é o erro que este passo existe para evitar.
+
+## Por que a máquina importa
+
+Os três caminhos de build (ver [cng-config-plugins.md](cng-config-plugins.md) e
+[eas-build-submit-workflows.md](eas-build-submit-workflows.md)) têm requisitos de hardware/SO bem
+diferentes:
+
+| Caminho | Requisito |
+|---|---|
+| **Local — iOS** (`expo run:ios`) | **Exclusivamente macOS** com Xcode. Não existe forma de compilar um `.ipa` localmente no Windows ou Linux — isso é limitação da Apple, não do Expo. |
+| **Local — Android** (`expo run:android`) | Qualquer SO (Windows/macOS/Linux), mas precisa de JDK + Android SDK/Studio instalados, e de RAM/disco livres — o Gradle é pesado. |
+| **EAS Build (cloud)** | Nenhum requisito de toolchain local — roda no servidor da Expo. Só precisa de conta EAS e internet. É o único caminho que sempre funciona, independente da máquina. |
+| **EAS local build** (`eas build --local`) | Mesmos requisitos de toolchain do build local da plataforma alvo (Xcode pra iOS, Android SDK pra Android) — só muda a orquestração, não o requisito de SO. |
+
+## Checklist de diagnóstico
+
+Rode isto (adapte ao shell disponível — PowerShell no Windows, bash no macOS/Linux) e reporte o que
+encontrar antes de recomendar um caminho:
+
+```bash
+# Sistema operacional — decide de cara se build local de iOS é sequer possível
+uname -a          # macOS/Linux
+# no Windows (PowerShell): $PSVersionTable.OS  ou  systeminfo | findstr /B /C:"OS Name"
+
+# Toolchain base
+node -v
+npx expo --version
+eas --version         # se ausente: npm install -g eas-cli
+eas whoami             # logado no EAS? build cloud precisa disso
+
+# Toolchain Android (qualquer SO)
+java -version
+echo $ANDROID_HOME    # ou: $env:ANDROID_HOME no PowerShell
+adb --version
+
+# Toolchain iOS (só relevante se o SO já é macOS)
+xcodebuild -version
+pod --version
+
+# Recursos livres — Gradle/Xcode consomem bastante
+df -h .                # Linux/macOS
+# Windows (PowerShell): Get-PSDrive C
+```
+
+Não presuma o SO do usuário pela sua própria execução — se você está rodando em uma máquina
+diferente da do usuário (ou eles vão executar o comando na máquina deles), pergunte ou confirme
+antes de recomendar um caminho que só funciona num SO específico.
+
+## Matriz de decisão
+
+| Situação | Recomendação |
+|---|---|
+| **Windows ou Linux, precisa de build iOS** | **EAS Build (cloud) é a única opção.** Não existe alternativa local — não tente contornar. |
+| **Windows/Linux, build Android, sem Android Studio/JDK instalados** | Recomende **EAS Build (cloud)** primeiro — evita o usuário instalar ~10GB de toolchain só pra um build. Ofereça o caminho local como opção *se* ele já for fazer trabalho nativo recorrente (ver [native-modules.md](native-modules.md)). |
+| **Windows/Linux, build Android, com Android Studio/JDK já instalados** | `npx expo run:android` local é viável — mais rápido pra iteração (sem fila de build na nuvem). |
+| **macOS, com Xcode e Android Studio instalados** | Build local viável nas duas plataformas — bom para quem itera bastante. |
+| **macOS, só com Xcode (sem Android Studio)** | iOS local, Android via EAS Build cloud (ou instale o Android SDK se o trabalho for recorrente). |
+| **Máquina com pouca RAM livre (menos de ~8GB) ou pouco disco (menos de ~20GB livre)** | Prefira **EAS Build cloud** mesmo com toolchain instalado — Gradle/Xcode local costuma travar ou degradar o resto da máquina em ambientes apertados. |
+| **CI, sandbox, container, ou qualquer ambiente sem GUI persistente** | **EAS Build cloud** sempre — build local nativo pressupõe ambiente interativo/persistente. |
+| **Só precisa iterar em JS/lógica, sem lib nativa nova** | Nem build local nem cloud — `npx expo start` com Expo Go (se não há código nativo custom) ou o dev build já instalado resolve, sem gastar fila nem toolchain. |
+
+## Como comunicar a recomendação
+
+Não jogue a matriz inteira pro usuário — diga o diagnóstico e a conclusão prática em 2-3 frases:
+*"Você está no Windows sem Android Studio instalado. Pra esse caso o caminho mais rápido é EAS
+Build na nuvem (`eas build --profile development --platform android`), sem precisar instalar o
+SDK Android. Se você for mexer bastante em código nativo, aí vale instalar o Android Studio pra
+buildar local e iterar mais rápido — me avisa se quiser esse caminho."* Dê a opção, não imponha —
+o usuário pode ter motivo pra preferir o caminho mais pesado (ex.: já tem tudo instalado por outro
+projeto).
