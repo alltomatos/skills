@@ -149,6 +149,7 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 | Bug dificil ou regressao | [`/diagnose`](./skills/engineering/diagnose/SKILL.md) |
 | Codigo sem testes | [`/tdd`](./skills/engineering/tdd/SKILL.md) |
 | APIs de terceiros | [`/query-docs`](./skills/engineering/query-docs/SKILL.md) |
+| Apps Expo/React Native (EAS, Router, config plugins, upgrade) | [`/expo-expert`](./skills/engineering/expo-expert/SKILL.md) |
 | E2E e seguranca | [`/secure-e2e`](./skills/engineering/secure-e2e/SKILL.md) |
 | Analise de qualidade | [`/qa-analyst`](./skills/engineering/qa-analyst/SKILL.md) |
 | Arquitetura degradada | [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) |
@@ -163,7 +164,9 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 
 ### Engineering
 
-Skills para trabalho diario com codigo: `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `setup-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs` e `orchestrator`.
+Skills para trabalho diario com codigo: `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `setup-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert` e `orchestrator`.
+
+`expo-expert` e conhecimento especializado de stack (Expo/React Native): CNG e config plugins, Expo Modules API, EAS Build/Submit/Update/Workflows, Expo Router, Nova Arquitetura, animacao (Reanimated/Skia), Native UI, DOM components, data fetching e upgrade de SDK. Ensina o agent a consultar a documentacao viva do Expo (`llms.txt` + `.md`) em vez de confiar em conhecimento de treino desatualizado.
 
 ### Productivity
 

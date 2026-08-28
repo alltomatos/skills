@@ -108,6 +108,7 @@ O orchestrator delega para skills especializadas, por exemplo:
 - `/secure-e2e` para fluxos E2E e seguranca;
 - `/diagnose` para bugs e regressao;
 - `/query-docs` para APIs de terceiros;
+- `/expo-expert` para conhecimento especializado de stack Expo/React Native (EAS, Router, config plugins, upgrade de SDK);
 - `/write-a-skill` para gargalos nao cobertos.
 
 ### Fila sequencial para Epics fatiados de um PRD
