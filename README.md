@@ -156,6 +156,8 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 | Prototipo descartavel | [`/prototype`](./skills/engineering/prototype/SKILL.md) |
 | Bootstrap de MVP | [`/scaffold-mvp`](./skills/engineering/scaffold-mvp/SKILL.md) |
 | Falta de contexto | [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) |
+| Servidores MCP | [`/mcp-builder`](./skills/engineering/mcp-builder/SKILL.md) |
+| Criacao, eval e otimizacao de skills | [`/skill-creator`](./skills/productivity/skill-creator/SKILL.md) |
 | Gargalo nao mapeado | [`/write-a-skill`](./skills/productivity/write-a-skill/SKILL.md) |
 | Alinhamento de plano | [`/grill-me`](./skills/productivity/grill-me/SKILL.md) |
 | Handoff | [`/handoff`](./skills/productivity/handoff/SKILL.md) |
@@ -164,13 +166,17 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 
 ### Engineering
 
-Skills para trabalho diario com codigo: `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `setup-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert` e `orchestrator`.
+Skills para trabalho diario com codigo: `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `setup-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert`, `mcp-builder` e `orchestrator`.
 
 `expo-expert` e conhecimento especializado de stack (Expo/React Native): CNG e config plugins, Expo Modules API, EAS Build/Submit/Update/Workflows, Expo Router, Nova Arquitetura, animacao (Reanimated/Skia), Native UI, DOM components, data fetching e upgrade de SDK. Ensina o agent a consultar a documentacao viva do Expo (`llms.txt` + `.md`) em vez de confiar em conhecimento de treino desatualizado.
 
+`mcp-builder` e guia para construcao de servidores MCP (Model Context Protocol) de alta qualidade em Python (FastMCP) e Node/TypeScript, com esquemas rigorosos, tratamento de erros orientados ao agente e scripts de avaliacao/benchmark.
+
 ### Productivity
 
-Skills de workflow geral: `caveman`, `grill-me`, `handoff` e `write-a-skill`.
+Skills de workflow geral: `caveman`, `grill-me`, `handoff`, `write-a-skill` e `skill-creator`.
+
+`skill-creator` e uma meta-skill para criar, testar, avaliar (qualitativamente e quantitativamente com evals/viewer HTML) e otimizar a acuracia de acionamento das descricoes de novas skills.
 
 ### Misc
 
