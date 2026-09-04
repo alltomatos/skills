@@ -125,3 +125,16 @@ O mesmo `app/` gera site. Recursos avançados (todos com páginas próprias na d
   [universal-web-tv.md](universal-web-tv.md)).
 - **RSC/SSR ainda amadurecendo**: excelente para web/marketing, mas cheque status na doc antes de
   apostar num app crítico.
+- **`KeyboardAvoidingView` pode simplesmente não funcionar no Android dentro de um `Stack`.**
+  Confirmado em produção: nem `behavior="height"` nem `behavior={undefined}` resolveram um composer
+  de chat sumindo atrás do teclado — a causa é que o Expo Router roda cada tela num Fragment nativo
+  via `react-native-screens` (native-stack), e esse Fragment não participa do resize de janela do
+  Android (`windowSoftInputMode=resize`) do jeito que uma Activity "pura" participaria. A correção
+  suportada oficialmente é a lib `react-native-keyboard-controller`
+  (`docs.expo.dev/guides/keyboard-handling.md`) — mas ela **não funciona no Expo Go**, exige
+  development build, então não é uma troca a fazer no meio de uma sessão de testes via Expo Go.
+  Alternativa que funciona em Expo Go e não depende de nenhum resize de SO/Fragment: **medir a
+  altura do teclado na mão** com `Keyboard.addListener('keyboardDidShow', e =>
+  e.endCoordinates.height)` (`keyboardWillShow` no iOS) e aplicar esse valor como `paddingBottom`
+  no container raiz da tela — sem `KeyboardAvoidingView` nenhum. Funciona igual em Expo Go e em
+  dev build, então não precisa trocar de novo quando o app migrar pra development build depois.

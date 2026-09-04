@@ -40,6 +40,36 @@ dado.
 Se o backend é simples, o próprio [Expo Router](expo-router.md) pode servir os endpoints
 (`app/**/<nome>+api.ts`), eliminando um serviço separado para CRUD básico — bom para MVPs ou BFF.
 
+## Streaming e Server-Sent Events sem lib extra
+
+Pra consumir um endpoint SSE (`Content-Type: text/event-stream`) em RN, a rota que costuma ser
+recomendada é `react-native-sse` ou um polyfill de `EventSource` — mas o `expo/fetch` (uma
+implementação WinterCG-compliant que o próprio Expo expõe, suportada em Android/iOS/tvOS/web/Expo
+Go) já dá um streaming reader nativo, o que elimina essa dependência pra quem só precisa parsear
+SSE manualmente:
+
+```ts
+import { fetch } from "expo/fetch";
+
+const res = await fetch(url, { headers: { Accept: "text/event-stream" }, signal });
+const reader = res.body!.getReader();
+const decoder = new TextDecoder();
+let buffer = "";
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+  // separa por "\n\n", extrai as linhas "data:", faz JSON.parse — poucas
+  // linhas de parser cobrem o caso comum sem precisar de EventSource.
+}
+```
+
+Validado em produção como cliente de um backend com SSE real (`GET /event`) — a única pegadinha é
+que `expo/fetch` vira o `fetch` global automaticamente em nativo; pra manter o `fetch` builtin do
+RN em paralelo, use `EXPO_PUBLIC_USE_RN_FETCH=1` (os imports nomeados de `expo/fetch` continuam
+funcionando de qualquer forma).
+
 ## Persistência local — três camadas, escolha pela necessidade
 
 | Necessidade | Ferramenta |

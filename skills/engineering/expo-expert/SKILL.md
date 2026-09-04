@@ -81,6 +81,9 @@ Muita gente — e muito material antigo — ainda pensa no Expo pré-2022. Corri
 - **Nova Arquitetura é o default a partir do SDK 52.** No SDK 53 todos os pacotes do próprio Expo
   já a suportam; no **SDK 55+ ela é obrigatória** (o flag `newArchEnabled` é ignorado, React Native
   0.83). A arquitetura legada foi congelada em jun/2025. Só dá pra desabilitar em SDK 52–54.
+  **Confirmado na prática (SDK 57)**: `newArchEnabled` em `app.json` não é só ignorado, é
+  **rejeitado** — `expo-doctor` falha com `should NOT have additional property 'newArchEnabled'`
+  (erro de schema, não warning). Remova a chave por completo, não tente setar `false`.
 - **Expo É o framework React Native recomendado** pelo time do React Native para apps de produção.
   Não é "React Native com limitações"; é a forma recomendada de fazer React Native.
 - **Development build ≠ Expo Go.** Assim que você adiciona uma lib com código nativo próprio, o
@@ -103,6 +106,11 @@ Muita gente — e muito material antigo — ainda pensa no Expo pré-2022. Corri
   na doc (`.md`) e cite. Uma resposta "deixa eu confirmar na doc" é melhor que uma errada.
 - **Reproduza antes de teorizar** em bugs de build/nativo: peça o `eas.json`, o `app.config`, a
   versão de SDK e o log completo do build antes de propor a causa.
+- **`create-expo-app` falha silenciosamente em terminal não-interativo** se o diretório já tiver
+  qualquer arquivo (mesmo só `.git`/`.claude`) — ele pergunta "sobrescrever?" e, sem TTY pra
+  responder, sai com código 0 e nenhum arquivo criado (fácil de não perceber). Rode o scaffold num
+  diretório vazio (ex.: `/tmp`) e mova/mescle o resultado depois, em vez de tentar rodar direto no
+  diretório final não-vazio.
 
 ## Roteamento por domínio
 

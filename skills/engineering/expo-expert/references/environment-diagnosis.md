@@ -74,6 +74,40 @@ antes de recomendar um caminho que só funciona num SO específico.
 | **CI, sandbox, container, ou qualquer ambiente sem GUI persistente** | **EAS Build cloud** sempre — build local nativo pressupõe ambiente interativo/persistente. |
 | **Só precisa iterar em JS/lógica, sem lib nativa nova** | Nem build local nem cloud — `npx expo start` com Expo Go (se não há código nativo custom) ou o dev build já instalado resolve, sem gastar fila nem toolchain. |
 
+## Conectividade do dispositivo físico (Expo Go / dev build via LAN)
+
+Rodar `npx expo start` e escanear o QR no celular assume que o celular consegue alcançar o Metro na
+porta 8081 (ou a que estiver ativa) do computador. Quando o app carrega o bundle uma vez mas depois
+falha em reconectar, ou nunca conecta, siga esta ordem de diagnóstico (validada em produção — cada
+uma destas foi uma hipótese descartada até achar a real):
+
+1. **O terminal que iniciou `expo start` é não-interativo** (ex.: harness de agente, CI)? Nesse
+   caso o Metro não imprime o QR/URL `exp://` completo — só "Waiting on http://localhost:8081". Pra
+   descobrir a URL real, pegue o IP da máquina (`ipconfig`/`ifconfig`) e monte `exp://<ip>:8081` na
+   mão, ou peça pro usuário rodar o comando ele mesmo num terminal interativo.
+2. **Firewall do SO bloqueando a porta?** Confira antes de assumir — no Windows,
+   `Get-NetConnectionProfile` mostra se a rede Wi-Fi está classificada como "Public" (regras de
+   firewall por app costumam já cobrir isso, mas confira `Get-NetFirewallRule` pelo executável
+   exato do Node em uso — gerenciadores de versão como nvm-windows trocam o caminho do `node.exe`,
+   e uma regra antiga apontando pro caminho errado não vale). **Mas não presuma que é o firewall** —
+   confirme testando (`Get-NetTCPConnection -LocalPort 8081` mostra se algo está de fato escutando;
+   se o firewall estiver *desligado* e ainda assim não conectar, o problema é outro).
+3. **Isolamento de cliente no roteador/AP.** Se o firewall está confirmadamente desligado, a porta
+   está escutando em todas as interfaces, e mesmo assim zero pacote chega no Metro (confirme
+   olhando o log do Metro — nenhuma linha de bundle request aparece), suspeite de **AP/client
+   isolation** no roteador — comum em CPEs de operadora e redes com "5G"/hotspot no nome. Isso
+   bloqueia comunicação direta entre dispositivos na mesma rede Wi-Fi mesmo com firewall de host
+   desligado, e não tem workaround do lado do app.
+4. **Tunnel (`expo start --tunnel`, via `@expo/ngrok`) costuma estar quebrado hoje** — o ngrok
+   mudou a API pra exigir authtoken/conta em versões recentes, e a integração do Expo não foi
+   atualizada. Erro típico: `TypeError: Cannot read properties of undefined (reading 'body')`. Não
+   perca tempo tentando consertar isso — pule direto pra alternativa 5.
+5. **Tailscale (ou outra VPN mesh) é o fallback mais confiável** quando a rede local tem isolamento
+   de AP e o tunnel do Expo está quebrado: conecte computador e celular no mesmo tailnet, rode
+   `expo start` normalmente (ele escuta em todas as interfaces, incluindo a do Tailscale), e no
+   Expo Go use "Enter URL manually" com `exp://<ip-tailscale>:8081` em vez de escanear o QR (que
+   mostraria o IP da LAN, não o do Tailscale).
+
 ## Como comunicar a recomendação
 
 Não jogue a matriz inteira pro usuário — diga o diagnóstico e a conclusão prática em 2-3 frases:
