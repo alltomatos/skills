@@ -50,7 +50,7 @@ chmod +x scripts/setup-alltomatos-skills.sh
 
 ### Re-deploy das skills
 
-Quando o `/orchestrator` detectar uma nova revisao, ele executara o re-deploy automaticamente. Para executar manualmente:
+Quando o `/developer` detectar uma nova revisao, ele pergunta se voce deseja atualizar agora ou prosseguir sem atualizar; o re-deploy so ocorre com confirmacao explicita. Para executar manualmente:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alltomatos/skills/main/scripts/setup-alltomatos-skills.sh | bash -s -- --redeploy
@@ -62,14 +62,14 @@ Ou, a partir de um clone:
 ./scripts/setup-alltomatos-skills.sh --redeploy ~/.codex/skills ~/.claude/skills
 ```
 
-As instalacoes existentes sao preservadas em backups quando necessario.
+As instalacoes existentes sao preservadas em backups quando necessario (`<skill>.backup.<timestamp>`). A cada redeploy, o script mantem apenas o backup mais recente por skill e remove automaticamente os anteriores — nao ha acumulo indefinido de backups nos ambientes instalados.
 
 ## Primeiro uso
 
 Depois da instalacao, abra um projeto no agent e execute:
 
 ```text
-/orchestrator
+/developer
 ```
 
 O projeto consumidor precisa estar versionado no Git e possuir um repositorio remoto no GitHub. Em um projeto novo:
@@ -81,13 +81,13 @@ git commit -m "chore: initialize repository"
 gh repo create <nome> --source . --remote origin --push
 ```
 
-Se o ambiente estiver vazio, sem Git ou sem remote GitHub, o orchestrator deve parar e orientar esse processo antes de implementar qualquer coisa.
+Se o ambiente estiver vazio, sem Git ou sem remote GitHub, o developer deve parar e orientar esse processo antes de implementar qualquer coisa.
 
 ## Fluxo de trabalho: engenharia de ciclo fechado
 
-1. **Atualizacao do framework**: o orchestrator localiza o clone de origem associado as skills instaladas, consulta o remote GitHub, informa commits novos e faz o re-deploy nos ambientes em uso.
+1. **Atualizacao do framework**: o developer localiza o clone de origem associado as skills instaladas, consulta o remote GitHub, informa commits novos e faz o re-deploy nos ambientes em uso.
 2. **Governanca**: valida Git, remote GitHub, autenticacao e estado do projeto.
-3. **Documentacao**: cria ou atualiza `AGENTS.md`/`CLAUDE.md`, `CONTEXT.md`, `docs/agents/`, ADRs e `ORCHESTRATOR-ROADMAP.md`.
+3. **Documentacao**: cria ou atualiza `AGENTS.md`/`CLAUDE.md`, `CONTEXT.md`, `docs/agents/`, ADRs e `DEVELOPER-ROADMAP.md`.
 4. **Estrategia**: usa `/roadmap` e `/grill-with-docs` para definir Epics, linguagem de dominio e decisoes.
 5. **Fragmentacao**: usa `/to-issues` para publicar slices verticais no GitHub com criterios de aceite e dependencias.
 6. **Execucao**: delega tarefas pequenas, usando worktrees para paralelismo seguro.
@@ -95,15 +95,15 @@ Se o ambiente estiver vazio, sem Git ou sem remote GitHub, o orchestrator deve p
 8. **QA**: invoca `/qa-analyst` obrigatoriamente antes de qualquer PR, sem excecao de tier.
 9. **Entrega**: somente apos QA aprovado, executa o fluxo de PR disponivel no ambiente com confirmacao humana.
 
-O GitHub e a fonte persistente de Issues, escopo, criterios de aceite, dependencias, revisao e historico. `ESTADO_ORQUESTRATOR.md` e somente a visao operacional da DAG.
+O GitHub e a fonte persistente de Issues, escopo, criterios de aceite, dependencias, revisao e historico. `ESTADO_DEVELOPER.md` e somente a visao operacional da DAG.
 
-## O Orchestrator
+## O Developer
 
-O `/orchestrator` e a Skill Mestra deste fork, um conceito que nao existe no repositorio original. Ele avalia, documenta, delega, fiscaliza e expande o fluxo de engenharia.
+O `/developer` e a Skill Mestra deste fork, um conceito que nao existe no repositorio original. Ele avalia, documenta, delega, fiscaliza e expande o fluxo de engenharia.
 
 ### Regra de ouro
 
-O orchestrator nao executa trabalho pesado diretamente. Ele identifica o problema e delega para a skill correta. Se nao existe skill para o gargalo, invoca `/write-a-skill` para cria-la.
+O developer nao executa trabalho pesado diretamente. Ele identifica o problema e delega para a skill correta. Se nao existe skill para o gargalo, invoca `/write-a-skill` para cria-la.
 
 ### Tiers de risco
 
@@ -139,7 +139,7 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 
 | Problema | Skill |
 | --- | --- |
-| Governanca e orquestracao | [`/orchestrator`](./skills/engineering/orchestrator/SKILL.md) |
+| Governanca e orquestracao | [`/developer`](./skills/engineering/developer/SKILL.md) |
 | Roadmap e Epics | [`/roadmap`](./skills/engineering/roadmap/SKILL.md) |
 | Setup documental | [`/setup-skills`](./skills/engineering/setup-skills/SKILL.md) |
 | Linguagem de dominio e ADRs | [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md) |
@@ -157,6 +157,8 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 | Bootstrap de MVP | [`/scaffold-mvp`](./skills/engineering/scaffold-mvp/SKILL.md) |
 | Falta de contexto | [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) |
 | Servidores MCP | [`/mcp-builder`](./skills/engineering/mcp-builder/SKILL.md) |
+| Provisionar maquina Windows nova | [`/devsetup`](./skills/engineering/devsetup/SKILL.md) |
+| Deploy e monitoramento SuperKuma | [`/superkuma-monitoring`](./skills/engineering/superkuma-monitoring/SKILL.md) |
 | Criacao, eval e otimizacao de skills | [`/skill-creator`](./skills/productivity/skill-creator/SKILL.md) |
 | Gargalo nao mapeado | [`/write-a-skill`](./skills/productivity/write-a-skill/SKILL.md) |
 | Alinhamento de plano | [`/grill-me`](./skills/productivity/grill-me/SKILL.md) |
@@ -166,11 +168,15 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 
 ### Engineering
 
-Skills para trabalho diario com codigo: `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `setup-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert`, `mcp-builder` e `orchestrator`.
+Skills para trabalho diario com codigo: `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `setup-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert`, `mcp-builder`, `devsetup`, `superkuma-monitoring` e `developer`.
+
+`devsetup` provisiona uma maquina Windows nova (ou recem-formatada) para desenvolvimento com agentes de IA via `winget`, sem tweaks de sistema ou scripts de terceiros.
 
 `expo-expert` e conhecimento especializado de stack (Expo/React Native): CNG e config plugins, Expo Modules API, EAS Build/Submit/Update/Workflows, Expo Router, Nova Arquitetura, animacao (Reanimated/Skia), Native UI, DOM components, data fetching e upgrade de SDK. Ensina o agent a consultar a documentacao viva do Expo (`llms.txt` + `.md`) em vez de confiar em conhecimento de treino desatualizado.
 
 `mcp-builder` e guia para construcao de servidores MCP (Model Context Protocol) de alta qualidade em Python (FastMCP) e Node/TypeScript, com esquemas rigorosos, tratamento de erros orientados ao agente e scripts de avaliacao/benchmark.
+
+`superkuma-monitoring` cobre o ciclo completo de monitoramento SuperKuma: deploy de uma instancia nova (VM Proxmox, Docker Compose + MariaDB), update/upgrade de instancia existente, e operacao do servidor MCP SuperKuma para descobrir a infraestrutura de um site (AD, Proxmox, VMware, Linux, pfSense, Mikrotik, switches, UniFi, TrueNAS, cameras) e transforma-la em monitors, tags, notificacoes e status pages.
 
 ### Productivity
 
@@ -186,7 +192,7 @@ Skills em `personal/`, `in-progress/` e `deprecated/` nao sao instaladas pelo sc
 
 ## Governanca documental
 
-O projeto consumidor deve manter `AGENTS.md` ou `CLAUDE.md`, `CONTEXT.md` ou `CONTEXT-MAP.md`, `ORCHESTRATOR-ROADMAP.md`, `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md` e `docs/adr/` quando houver decisoes relevantes.
+O projeto consumidor deve manter `AGENTS.md` ou `CLAUDE.md`, `CONTEXT.md` ou `CONTEXT-MAP.md`, `DEVELOPER-ROADMAP.md`, `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md` e `docs/adr/` quando houver decisoes relevantes.
 
 ## Creditos e origem
 

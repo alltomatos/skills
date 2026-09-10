@@ -13,4 +13,5 @@ Skills I use daily for code work.
 - **[zoom-out](./zoom-out/SKILL.md)** — Tell the agent to zoom out and give broader context or a higher-level perspective on an unfamiliar section of code.
 - **[prototype](./prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design — either a runnable terminal app for state/business-logic questions, or several radically different UI variations toggleable from one route.
 - **[mcp-builder](./mcp-builder/SKILL.md)** — Create high-quality Model Context Protocol (MCP) servers in Python (FastMCP) or Node/TypeScript with tool design and evaluation.
-- **[orchestrator](./orchestrator/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade, delega tarefas e gera novas sub-skills. Ponto de entrada recomendado.
+- **[developer](./developer/SKILL.md)** — Mestra de agentes. Analisa o estado do repositório, garante conformidade, delega tarefas e gera novas sub-skills. Ponto de entrada recomendado.
+- **[superkuma-monitoring](./superkuma-monitoring/SKILL.md)** — Deploy a new SuperKuma instance (Proxmox VM, Docker Compose + MariaDB), update/upgrade an existing one, and operate the SuperKuma MCP server to discover a site's infrastructure and turn it into monitors.

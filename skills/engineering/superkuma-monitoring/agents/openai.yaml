@@ -1,0 +1,3 @@
+interface:
+  display_name: "SuperKuma Monitoring"
+  short_description: "Deploy and operate SuperKuma uptime monitoring via MCP"
