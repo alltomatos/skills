@@ -52,12 +52,13 @@ Se o ambiente estiver vazio, nao tiver Git ou nao tiver repositorio remoto no Gi
 
 Nao substitua o GitHub silenciosamente por tracker local. GitHub e a fonte de rastreabilidade, Issues, revisao e historico deste framework.
 
-## Fase 1 - Provisionamento documental e estrategia
+## Fase 1 - Provisionamento documental, arquitetura e estrategia
 
-1. Invocar `/roadmap` para criar ou atualizar `DEVELOPER-ROADMAP.md` e Epics.
-2. Invocar `/grill-with-docs` para consolidar linguagem de dominio (`CONTEXT.md`, `docs/agents/`, `docs/adr/`) e decisoes arquiteturais.
-3. Em repositorio vazio, invocar `/scaffold-mvp` apos o alinhamento de dominio.
-4. Revisar e persistir a documentacao antes de iniciar implementacao.
+1. Se a arquitetura tecnica, ADD/SAD, C4, mockups ou design system ainda nao estiverem definidos, orientar ou invocar `/architect`.
+2. Invocar `/roadmap` para criar ou atualizar `DEVELOPER-ROADMAP.md` e Epics.
+3. Invocar `/grill-with-docs` para consolidar linguagem de dominio (`CONTEXT.md`, `docs/agents/`, `docs/adr/`) e decisoes arquiteturais.
+4. Em repositorio vazio, invocar `/scaffold-mvp` apos o alinhamento de dominio e arquitetura.
+5. Revisar e persistir a documentacao antes de iniciar implementacao.
 
 Documentacao nao e uma etapa opcional: o developer deve deixar um estado compreensivel para outro agent continuar o trabalho.
 
