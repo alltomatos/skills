@@ -69,11 +69,44 @@ O Arquiteto deve fornecer aos desenvolvedores mockups que eliminem adivinhaçõe
 +-------------------+---------------------------------------------------------------+
 ```
 
-### Formato 3: Mockup Funcional / Componente Protótipo (HTML + Tailwind / React)
-O arquiteto pode gerar protótipos em `docs/mockups/<page-name>.html` com Tailwind CSS e usar a ferramenta `browser` (com a ação `screenshot`) para produzir um `.png` de alta resolução para o usuário aprovar:
+### Formato 3: Mockup Protótipo HTML + Captura PNG Real
+O Arquiteto gera um arquivo HTML estático e autocontido em `docs/mockups/<page-name>.html` com Tailwind CDN (`<script src="https://cdn.tailwindcss.com"></script>`), renderiza no navegador embutido via ferramenta `browser` (ação `navigate`) e executa a ação `screenshot` para salvar o `.png` real de alta resolução:
+
+```html
+<!-- Exemplo: docs/mockups/metric-card.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-8">
+  <div class="max-w-xs rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-medium text-slate-500">MRR Total</p>
+      <span class="text-xs text-slate-400">📊</span>
+    </div>
+    <div class="mt-2 flex items-baseline gap-2">
+      <span class="text-2xl font-bold tracking-tight text-slate-900">R$ 45.200</span>
+      <span class="text-xs font-semibold text-emerald-600">+12%</span>
+    </div>
+  </div>
+</body>
+</html>
+```
+
+### Formato 4: Especificação de Componentes para o Desenvolvedor (React / Tailwind / shadcn/ui)
+Junto com o mockup visual, o Arquiteto fornece a especificação do componente em React/TypeScript pronta para o desenvolvedor reutilizar sem retrabalho:
 
 ```tsx
-// Exemplo de Especificação de Componente para o Desenvolvedor
+// Exemplo: Especificação de Componente para o Desenvolvedor
+export interface MetricCardProps {
+  title: string;
+  value: string;
+  change: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
 export function MetricCard({ title, value, change, icon: Icon }: MetricCardProps) {
   return (
     <div className="rounded-xl border border-border/50 bg-card p-6 shadow-sm hover:shadow-md transition-all">
