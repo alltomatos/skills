@@ -62,10 +62,12 @@ Dependendo do objetivo do projeto, o Arquiteto gera os seguintes artefatos padro
 - Consolida NFRs, visão corporativa, diagramas C4, padrões de stack, estratégia de persistência, segurança e observabilidade.
 - *Template:* [references/add-template.md](references/add-template.md).
 
-### 2. Design System & Mockups de Tela (UI/UX)
+### 2. Design System & Mockups de Tela (UI/UX) - Visual Gate Obrigatório
 - **Consulta Obrigatória ao UI/UX Pro Max:** Ao planejar a interface, paletas, tipografia, anti-patterns de nicho e design systems, o agente **pode e deve consultar diretamente o repositório oficial [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)** para extrair as regras de raciocínio visual (192 categorias de produto, 79 estilos de UI, 192 paletas de cores e 74 combinações de fontes) e adaptá-las à realidade do projeto.
 - **Design System Persistente:** Criação de `design-system/MASTER.md` (paleta semântica, tipografia, elevações, anti-patterns) e `design-system/pages/<page-name>.md`.
-- **Mockups de Tela:** Wireframes estruturais em ASCII/Grid e especificações de componentes prontos para os desenvolvedores em React / Tailwind / shadcn/ui.
+- **Trava de Mockup Visual Obrigatória (Visual-Before-Code):** Antes de qualquer implementação de nova tela ou grande refatoração visual pelo `/developer`, o Arquiteto **DEVE obrigatoriamente gerar o mockup visual vetorial em `design-system/mockups/<page-name>-mockup.svg`** (ou renderizar protótipo HTML em `docs/mockups/` e capturar `.png` via browser).
+- **Aprovação Obrigatória do Usuário (HITL Gate Inegociável):** O Arquiteto e os agentes executores **NÃO PODEM** prosseguir para a criação de issues de frontend ou codificação de telas sem a **aprovação e validação explícita do usuário no chat**. O mockup SVG/PNG deve ser apresentado com link direto e o agente deve aguardar o "de acordo" do usuário antes de delegar para o `/developer`.
+- **Mockups de Tela Estruturais:** Wireframes em ASCII/Grid complementares na documentação e especificações de componentes prontos para os desenvolvedores em React / Tailwind / shadcn/ui.
 - *Guia:* [references/ui-ux-design-specs.md](references/ui-ux-design-specs.md).
 
 ### 3. Diagramas Visuais (C4 Model, Sequência e DER)
@@ -84,5 +86,6 @@ Dependendo do objetivo do projeto, o Arquiteto gera os seguintes artefatos padro
 ## 4. Fluxo de Trabalho & Handoff para Engenharia
 
 1. **Entendimento & Grilling:** Interrogatório técnico amigável com o usuário, validando NFRs, negócio, segurança e UI/UX.
-2. **Definição Arquitetural & Produção de Artefatos:** Geração de ADD, C4, Design Tokens (`MASTER.md`), Mockups, DER e ADRs.
-3. **Handoff para o Developer:** O Arquiteto entrega o pacote completo para o `/developer` e `/to-issues`, que fatiará a execução em GitHub Issues atômicas e testáveis.
+2. **Definição Arquitetural & Produção de Mockup:** Geração de ADD, C4, Design Tokens (`MASTER.md`), Mockup Visual SVG (`design-system/mockups/*.svg`), DER e ADRs.
+3. **Validação Visual HITL (Parada Obrigatória):** Apresentação do mockup SVG para o usuário. **O fluxo é congelado até que o usuário valide expressamente o layout, a hierarquia e o visual no chat.**
+4. **Handoff para o Developer:** Somente após o "Aprovado" do usuário, o Arquiteto entrega o pacote com o mockup validado para o `/developer` e `/to-issues` fatiar e implementar.

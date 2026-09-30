@@ -28,7 +28,7 @@ Para garantir consistência visual e velocidade de implementação sem ambiguida
 Ao orientar o desenvolvedor, o Arquiteto define a combinação ideal de:
 
 | Categoria do Produto | Estilo Visual Recomendado | Humor da Paleta | Tipografia Sugerida | Anti-Patterns a Evitar |
-| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- |
 | **SaaS B2B & Enterprise** | Clean Minimal / Bento Grid / Modern Neutral | Neutros slate/zinc com acento azul cobalto ou índigo | Inter / Plus Jakarta Sans | Gradientes neon agressivos, falta de contraste |
 | **Fintech & Banking** | High-Trust Dark/Light Mode, Data Density | Slate escuro / Navy com acentos em Emerald ou Gold | Inter / Outfit | Animações lentas/pesadas, gradientes roxo/rosa "genéricos de IA" |
 | **Dev Tools & Cloud** | Technical Dark Mode / Dense Bento | Monocromático escuro com sintaxe highlighting | JetBrains Mono / Geist | Espaçamentos excessivos que reduzem densidade de informação |
@@ -39,10 +39,16 @@ Ao orientar o desenvolvedor, o Arquiteto define a combinação ideal de:
 
 ## 3. Especificação de Mockups para o Desenvolvedor
 
-O Arquiteto deve fornecer aos desenvolvedores mockups que eliminem adivinhações:
+O Arquiteto deve fornecer aos desenvolvedores mockups que eliminem adivinhações, seguindo a ordem de prioridade:
 
-### Formato 1: Mockup Estrutural em Markdown / ASCII (Layout de Grid)
-Útil para visualização rápida na Issue ou no PRD:
+### Formato 1: Mockup Visual Vetorial de Alta Fidelidade (SVG Obrigatório)
+- **Local Padrão:** `design-system/mockups/<page-name>-mockup.svg`
+- **Dimensões Padrão:** `1440x900` (Widescreen Desktop) ou `390x844` (Mobile).
+- **Conteúdo Obrigatório:** Sidebar real, Topbar com status, grid operacional, cards com dados de exemplo reais (sem "Lorem Ipsum"), estados de formulários, badges e painéis de fechamento/resumo.
+- **Visualização Imediata:** Renderizável nativamente no GitHub, VS Code, Cursor e qualquer navegador.
+
+### Formato 2: Mockup Estrutural em Markdown / ASCII (Layout de Grid)
+Útil para documentação textual rápida em `design-system/pages/<page-name>.md` e no corpo da Issue:
 
 ```text
 +-----------------------------------------------------------------------------------+
@@ -63,8 +69,8 @@ O Arquiteto deve fornecer aos desenvolvedores mockups que eliminem adivinhaçõe
 +-------------------+---------------------------------------------------------------+
 ```
 
-### Formato 2: Mockup Funcional / Componente Protótipo (HTML + Tailwind / React)
-O arquiteto pode gerar ou especificar o código do protótipo com os componentes shadcn/ui e Tailwind exatos para o desenvolvedor reutilizar:
+### Formato 3: Mockup Funcional / Componente Protótipo (HTML + Tailwind / React)
+O arquiteto pode gerar protótipos em `docs/mockups/<page-name>.html` com Tailwind CSS e usar a ferramenta `browser` (com a ação `screenshot`) para produzir um `.png` de alta resolução para o usuário aprovar:
 
 ```tsx
 // Exemplo de Especificação de Componente para o Desenvolvedor
@@ -90,6 +96,7 @@ export function MetricCard({ title, value, change, icon: Icon }: MetricCardProps
 
 O Arquiteto inclui este checklist na especificação técnica para validação no `/qa-analyst`:
 
+- [ ] **Aprovação Explícita do Usuário (HITL Gate):** Mockup SVG visualizado e aprovado pelo usuário no chat antes da implementação.
 - [ ] **Sem Emojis como Ícones:** Usar biblioteca vetorial oficial (Lucide Icons / Phosphor / Heroicons).
 - [ ] **Acessibilidade & Contraste:** Mínimo de 4.5:1 de contraste para textos e badges (WCAG AA).
 - [ ] **Estados Interativos:** Definir explicitamente estados `hover`, `focus-visible`, `active`, `disabled` e `loading`.
