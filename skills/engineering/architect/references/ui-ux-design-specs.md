@@ -130,6 +130,7 @@ export function MetricCard({ title, value, change, icon: Icon }: MetricCardProps
 O Arquiteto inclui este checklist na especificação técnica para validação no `/qa-analyst`:
 
 - [ ] **Aprovação Explícita do Usuário (HITL Gate):** Mockup SVG visualizado e aprovado pelo usuário no chat antes da implementação.
+- [ ] **Manual de Uso / User Guide Correspondente:** Arquivo `docs/userguide/<page-name>.md` criado explicando o fluxo e funcionalidades da página para os usuários finais e equipe de produto.
 - [ ] **Sem Emojis como Ícones:** Usar biblioteca vetorial oficial (Lucide Icons / Phosphor / Heroicons).
 - [ ] **Acessibilidade & Contraste:** Mínimo de 4.5:1 de contraste para textos e badges (WCAG AA).
 - [ ] **Estados Interativos:** Definir explicitamente estados `hover`, `focus-visible`, `active`, `disabled` e `loading`.
