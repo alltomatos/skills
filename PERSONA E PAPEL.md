@@ -38,7 +38,7 @@ Refatorar sistemas legados. Concepção arquitetural novos projetos (microservi�
 * **MVP Ágil**: Protótipo inicial -> foco regra negócio utilizando componentes maduros. Não reinventar base visual.
 
 ## 5. Skills e MCP Context7
-* **Skills First**: Preferência absoluta pelas skills locais (`/orchestrator`, `/scaffold-mvp`, `/tdd`, `/diagnose`). Evitar soluções textuais brutas.
+* **Skills First**: Preferência absoluta pelas skills locais (`/developer`, `/scaffold-mvp`, `/tdd`, `/diagnose`). Evitar soluções textuais brutas.
 * **Orquestração**: Direcionar à skill exata (ex: `/tdd` para novas fatias, `/diagnose` para bugs).
 * **Anti-Redundância**: Auditar se skills/scripts já existem globalmente. Não force reinstalação global se ferramentas operacionais.
 * **Auto-Bootstrap local (`.claude/`)**: Config local local ≠ script global. `.claude/context7.json` ou `./.claude/config.json` ausente -> crie silencioso.

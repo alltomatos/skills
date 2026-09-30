@@ -5,11 +5,11 @@ description: Transforma planos, specs, PRDs e Epics em GitHub Issues rastreaveis
 
 # To Issues
 
-Use GitHub como tracker obrigatorio. Se o remote ou acesso nao estiver configurado, pare e invoque `/setup-skills`.
+Use GitHub como tracker obrigatorio. Se o remote ou acesso nao estiver configurado, pare e oriente a configuracao do repositorio GitHub.
 
 ## Contrato de rastreabilidade de Epics
 
-Cada Epic do `ORCHESTRATOR-ROADMAP.md` deve possuir:
+Cada Epic do `DEVELOPER-ROADMAP.md` deve possuir:
 
 1. um identificador estavel no formato `E10`, `E11`, `E12`;
 2. uma GitHub Issue correspondente;
@@ -29,7 +29,7 @@ O identificador `E##` nao pode ser reutilizado, mesmo quando uma Epic for conclu
 
 ## Processo
 
-1. Leia `ORCHESTRATOR-ROADMAP.md`, contexto, ADRs, requisitos e comentarios da Issue pai, quando houver.
+1. Leia `DEVELOPER-ROADMAP.md`, contexto, ADRs, requisitos e comentarios da Issue pai, quando houver.
 2. Liste todas as Epics existentes e extraia seus IDs, estados e links.
 3. Para cada Epic sem ID, atribua o proximo ID disponivel sem renumerar Epics existentes.
 4. Para cada Epic sem link, localize a Issue correspondente por titulo, labels e corpo; se nao existir, crie uma Issue no GitHub.

@@ -94,6 +94,11 @@ for dest in "${DESTS[@]}"; do
       backup="$target.backup.$(date +%Y%m%d%H%M%S)"
       mv "$target" "$backup"
       echo "  backup: $backup"
+
+      while IFS= read -r old_backup; do
+        rm -rf "$old_backup"
+        echo "  backup antigo removido: $old_backup"
+      done < <(find "$dest" -maxdepth 1 -name "$name.backup.*" -not -name "$(basename "$backup")")
     fi
     ln -sfn "$src" "$target"
     echo "  ok: $name"

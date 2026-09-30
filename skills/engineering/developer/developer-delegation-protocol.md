@@ -1,28 +1,28 @@
-# Orchestrator Delegation Protocol
+# Developer Delegation Protocol
 
-> Templates e estruturas auxiliares para o `/orchestrator` v2.
+> Templates e estruturas auxiliares para o `/developer` v2.
 > Importado por `SKILL.md` nas seções de Mentoria, Fragmentação e Fiscalização.
 
 ---
 
 ## Matriz de Autonomia de Delegação
 
-O Orquestrador opera com base em **Tiers de Risco**. A autonomia é concedida conforme a natureza da tarefa:
+O Developer opera com base em **Tiers de Risco**. A autonomia é concedida conforme a natureza da tarefa:
 
 ### Tier 1: Rota Direta ("Fast Path" - Risco Mínimo)
-O Orquestrador reconhece tarefas T1 (limpeza, documentações simples que não alteram lógica, refatorações safe e setups de ferramentas/linters) como elegíveis para o **Fast Path**:
+O Developer reconhece tarefas T1 (limpeza, documentações simples que não alteram lógica, refatorações safe e setups de ferramentas/linters) como elegíveis para o **Fast Path**:
 - **Bypass de Processo**: Pula obrigatoriamente a atualização/auditoria de Roadmap estratégico global e as sessões burocráticas/extensivas de interrogatório via `/grill-with-docs` ou `/grill-me`.
-- **Execução Atômica**: O Orquestrador planeja e executa a tarefa imediatamente de forma direta.
+- **Execução Atômica**: O Developer planeja e executa a tarefa imediatamente de forma direta.
 - **Guardrails de Qualidade Mandatórios**: O fluxo deve honrar rigorosamente o rito de TDD e acionar `/qa-analyst` antes de qualquer PR. Se nao houver skill de PR disponivel, orientar o fluxo Git manualmente e pedir confirmacao humana.
-- **Ação**: Executa silenciosamente → Loga no `ESTADO_ORQUESTRATOR.md` → Finaliza o PR da mudança atômica.
+- **Ação**: Executa silenciosamente → Loga no `ESTADO_DEVELOPER.md` → Finaliza o PR da mudança atômica.
 
 ### Tier 2: Execução em Batch (Risco Médio)
 - **Configuração de ambiente**: Instalação de linters e formatadores, instrumentação de cobertura de testes, criação de ADRs estruturais e melhorias de performance localizada sem breaking changes.
 - **Burocracia Reduzida**: Exige alinhamento com o `/roadmap` ativo antes de rodar os batches, mas permite agregação de commits.
-- **Ação**: Executa o lote sob guardrail do TDD → Loga no `ESTADO_ORQUESTRATOR.md` → Reporta no final do batch.
+- **Ação**: Executa o lote sob guardrail do TDD → Loga no `ESTADO_DEVELOPER.md` → Reporta no final do batch.
 
 ### Tier 3: Governança Estratégica (Interativa Obrigatória)
-Para decisões que impactam o domínio do projeto, a autonomia é **suspensa**. O Orquestrador deve pausar, apresentar o plano e aguardar o "Go" humano.
+Para decisões que impactam o domínio do projeto, a autonomia é **suspensa**. O Developer deve pausar, apresentar o plano e aguardar o "Go" humano.
 - **Mudanças de Domínio**: Definição de modelos de dados, novas funcionalidades, mudanças de arquitetura macro (ex: mudar de Monólito para Microserviços).
 - **Roadmap**: Qualquer alteração na direção estratégica, priorização de Epics ou definição de prazos.
 - **Regras de Negócio**: Qualquer modificação que altere o comportamento da aplicação conforme a regra do usuário.
@@ -34,30 +34,30 @@ Para decisões que impactam o domínio do projeto, a autonomia é **suspensa**. 
 
 ## Gatilho de Aprovação por Risco
 
-O Orquestrador possui autonomia diferenciada baseada na criticidade técnica:
+O Developer possui autonomia diferenciada baseada na criticidade técnica:
 - **Tier 1 (Fast Path):** Execução sem interrupção humana. Pula as etapas de interrogatório/grill e auditoria do Roadmap. Execução atômica e direta, validando apenas o TDD local e commits semânticos no Git Flow.
-- **Tier 2 (Batchável):** Execução contínua do lote. O Orquestrador agrupa o resultado, requer verificação do Roadmap, e reporta apenas ao finalizar o bloco de tarefas ou se detectar falhas no TDD.
-- **Tier 3 (Risco Alto):** Requer aprovação explícita inicial do plano geral de tarefas. Para tarefas individuais na execução do DAG, o Orquestrador tentará prosseguir autonomamente após o "Go" inicial apenas se:
+- **Tier 2 (Batchável):** Execução contínua do lote. O Developer agrupa o resultado, requer verificação do Roadmap, e reporta apenas ao finalizar o bloco de tarefas ou se detectar falhas no TDD.
+- **Tier 3 (Risco Alto):** Requer aprovação explícita inicial do plano geral de tarefas. Para tarefas individuais na execução do DAG, o Developer tentará prosseguir autonomamente após o "Go" inicial apenas se:
   1. O suite de testes (TDD) passar totalmente.
   2. A análise estática de tipos não reportar quebra de contrato.
-  Caso ambos sejam verdadeiros, o Orquestrador assume o risco e prossegue, logando a decisão no `ESTADO_ORQUESTRATOR.md` como "DECISÃO AUTÔNOMA". Se houver falha de validação, ele interrompe a execução do DAG imediatamente e solicita intervenção.
+  Caso ambos sejam verdadeiros, o Developer assume o risco e prossegue, logando a decisão no `ESTADO_DEVELOPER.md` como "DECISÃO AUTÔNOMA". Se houver falha de validação, ele interrompe a execução do DAG imediatamente e solicita intervenção.
 
 ---
 
 ## Regras de Fragmentação (DAG & Atomização)
 
-> **Regra de Ouro**: A autonomia é total. O Orquestrador fragmenta o plano macro em tarefas atômicas e identifica nós independentes no DAG.
+> **Regra de Ouro**: A autonomia é total. O Developer fragmenta o plano macro em tarefas atômicas e identifica nós independentes no DAG.
 
 ### Delegação Paralela e Isolamento (Concorrência via Git Worktrees)
-O Orquestrador pode e deve delegar tarefas simultâneas para otimizar o tempo de desenvolvimento, respeitando as seguintes diretrizes:
+O Developer pode e deve delegar tarefas simultâneas para otimizar o tempo de desenvolvimento, respeitando as seguintes diretrizes:
 
 1. **Paralelismo da DAG**: Identifique tarefas independentes com dependências resolvidas no grafo e despache-as concorrentemente acionando múltiplos agentes executores em paralelo (ex: 2 subagentes operando em direções distintas).
 2. **Uso de Git Worktree para Concorrência**: Sempre que a execução de tarefas paralelas for disparada, os subagentes associados **devem** rodar sob isolamento de worktree (`isolation: "worktree"`). Isso isola o ambiente de arquivos do usuário contra regressões sintáticas e conflitos no Git.
 3. **Uso de Git Worktree por Tamanho de Atividade**: Mesmo no caso de uma única tarefa, se o tamanho da atividade envolver refatoração pesada de infra, transição de esquemas ou desenvolvimento de novos módulos inteiros (ou seja, tarefas que excedam a escrita de um único arquivo isolado ou demandem mais de 10 minutos de computação contínua), **instancie o subagente em uma worktree dedicada** para preservar a segurança da ramificação de desenvolvimento ativa do desenvolvedor.
-4. **Resolução de Fusão (Merge)**: Ao finalizar as tarefas paralelas, o Orquestrador assume o papel de coletor das branches isoladas temporárias e executa a mesclagem estruturada (resolvendo conflitos se houverem) e valida a compilação geral da aplicação.
+4. **Resolução de Fusão (Merge)**: Ao finalizar as tarefas paralelas, o Developer assume o papel de coletor das branches isoladas temporárias e executa a mesclagem estruturada (resolvendo conflitos se houverem) e valida a compilação geral da aplicação.
 
 ### Estrutura de Declaração de DAG (Grafo de Dependências):
-Ao fragmentar o plano macro, o Orchestrator monta e persiste a modelagem no arquivo local `.claude/ESTADO_ORCHESTRATOR.md` seguindo o formato:
+Ao fragmentar o plano macro, o Developer monta e persiste a modelagem no arquivo local `.claude/ESTADO_DEVELOPER.md` seguindo o formato:
 
 ```markdown
 ### Tarefas
@@ -65,23 +65,22 @@ Ao fragmentar o plano macro, o Orchestrator monta e persiste a modelagem no arqu
 - [ ] T2: Implementar validador de domínio (Tier 2) | depends_on: [T1]
 - [ ] T3: Alteração de schema Crítico (Tier 3) | depends_on: [T2]
 ```
-O Orchestrator identifica tarefas elegíveis (dependências resolvidas) e pode disparar subagentes concorrentemente.
+O Developer identifica tarefas elegíveis (dependências resolvidas) e pode disparar subagentes concorrentemente.
 ---
 
 ---
 
 ## Protocolo de Fila Sequencial e Gestão de Estado
 
-O Orchestrator **nunca** gerencia tarefas apenas na memória curta. O estado persistido é rei.
+O Developer **nunca** gerencia tarefas apenas na memória curta. O estado persistido é rei.
 
 ### Guia de Delegação Rápida
-O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação:
+O Developer deve consultar esta tabela antes de disparar qualquer delegação:
 
 | Problema | Skill |
 | --- | --- |
-| Governança & Orquestração | `/orchestrator` |
+| Governança & Orquestração | `/developer` |
 | Versionamento & PRs | Fluxo Git disponivel no ambiente, com confirmacao humana |
-| Infraestrutura ausente | `/setup-skills` |
 | Linguagem de domínio ausente | `/grill-with-docs` |
 | Arquitetura degradada | `/improve-codebase-architecture` |
 | Bug difícil ou regressão | `/diagnose` |
@@ -96,13 +95,13 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 
 ### Ciclo de Execução do Gestor de Operações:
 
-1. **Atualiza Estado**: O Orchestrator lê de/escreve em `.claude/ESTADO_ORCHESTRATOR.md` a cada tarefa concluída.
+1. **Atualiza Estado**: O Developer lê de/escreve em `.claude/ESTADO_DEVELOPER.md` a cada tarefa concluída.
 2. **Checa Bloqueios**: Identifica a próxima tarefa cujas dependências já foram finalizadas.
 3. **Delegação e Retorno**:
    - Dispara a tarefa no agente/skill associada.
    - Aguarda conclusão.
 4. **Sanity Checkpoint (A cada 3-5 conclusões)**:
-   A cada 3 tarefas passadas à categoria de `completed`, o Orchestrator deve pausar para rodar a checklist de sanidade:
+   A cada 3 tarefas passadas à categoria de `completed`, o Developer deve pausar para rodar a checklist de sanidade:
    ```checklist
    [ ] As premissas originais do projeto continuam válidas?
    [ ] Houve desvio técnico que necessita de replanejamento na DAG?
@@ -114,12 +113,12 @@ O Orquestrador deve consultar esta tabela antes de disparar qualquer delegação
 
 ## Protocolo de Operação: Modo Eficiência (Qualidade e Validação)
 
-A partir de agora, o Orquestrador opera em **Modo Eficiência**. O objetivo é zero retrabalho.
+A partir de agora, o Developer opera em **Modo Eficiência**. O objetivo é zero retrabalho.
 
-1. **Atraso Deliberado (The "Wait-and-Validate" Principle)**: Em vez de disparar delegações em paralelo, o Orquestrador deve esperar a confirmação completa da skill anterior (ex: `setup-skills`) antes de cogitar a próxima (ex: `grill-with-docs`).
+1. **Atraso Deliberado (The "Wait-and-Validate" Principle)**: Em vez de disparar delegações em paralelo, o Developer deve esperar a confirmação completa da skill anterior antes de cogitar a próxima (ex: `grill-with-docs`).
 2. **Qualidade em Tiers**:
    - **Fase de Setup**: Interatividade total. Nenhum comando é automatizado sem feedback positivo.
-   - **Fase de Planejamento**: Obrigatório o uso do `roadmap` e `plan`. Nenhuma delegação de código ocorre sem o plano estar aprovado no `ORCHESTRATOR-ROADMAP.md`.
+   - **Fase de Planejamento**: Obrigatório o uso do `roadmap` e `plan`. Nenhuma delegação de código ocorre sem o plano estar aprovado no `DEVELOPER-ROADMAP.md`.
    - **Fase de Execução**: O foco é em atomicidade. Se uma tarefa complexa surgir, ela **deve** ser fatiada antes da execução.
 3. **Paciência Estratégica**: É preferível perder 5 minutos a mais no setup do que ter que deletar e reconstruir arquivos por causa de falhas de contexto.
 ---
@@ -127,7 +126,7 @@ A partir de agora, o Orquestrador opera em **Modo Eficiência**. O objetivo é z
 ## Template: Fiscalização de Testes (Durante e Pós-Fila)
 
 ### 1. Checkpoint de Fila (Após cada tarefa que altere código)
-Antes de marcar a tarefa como `completed` no estado, o Orchestrator deve validar o suite de teste localmente:
+Antes de marcar a tarefa como `completed` no estado, o Developer deve validar o suite de teste localmente:
 - A funcionalidade alterada possui testes? (verificado via `git diff` / `Read`)
 - O runner de testes local (`npm test`, `pytest`, etc.) está verde?
 Se falhar: Invocar `/diagnose` imediatamente na unidade afetada antes de passar para a próxima tarefa da DAG.
@@ -150,10 +149,10 @@ Para toda tarefa que resultar em alteração de código, o ciclo de conclusão *
 - [ ] Casos de teste de erro/comportamento inesperado foram avaliados, não só o caminho feliz?
 - [ ] Bugs encontrados pela análise de QA foram registrados e resolvidos (ou reabertos como nova tarefa na DAG) antes de prosseguir?
 
-Falha neste portão -> **bloqueia** o avanço para o PR. O Orchestrator reabre a DAG com as tarefas de correção apontadas pela `/qa-analyst` e só prossegue após nova validação limpa.
+Falha neste portão -> **bloqueia** o avanço para o PR. O Developer reabre a DAG com as tarefas de correção apontadas pela `/qa-analyst` e só prossegue após nova validação limpa.
 
 ### 4. Protocolo de PR e Fechamento de Ciclo (Mandatário)
-Somente após o Portão de QA ser aprovado, o Orchestrator pode iniciar o fluxo de PR disponível no ambiente. Nunca invoque uma skill de PR que nao esteja instalada:
+Somente após o Portão de QA ser aprovado, o Developer pode iniciar o fluxo de PR disponível no ambiente. Nunca invoque uma skill de PR que nao esteja instalada:
 - [ ] O commit segue Conventional Commits?
 - [ ] A branch seguiu o padrão `tipo/issue-descricao`?
 - [ ] O template de PR foi preenchido?

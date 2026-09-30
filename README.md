@@ -99,7 +99,9 @@ O GitHub e a fonte persistente de Issues, escopo, criterios de aceite, dependenc
 
 ## O Developer
 
-O `/developer` e a Skill Mestra deste fork, um conceito que nao existe no repositorio original. Ele avalia, documenta, delega, fiscaliza e expande o fluxo de engenharia.
+O `/developer` e a Skill Mestra deste fork (renomeada de `orchestrator`), um conceito que nao existe no repositorio original. Ele avalia, documenta, delega, fiscaliza e expande o fluxo de engenharia.
+
+`/orchestrator` continua funcionando como atalho de compatibilidade — chama exatamente a mesma skill, para nao quebrar instalacoes feitas antes do rename.
 
 ### Regra de ouro
 
@@ -140,8 +142,9 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 | Problema | Skill |
 | --- | --- |
 | Governanca e orquestracao | [`/developer`](./skills/engineering/developer/SKILL.md) |
+| Arquitetura de sistemas, ADD/SAD, C4, Mockups/UI e ADRs | [`/architect`](./skills/engineering/architect/SKILL.md) |
 | Roadmap e Epics | [`/roadmap`](./skills/engineering/roadmap/SKILL.md) |
-| Setup documental | [`/setup-skills`](./skills/engineering/setup-skills/SKILL.md) |
+| Triagem e gestao de issues | [`/triage`](./skills/engineering/triage/SKILL.md) |
 | Linguagem de dominio e ADRs | [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md) |
 | Modulo ou feature especifica | [`/grill-feature-with-docs`](./skills/engineering/grill-feature-with-docs/SKILL.md) |
 | Fragmentacao em GitHub Issues | [`/to-issues`](./skills/engineering/to-issues/SKILL.md) |
@@ -157,9 +160,11 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 | Bootstrap de MVP | [`/scaffold-mvp`](./skills/engineering/scaffold-mvp/SKILL.md) |
 | Falta de contexto | [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) |
 | Servidores MCP | [`/mcp-builder`](./skills/engineering/mcp-builder/SKILL.md) |
-| Provisionar maquina Windows nova | [`/devsetup`](./skills/engineering/devsetup/SKILL.md) |
 | Deploy e monitoramento SuperKuma | [`/superkuma-monitoring`](./skills/engineering/superkuma-monitoring/SKILL.md) |
+| Pre-commit hooks com Husky/Prettier | [`/setup-pre-commit`](./skills/misc/setup-pre-commit/SKILL.md) |
+| Travas de seguranca Git no agent | [`/git-guardrails-claude-code`](./skills/misc/git-guardrails-claude-code/SKILL.md) |
 | Criacao, eval e otimizacao de skills | [`/skill-creator`](./skills/productivity/skill-creator/SKILL.md) |
+| Comunicacao ultra-comprimida (economia de tokens) | [`/caveman`](./skills/productivity/caveman/SKILL.md) |
 | Gargalo nao mapeado | [`/write-a-skill`](./skills/productivity/write-a-skill/SKILL.md) |
 | Alinhamento de plano | [`/grill-me`](./skills/productivity/grill-me/SKILL.md) |
 | Handoff | [`/handoff`](./skills/productivity/handoff/SKILL.md) |
@@ -168,9 +173,11 @@ Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governan
 
 ### Engineering
 
-Skills para trabalho diario com codigo: `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `setup-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert`, `mcp-builder`, `devsetup`, `superkuma-monitoring` e `developer`.
+Skills para trabalho diario com codigo: `architect`, `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert`, `mcp-builder`, `superkuma-monitoring` e `developer`.
 
-`devsetup` provisiona uma maquina Windows nova (ou recem-formatada) para desenvolvimento com agentes de IA via `winget`, sem tweaks de sistema ou scripts de terceiros.
+`architect` atua como Arquiteto de Software, Solucoes e Engenharia senior: projeta sistemas para nivel corporativo (Production-Readiness), conduz alinhamento de escopo via interrogatorio ativo (/grill), define design tokens/mockups de tela (padrao MASTER+Overrides) para orientar os desenvolvedores, garante rigor de engenharia (Clean Arch, DDD, sem N+1, OWASP, regressao zero) e gera artefatos chave (ADD/SAD, C4 Model em Mermaid, ADRs, esquemas DER/MER, contratos OpenAPI/gRPC e topologias de nuvem/infraestrutura).
+
+`orchestrator` e um atalho de compatibilidade: mesma skill que `developer` (nome antigo, mantido para nao quebrar instalacoes existentes).
 
 `expo-expert` e conhecimento especializado de stack (Expo/React Native): CNG e config plugins, Expo Modules API, EAS Build/Submit/Update/Workflows, Expo Router, Nova Arquitetura, animacao (Reanimated/Skia), Native UI, DOM components, data fetching e upgrade de SDK. Ensina o agent a consultar a documentacao viva do Expo (`llms.txt` + `.md`) em vez de confiar em conhecimento de treino desatualizado.
 

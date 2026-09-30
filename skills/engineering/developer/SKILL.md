@@ -1,15 +1,15 @@
 ---
-name: orchestrator
+name: developer
 description: Governa projetos com agentes, audita pre-condicoes, cria documentacao, transforma gaps em GitHub Issues e coordena execucao, testes e QA.
 ---
 
-# ORCHESTRATOR - Central de Controle
+# DEVELOPER - Central de Controle
 
 Planeja, governa, audita e delega execucao. Nao execute tarefas complexas diretamente quando uma skill especializada existir.
 
 ## Fase - Atualizacao do framework
 
-Esta verificacao deve ocorrer no inicio de toda execucao do orchestrator, antes das pre-condicoes do projeto.
+Esta verificacao deve ocorrer no inicio de toda execucao do developer, antes das pre-condicoes do projeto.
 
 1. Identifique de onde as skills foram instaladas. Para cada skill carregada, resolva o caminho real do link e procure o clone que contem `.claude-plugin/plugin.json` e `scripts/setup-alltomatos-skills.sh`.
 2. No clone encontrado, leia o remote `origin`, a branch atual e o commit local instalado.
@@ -23,15 +23,16 @@ Atualizacao do framework disponivel
 - Instalado: <commit ou data>
 - Disponivel: <commit ou data>
 - Novidades: <resumo dos commits ou arquivos alterados>
-- Acao: execute novamente o instalador apos revisar as mudancas
+- Acao: deseja atualizar agora ou prosseguir sem atualizar?
 ```
 
-6. Se houver commits novos, informe a atualizacao disponivel e execute o re-deploy das skills nos ambientes em uso. Use o instalador em modo nao interativo, por exemplo `scripts/setup-alltomatos-skills.sh --redeploy <diretorios-detectados>`. O re-deploy deve acontecer depois do `fetch`, sem sobrescrever backups existentes.
-7. Depois do re-deploy, confirme que `orchestrator` e `setup-skills` apontam para a revisao nova e informe o resultado ao usuario antes de continuar.
+6. Se houver commits novos, pergunte ao usuario se deseja atualizar agora ou prosseguir sem atualizar. Nao execute o re-deploy sem essa confirmacao explicita.
+   - Se o usuario confirmar a atualizacao, execute o re-deploy das skills nos ambientes em uso. Use o instalador em modo nao interativo, por exemplo `scripts/setup-alltomatos-skills.sh --redeploy <diretorios-detectados>`. O re-deploy deve acontecer depois do `fetch`, sem sobrescrever backups existentes. Depois do re-deploy, confirme que `developer` aponta para a revisao nova e informe o resultado ao usuario antes de continuar.
+   - Se o usuario optar por prosseguir sem atualizar, registre a decisao e continue o fluxo normalmente com a revisao atual.
 8. Se nao houver mudancas, registre `Framework atualizado (<commit>)` sem interromper o fluxo.
 9. Se nao for possivel localizar o clone, o remote ou a rede, informe `Nao foi possivel verificar atualizacoes do framework` e continue apenas se as skills locais estiverem disponiveis. Nao faca re-deploy sem confirmar uma revisao nova.
 
-Quando uma revisao nova for confirmada, o re-deploy e automatico e faz parte do contrato do orchestrator. Para uma instalacao inicial ou troca de ambientes, a decisao continua sendo explicita do usuario por meio de `scripts/setup-alltomatos-skills.sh`.
+Quando uma revisao nova for confirmada, o re-deploy so ocorre mediante confirmacao explicita do usuario nesta mesma execucao — nunca automaticamente. Para uma instalacao inicial ou troca de ambientes, a decisao continua sendo explicita do usuario por meio de `scripts/setup-alltomatos-skills.sh`.
 
 ## Fase 0 - Pre-condicoes de governanca
 
@@ -47,19 +48,18 @@ Se o ambiente estiver vazio, nao tiver Git ou nao tiver repositorio remoto no Gi
 2. inicializar o repositorio local;
 3. configurar o remote `origin`;
 4. fazer o primeiro commit e push;
-5. retornar ao orchestrator.
+5. retornar ao developer.
 
 Nao substitua o GitHub silenciosamente por tracker local. GitHub e a fonte de rastreabilidade, Issues, revisao e historico deste framework.
 
-## Fase 1 - Provisionamento documental
+## Fase 1 - Provisionamento documental e estrategia
 
-1. Invocar `/setup-skills` para completar `AGENTS.md` ou `CLAUDE.md`, `CONTEXT.md`, `docs/agents/` e `docs/adr/`.
-2. Invocar `/roadmap` para criar ou atualizar `ORCHESTRATOR-ROADMAP.md` e Epics.
-3. Invocar `/grill-with-docs` para consolidar linguagem de dominio e decisoes arquiteturais.
-4. Em repositorio vazio, invocar `/scaffold-mvp` apos o alinhamento de dominio.
-5. Revisar e persistir a documentacao antes de iniciar implementacao.
+1. Invocar `/roadmap` para criar ou atualizar `DEVELOPER-ROADMAP.md` e Epics.
+2. Invocar `/grill-with-docs` para consolidar linguagem de dominio (`CONTEXT.md`, `docs/agents/`, `docs/adr/`) e decisoes arquiteturais.
+3. Em repositorio vazio, invocar `/scaffold-mvp` apos o alinhamento de dominio.
+4. Revisar e persistir a documentacao antes de iniciar implementacao.
 
-Documentacao nao e uma etapa opcional: o orchestrator deve deixar um estado compreensivel para outro agent continuar o trabalho.
+Documentacao nao e uma etapa opcional: o developer deve deixar um estado compreensivel para outro agent continuar o trabalho.
 
 ### Caso especial - projeto novo com apenas um PRD na pasta
 
@@ -82,7 +82,7 @@ Verifique:
 [ ] CONTEXT.md ou CONTEXT-MAP.md
 [ ] docs/agents/ com tracker e labels
 [ ] docs/adr/ quando houver decisoes relevantes
-[ ] ORCHESTRATOR-ROADMAP.md
+[ ] DEVELOPER-ROADMAP.md
 [ ] Skills instaladas no ambiente escolhido
 ```
 
@@ -90,7 +90,7 @@ Classifique gaps como P1 (seguranca/tipos), P2 (arquitetura), P3 (performance) o
 
 ## Fase 3 - Fragmentacao no GitHub
 
-Os gaps aprovados devem ser transformados em Issues por `/to-issues`. O GitHub e a fonte persistente de escopo, criterios de aceite, dependencias e status; `ESTADO_ORQUESTRATOR.md` e apenas a visao operacional da DAG.
+Os gaps aprovados devem ser transformados em Issues por `/to-issues`. O GitHub e a fonte persistente de escopo, criterios de aceite, dependencias e status; `ESTADO_DEVELOPER.md` e apenas a visao operacional da DAG.
 
 1. Passe para `/to-issues` os gaps, roadmap e documentacao aprovados.
 2. Apresente a decomposicao para aprovacao quando houver decisao HITL.
@@ -102,7 +102,7 @@ Os gaps aprovados devem ser transformados em Issues por `/to-issues`. O GitHub e
 
 Use slices verticais pequenos. Tarefas independentes podem ser executadas em paralelo com worktrees isoladas. Tarefas que alterem schema, autenticacao, APIs publicas ou dados exigem confirmacao humana.
 
-O orchestrator delega para skills especializadas, por exemplo:
+O developer delega para skills especializadas, por exemplo:
 
 - `/tdd` para implementacao orientada a testes;
 - `/secure-e2e` para fluxos E2E e seguranca;

@@ -1,0 +1,3 @@
+interface:
+  display_name: "MCP Builder"
+  short_description: "Guide for building high-quality MCP servers"

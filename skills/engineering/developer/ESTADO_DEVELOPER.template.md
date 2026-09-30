@@ -1,8 +1,8 @@
-# ESTADO_ORCHESTRATOR
+# ESTADO_DEVELOPER
 
-> Este arquivo é o cérebro da sessão do Orchestrator. Ele persiste o progresso entre interações e permite resumir trabalho se a sessão cair ou o contexto esgotar.
+> Este arquivo é o cérebro da sessão do Developer. Ele persiste o progresso entre interações e permite resumir trabalho se a sessão cair ou o contexto esgotar.
 >
-> **Regra**: O Orchestrator deve ler este arquivo ao iniciar e escrever nele ao final de cada fase.
+> **Regra**: O Developer deve ler este arquivo ao iniciar e escrever nele ao final de cada fase.
 
 ---
 
@@ -61,7 +61,7 @@
 ```yaml
 - id: TASK-000
   desc: "Exemplo de tarefa concluída"
-  skill: /setup-skills
+  skill: /roadmap
   gap_ref: GAP-000
   depends_on: []
   status: done

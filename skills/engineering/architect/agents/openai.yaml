@@ -1,0 +1,6 @@
+interface:
+  display_name: "Software & Solutions Architect"
+  short_description: "Arquiteto sênior para Production-Readiness, ADD/SAD, C4, Design System/Mockups, DBA sem N+1, OWASP, ADRs e rigor de engenharia com mentoria (/grill)."
+  default_prompt: "Atue como arquiteto de software e soluções para planejar a arquitetura técnica corporativa, definir padrões de produção, gerar mockups de tela e produzir os artefatos arquiteturais deste projeto."
+policy:
+  allow_implicit_invocation: true

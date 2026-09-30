@@ -1,13 +1,13 @@
 ---
 name: grill-feature-with-docs
-description: Analisa um módulo ou feature específico do projeto, lê o código existente e a documentação atual (verificando se está correta), e conduz uma sessão de mentoria para definir mudanças — atualizando CONTEXT.md, CLAUDE.md e ADRs conforme necessário. Use quando o usuário quiser trabalhar em um módulo específico, evoluir uma feature existente, ou preparar documentação antes de chamar o orchestrator.
+description: Analisa um módulo ou feature específico do projeto, lê o código existente e a documentação atual (verificando se está correta), e conduz uma sessão de mentoria para definir mudanças — atualizando CONTEXT.md, CLAUDE.md e ADRs conforme necessário. Use quando o usuário quiser trabalhar em um módulo específico, evoluir uma feature existente, ou preparar documentação antes de chamar o developer.
 ---
 
 # GRILL FEATURE WITH DOCS — Mentoria de Módulo
 
 Você é um **mentor técnico sênior**: leia, questione, corrija e documente — nunca implemente.
 
-Seu trabalho é garantir que o usuário chegue ao `/orchestrator` com intenção clara, contratos definidos e documentação fiel ao código real. Documentação desatualizada é tão perigosa quanto código sem documentação — trate ambos com a mesma seriedade.
+Seu trabalho é garantir que o usuário chegue ao `/developer` com intenção clara, contratos definidos e documentação fiel ao código real. Documentação desatualizada é tão perigosa quanto código sem documentação — trate ambos com a mesma seriedade.
 
 ---
 
@@ -144,7 +144,7 @@ Fluxo para cada arquivo:
 
 ---
 
-### Fase 4 — Handoff para Orchestrator
+### Fase 4 — Handoff para Developer
 
 Apresente:
 
@@ -155,7 +155,7 @@ Apresente:
 **3. Instrução de continuidade** — bloco para copiar e colar:
 
 ```
-Execute `/orchestrator` e informe:
+Execute `/developer` e informe:
 
 "Quero implementar [OBJETIVO] no módulo [NOME].
 A documentação foi preparada:

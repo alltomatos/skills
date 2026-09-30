@@ -17,23 +17,23 @@ O conteúdo de uma skill (`SKILL.md` e arquivos de apoio) não deve nomear mecan
 
 Toda skill distribuída deve ter `agents/openai.yaml` ao lado do `SKILL.md`, com `interface.display_name` e `interface.short_description` para o picker do Codex. Skills cujo `SKILL.md` tenha `disable-model-invocation: true` (ou que sejam inerentemente específicas de um harness, como `git-guardrails-claude-code`) devem espelhar isso com `policy.allow_implicit_invocation: false`.
 
-## Protocolo de Agentic Workflow (/orchestrator)
+## Protocolo de Agentic Workflow (/developer)
 
 Este repositório utiliza um modelo de delegação hierárquica focado em conformidade:
 
-1. **Entrada**: `/orchestrator` audita o ambiente (fases 1-4).
-2. **Delegação**: O `orchestrator` atua como Arquiteto (não executa código pesado).
+1. **Entrada**: `/developer` audita o ambiente (fases 1-4).
+2. **Delegação**: O `developer` atua como Arquiteto (não executa código pesado).
 3. **Execução**: Delega para skills especializadas (`diagnose`, `tdd`, etc.).
-4. **Portão de QA (mandatório)**: ao final de todo desenvolvimento — para qualquer Tier de risco, sem exceção — o `orchestrator` **deve** invocar obrigatoriamente a skill `/qa-analyst` para analisar o código gerado/alterado antes de abrir o PR. Bugs ou gaps encontrados reabrem a DAG como novas tarefas; só após a análise de QA aprovar é que o `/git-flow-pr-standard` pode ser acionado.
+4. **Portão de QA (mandatório)**: ao final de todo desenvolvimento — para qualquer Tier de risco, sem exceção — o `developer` **deve** invocar obrigatoriamente a skill `/qa-analyst` para analisar o código gerado/alterado antes de abrir o PR. Bugs ou gaps encontrados reabrem a DAG como novas tarefas; só após a análise de QA aprovar é que o `/git-flow-pr-standard` pode ser acionado.
 5. **Expansão**: Gargalos não mapeados → invocação automática do `/write-a-skill`.
 
 ## Arquitetura do Sistema
 
 ```mermaid
 graph TD
-    User[/Usuário/] -->|1. Inicia| Orchestrator[/Orchestrator - Mestra/]
-    Orchestrator -->|2. Audita/Repara| SetupSkills[/setup-skills/]
-    Orchestrator -->|3. Delega Trabalho| Specialized[Skills Especializadas]
+    User[/Usuário/] -->|1. Inicia| Developer[/Developer - Mestra/]
+    Developer -->|2. Estratégia/Domínio| Roadmap[/roadmap/]
+    Developer -->|3. Delega Trabalho| Specialized[Skills Especializadas]
     Specialized -->|4. Resolve| Codebase[Base de Código]
     Specialized -->|5. Portão de QA obrigatório| QAAnalyst[/qa-analyst/]
     QAAnalyst -->|Aprovado| GitFlow[/git-flow-pr-standard/]

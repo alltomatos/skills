@@ -38,4 +38,4 @@ Context7 indisponível (HTTP 429, rede caída, sem internet) -> NÃO ABORTE FLUX
 ## INTEGRAÇÃO SKILLS
 * **`/scaffold-mvp`**: Gerar manifesto `.claude/context7.json` base com ids da stack ativa.
 * **`/tdd` e `/diagnose`**: Erro compilação/tipagem -> rodar `/query-docs` antes de tentar correção ad-hoc.
-* **`/setup-skills`**: Criar diretório `.claude/` e manifesto `context7.json` vazio se ausente.
+* **Context7 Manifesto**: Criar diretório `.claude/` e manifesto `context7.json` vazio se ausente.

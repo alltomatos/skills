@@ -5,7 +5,7 @@ description: Gerencia o estado estrategico e as Epics do projeto, mantendo IDs e
 
 # Roadmap
 
-Gerencie `ORCHESTRATOR-ROADMAP.md` como a bussola estrategica do projeto. O roadmap resume o plano; o GitHub Issue da Epic e a fonte detalhada de contexto e rastreabilidade.
+Gerencie `DEVELOPER-ROADMAP.md` como a bussola estrategica do projeto. O roadmap resume o plano; o GitHub Issue da Epic e a fonte detalhada de contexto e rastreabilidade.
 
 ## Estrutura obrigatoria
 
@@ -37,4 +37,4 @@ O arquivo deve conter:
 [ ] Estados refletem a realidade atual
 ```
 
-Se `ORCHESTRATOR-ROADMAP.md` nao existir, crie-o somente depois de confirmar GitHub e o contexto do projeto. Se nao houver Epics, registre essa situacao; nao crie Epics ficticias.
+Se `DEVELOPER-ROADMAP.md` nao existir, crie-o somente depois de confirmar GitHub e o contexto do projeto. Se nao houver Epics, registre essa situacao; nao crie Epics ficticias.

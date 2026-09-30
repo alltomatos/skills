@@ -42,4 +42,4 @@ Apenas prossiga após a anuência explícita do usuário. Se o usuário sugerir 
 4. **Gerar README Ágil:** Documente comandos de execução local, visão arquitetural adotada e como a prototipação rápida deve ser guiada (focando em reuso).
 
 ## Critérios de Retorno
-Finalize atualizando/registrando a stack base no `CONTEXT.md` (sob Detalhes Técnicos) e devolva o fluxo ao Orchestrator informando que o terreno está pronto para desenvolvimento de features.
+Finalize atualizando/registrando a stack base no `CONTEXT.md` (sob Detalhes Técnicos) e devolva o fluxo ao Developer informando que o terreno está pronto para desenvolvimento de features.

@@ -35,9 +35,9 @@ O re-deploy apos atualizacao pode ser executado sem interacao:
 ./scripts/setup-alltomatos-skills.sh --redeploy
 ```
 
-## Contrato do Orchestrator
+## Contrato do Developer
 
-O `/orchestrator` deve:
+O `/developer` deve:
 
 1. verificar no inicio se o framework tem atualizacoes no remote GitHub;
 2. localizar o clone de origem atraves das skills instaladas, mesmo quando o projeto consumidor nao possui clone do framework;
@@ -45,12 +45,12 @@ O `/orchestrator` deve:
 4. verificar Git local e remote GitHub do projeto consumidor;
 5. bloquear o fluxo de implementacao quando nao houver repositorio GitHub configurado;
 6. criar ou atualizar documentacao antes da implementacao;
-7. usar `/roadmap`, `/grill-with-docs` e `/setup-skills` para estabelecer estrategia, dominio e governanca;
+7. usar `/roadmap` e `/grill-with-docs` para estabelecer estrategia, dominio e governanca;
 8. fragmentar trabalho aprovado usando `/to-issues` no GitHub;
-9. manter `ESTADO_ORQUESTRATOR.md` como visao operacional, sem substituir as GitHub Issues;
+9. manter `ESTADO_DEVELOPER.md` como visao operacional, sem substituir as GitHub Issues;
 10. executar verificacoes, exigir `/qa-analyst` antes de qualquer PR e reabrir tarefas quando QA encontrar gaps.
 
-O orchestrator nao deve executar trabalho complexo diretamente quando uma skill especializada puder ser delegada.
+O developer nao deve executar trabalho complexo diretamente quando uma skill especializada puder ser delegada.
 
 ## Governanca do projeto consumidor
 
@@ -60,7 +60,7 @@ Antes da implementacao, o projeto deve possuir:
 - remote GitHub acessivel;
 - `AGENTS.md` ou `CLAUDE.md`;
 - `CONTEXT.md` ou `CONTEXT-MAP.md`;
-- `ORCHESTRATOR-ROADMAP.md`;
+- `DEVELOPER-ROADMAP.md`;
 - `docs/agents/issue-tracker.md`;
 - `docs/agents/triage-labels.md`;
 - `docs/agents/domain.md`;
