@@ -66,11 +66,13 @@ As instalacoes existentes sao preservadas em backups quando necessario (`<skill>
 
 ## Primeiro uso
 
-Depois da instalacao, abra um projeto no agent e execute:
+Depois da instalacao, abra um projeto no agent e execute o arquiteto para conduzir o alinhamento de escopo, design system e arquitetura tecnica:
 
 ```text
-/developer
+/architect
 ```
+
+*(O comando `/architect` atua na fase de descoberta, questionamento ativo, geracao de mockups/ADD e preparacao dos artefatos arquiteturais antes de repassar para execucao).*
 
 O projeto consumidor precisa estar versionado no Git e possuir um repositorio remoto no GitHub. Em um projeto novo:
 
@@ -81,17 +83,17 @@ git commit -m "chore: initialize repository"
 gh repo create <nome> --source . --remote origin --push
 ```
 
-Se o ambiente estiver vazio, sem Git ou sem remote GitHub, o developer deve parar e orientar esse processo antes de implementar qualquer coisa.
+Se o ambiente estiver vazio, sem Git ou sem remote GitHub, o arquiteto/developer deve parar e orientar esse processo antes de implementar qualquer coisa.
 
 ## Fluxo de trabalho: engenharia de ciclo fechado
 
-1. **Atualizacao do framework**: o developer localiza o clone de origem associado as skills instaladas, consulta o remote GitHub, informa commits novos e faz o re-deploy nos ambientes em uso.
-2. **Governanca**: valida Git, remote GitHub, autenticacao e estado do projeto.
-3. **Documentacao**: cria ou atualiza `AGENTS.md`/`CLAUDE.md`, `CONTEXT.md`, `docs/agents/`, ADRs e `DEVELOPER-ROADMAP.md`.
-4. **Estrategia**: usa `/roadmap` e `/grill-with-docs` para definir Epics, linguagem de dominio e decisoes.
-5. **Fragmentacao**: usa `/to-issues` para publicar slices verticais no GitHub com criterios de aceite e dependencias.
-6. **Execucao**: delega tarefas pequenas, usando worktrees para paralelismo seguro.
-7. **Feedback**: usa `/tdd`, `/query-docs`, `/diagnose` e `/secure-e2e` conforme o risco.
+1. **Atualizacao do framework**: localiza o clone de origem associado as skills instaladas, consulta o remote GitHub, informa commits novos e faz o re-deploy nos ambientes em uso.
+2. **Governanca e Escopo**: valida Git, remote GitHub, autenticacao e estado do projeto.
+3. **Arquitetura e Design (/architect)**: conduz interrogatorio ativo (/grill), projeta a solucao (ADD/SAD, C4, ADRs, esquemas DER), define tokens de design e mockups de tela (`MASTER.md` + overrides) e estabelece diretrizes de Production-Readiness.
+4. **Documentacao e Dominio**: consolida `AGENTS.md`/`CLAUDE.md`, `CONTEXT.md`, `docs/agents/`, ADRs e `DEVELOPER-ROADMAP.md` via `/roadmap` e `/grill-with-docs`.
+5. **Fragmentacao**: usa `/to-issues` para fatiar os Epics e artefatos em slices verticais no GitHub com criterios de aceite e dependencias.
+6. **Orquestracao e Execucao (/developer)**: o developer coordena a fila de tarefas, usando worktrees para paralelismo seguro.
+7. **Feedback e Qualidade**: usa `/tdd`, `/query-docs`, `/diagnose` e `/secure-e2e` conforme o risco.
 8. **QA**: invoca `/qa-analyst` obrigatoriamente antes de qualquer PR, sem excecao de tier.
 9. **Entrega**: somente apos QA aprovado, executa o fluxo de PR disponivel no ambiente com confirmacao humana.
 
