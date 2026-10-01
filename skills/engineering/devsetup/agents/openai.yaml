@@ -1,0 +1,3 @@
+interface:
+  display_name: "Devsetup"
+  short_description: "Bootstrap a Windows dev machine via winget"
