@@ -89,13 +89,13 @@ Se o ambiente estiver vazio, sem Git ou sem remote GitHub, o arquiteto/developer
 
 1. **Atualizacao do framework**: localiza o clone de origem associado as skills instaladas, consulta o remote GitHub, informa commits novos e faz o re-deploy nos ambientes em uso.
 2. **Governanca e Escopo**: valida Git, remote GitHub, autenticacao e estado do projeto.
-3. **Arquitetura e Design (/architect)**: conduz interrogatorio ativo (/grill), projeta a solucao (ADD/SAD, C4, ADRs, esquemas DER), define tokens de design e mockups de tela (`MASTER.md` + overrides) e estabelece diretrizes de Production-Readiness.
-4. **Documentacao e Dominio**: consolida `AGENTS.md`/`CLAUDE.md`, `CONTEXT.md`, `docs/agents/`, ADRs e `DEVELOPER-ROADMAP.md` via `/roadmap` e `/grill-with-docs`.
-5. **Fragmentacao**: usa `/to-issues` para fatiar os Epics e artefatos em slices verticais no GitHub com criterios de aceite e dependencias.
-6. **Orquestracao e Execucao (/developer)**: o developer coordena a fila de tarefas, usando worktrees para paralelismo seguro.
-7. **Feedback e Qualidade**: usa `/tdd`, `/query-docs`, `/diagnose` e `/secure-e2e` conforme o risco.
-8. **QA**: invoca `/qa-analyst` obrigatoriamente antes de qualquer PR, sem excecao de tier.
-9. **Entrega**: somente apos QA aprovado, executa o fluxo de PR disponivel no ambiente com confirmacao humana.
+3. **Arquitetura e Design (/architect)**: conduz interrogatorio ativo (/grill), projeta a solucao (ADD/SAD, C4, ADRs, esquemas DER), define tokens de design e mockups de tela (`MASTER.md` + overrides), User Guides e obtém aprovação HITL obrigatória do usuário.
+4. **Fragmentacao em Issues (/to-issues)**: fatiar os Epics e especificações aprovadas em slices verticais no GitHub com critérios de aceite verificáveis e dependências (`Blocked by`).
+5. **Orquestracao (/developer)**: coordena a fila de tarefas e o loop de desenvolvimento por Issue, gerenciando branches/worktrees.
+6. **Desenvolvimento Orientado a Testes (/tdd)**: aplica ciclo estrito Red-Green-Refactor para cada issue (com apoio de `/query-docs`, `/expo-expert`, `/diagnose`).
+7. **Garantia de Qualidade Funcional (/qa-analyst)**: portão obrigatório pré-segurança; confronta requisitos, casos de borda, testes funcionais e critérios de aceite.
+8. **Auditoria e Seguranca E2E (/secure-e2e)**: portão obrigatório pré-PR; auditoria de código (OWASP), testes ofensivos/negativos em browser e API (`*.spec.sec.ts`).
+9. **Entrega (PR)**: somente apos QA e Seguranca verdes, executa o fluxo de Pull Request com confirmacao humana.
 
 O GitHub e a fonte persistente de Issues, escopo, criterios de aceite, dependencias, revisao e historico. `ESTADO_DEVELOPER.md` e somente a visao operacional da DAG.
 

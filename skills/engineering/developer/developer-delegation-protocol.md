@@ -142,17 +142,25 @@ Após a última tarefa da DAG passar para `completed`, executa a fiscalização 
 ```
 - Opcional: Gerar um resumo de impacto das mudanças.
 
-### 3. Portão de QA (Mandatário, Pré-PR)
-Para toda tarefa que resultar em alteração de código, o ciclo de conclusão **não** avança para o PR sem passar pela análise da skill `/qa-analyst`. Isso vale para **todos os Tiers**, incluindo Fast Path (T1) — não há bypass.
+### 3. Portão de QA (Mandatário, Pré-Segurança)
+Para toda tarefa que resultar em alteração de código, o ciclo de conclusão **não** avança sem passar pela análise da skill `/qa-analyst`. Isso vale para **todos os Tiers**, incluindo Fast Path (T1) — não há bypass.
 - [ ] `/qa-analyst` foi invocado sobre o diff/código gerado nesta tarefa?
 - [ ] Requisitos originais foram confrontados com a implementação (ambiguidades? lacunas?)
 - [ ] Casos de teste de erro/comportamento inesperado foram avaliados, não só o caminho feliz?
 - [ ] Bugs encontrados pela análise de QA foram registrados e resolvidos (ou reabertos como nova tarefa na DAG) antes de prosseguir?
 
-Falha neste portão -> **bloqueia** o avanço para o PR. O Developer reabre a DAG com as tarefas de correção apontadas pela `/qa-analyst` e só prossegue após nova validação limpa.
+Falha neste portão -> **bloqueia** o avanço. O Developer reabre a DAG com as tarefas de correção apontadas pela `/qa-analyst` e só prossegue após nova validação limpa.
 
-### 4. Protocolo de PR e Fechamento de Ciclo (Mandatário)
-Somente após o Portão de QA ser aprovado, o Developer pode iniciar o fluxo de PR disponível no ambiente. Nunca invoque uma skill de PR que nao esteja instalada:
+### 4. Portão de Segurança e Testes E2E (Mandatário, Pré-PR)
+Após o incremento ser homologado funcionalmente pelo `/qa-analyst`, o Developer deve obrigatoriamente submeter o código à auditoria e testes ofensivos da skill `/secure-e2e`:
+- [ ] Auditoria de segurança de código realizada (OWASP, autenticação segura, autorização RBAC, rate limit, sanitização)?
+- [ ] Testes negativos de ataque (`*.spec.sec.ts`) criados ou executados via Playwright CLI contra rotas e dados críticos?
+- [ ] Nenhuma brecha ou vazamento de dados confidenciais (PII, tokens, senhas) detectado?
+
+Falha neste portão -> **bloqueia** o avanço para o PR. O Developer corrige as vulnerabilidades e blinda os testes com `/secure-e2e`.
+
+### 5. Protocolo de PR e Fechamento de Ciclo (Mandatário)
+Somente após a aprovação formal do `/qa-analyst` E do `/secure-e2e`, o Developer pode iniciar o fluxo de PR disponível no ambiente. Nunca invoque uma skill de PR que nao esteja instalada:
 - [ ] O commit segue Conventional Commits?
 - [ ] A branch seguiu o padrão `tipo/issue-descricao`?
 - [ ] O template de PR foi preenchido?
@@ -165,7 +173,8 @@ Somente após o Portão de QA ser aprovado, o Developer pode iniciar o fluxo de 
 | GAP Identificado | Skill Delegada | Tier de Risco |
 |------------------|----------------|---------------|
 | Testes ausentes ou frágeis | `/tdd` | Batch |
-| Fim de desenvolvimento — análise de QA obrigatória pré-PR | `/qa-analyst` | Mandatório (todos os Tiers) |
+| Fim de desenvolvimento — análise de QA obrigatória | `/qa-analyst` | Mandatório (todos os Tiers) |
+| Auditoria de código e testes de segurança E2E | `/secure-e2e` | Mandatório (todos os Tiers) |
 | Arquitetura degradada/acoplada | `/improve-codebase-architecture` | Batch |
 | Bug/regressão | `/diagnose` | Block |
 | Linguagem de domínio desalinhada | `/grill-with-docs` | Auto |

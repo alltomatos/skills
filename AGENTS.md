@@ -73,7 +73,7 @@ GitHub e a fonte de Issues, rastreabilidade, revisao e historico. Nao usar track
 O ciclo padrao e:
 
 ```text
-GitHub -> documentacao -> roadmap -> GitHub Issues -> implementacao -> testes -> QA -> PR
+Arquiteto (/architect) -> Issues (/to-issues) -> Developer (/developer) -> TDD (/tdd) -> QA (/qa-analyst) -> Seguranca E2E (/secure-e2e) -> PR
 ```
 
-TDD, diagnostico, testes E2E de seguranca e consulta de documentacao devem ser delegados para as skills correspondentes quando aplicavel. O portao de QA e obrigatorio para qualquer tier de risco.
+TDD, diagnostico, testes funcionais, analise de QA e auditoria/testes E2E de seguranca devem ser executados nessa sequencia estrita antes de qualquer PR. Os portoes de QA (`/qa-analyst`) e Seguranca (`/secure-e2e`) sao obrigatorios para qualquer tier de risco.

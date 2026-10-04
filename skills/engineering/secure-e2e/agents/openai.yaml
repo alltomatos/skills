@@ -1,3 +1,3 @@
 interface:
-  display_name: "Secure E2E"
-  short_description: "Security-first E2E tests with Playwright"
+  display_name: "Secure E2E & Code Security"
+  short_description: "Auditoria de código, testes de segurança ofensiva/defensiva e Playwright"

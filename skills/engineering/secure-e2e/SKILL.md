@@ -1,58 +1,74 @@
 ---
 name: secure-e2e
-description: End-to-end and security-first testing suite using Playwright. Generates tests to validate user flows and actively challenge safety barriers, input validation, authentication and permissions. Use when user wants to write E2E tests, verify security requirements, or prevent regression of bugs/vulnerabilities.
+description: Suíte de testes E2E e segurança ofensiva/defensiva com Playwright e auditoria de código. Realiza auditoria estática e dinâmica de vulnerabilidades (OWASP), pensa como um atacante para encontrar brechas, gera testes de regressão de segurança (*.spec.sec.ts) e orienta a remediação do código. Use quando precisar auditar código em busca de falhas, criar testes de segurança, validar autenticação/permissões ou prevenir regressões.
 ---
 
-# Secure E2E & Playwright CLI Protocol
+# Secure E2E & Protocolo de Auditoria e Segurança Ofensiva/Defensiva
 
-> **Crédito**: Arquitetura original por Matt Pocock ([mattpocock/skills](https://github.com/mattpocock/skills)). Adaptado para incluir a cultura de Segurança por Design no fork alltomatos/skills.
+> **Crédito**: Arquitetura original inspirada por Matt Pocock ([mattpocock/skills](https://github.com/mattpocock/skills)). Expandido para incorporar cultura completa de Segurança por Design, Auditoria de Código e Testes Negativos Defensivos no framework `alltomatos/skills`.
 
-A maioria dos testes de ponta a ponta (E2E) valida apenas o "caminho feliz" (Happy Path). Este protocolo estabelece que **testar segurança significa testar o caminho infeliz (Negative Testing)**. Se a aplicação diz que uma rota é restrita a administradores, devemos provar isso escrevendo um teste que tenta burlá-la e falha (portanto, retornando HTTP 403/401).
-
-## Filosofia: Segurança por Design e Negativa
-
-1.  **Testes de Segurança Ativos**: Todo novo fluxo de autenticação, formulário de entrada, ou rota de administração deve possuir um teste de segurança Playwright associado.
-2.  **Não Confie no Cliente**: Nós testamos o front-end manipulando o DOM e requests locais, mas também validamos os efeitos colaterais na API interceptando e disparando requisições diretas em paralelo com o contexto do browser.
-3.  **Clean Code nos Testes**: Evite testes frágeis acoplados à estrutura visual. Use seletores baseados em acessibilidade (`aria-label`, `role`) ou atributos de teste dedicados (`data-testid`).
-
-## Convenção de Arquivos de Teste
-
-Para diferenciar a intenção, divida seus arquivos de teste:
--   `*.spec.ts` ou `*.spec.func.ts` -> **Testes Funcionais**: Fluxos reais de usuário, validações de cliques, caminhos felizes do app.
--   `*.spec.sec.ts` -> **Testes de Segurança**: Tentativas de burlar regras, injeção de scripts (XSS), adulteração de formulários, Broken Authentication e ataques contra sessões.
+A maioria dos testes de ponta a ponta (E2E) valida apenas o "caminho feliz" (Happy Path). Esta skill capacita o agente a **pensar com mentalidade de auditor/analista de segurança (White-Hat)**: investigar superfícies de ataque no código-fonte, descobrir vetores de falha, comprovar a vulnerabilidade via testes de segurança negativos automatizados (`*.spec.sec.ts`) e aplicar a correção definitiva no código.
 
 ---
 
-## O Ciclo com Playwright CLI (`npx playwright`)
+## 1. Filosofia: Mentalidade de Atacante e Defesa em Profundidade
 
-Os agentes devem executar tarefas E2E seguindo este fluxo lógico e disciplinado:
+1. **Auditar Antes de Executar**: Analisar controllers, rotas, middlewares de autenticação, parsers de dados e queries de banco antes de criar testes.
+2. **Testar o Caminho Infeliz (Negative Testing)**: Se uma rota exige perfil de administrador, o teste deve tentar burlá-la com múltiplos perfis e tokens forjados, garantindo que o servidor rejeite ativamente (HTTP 401/403).
+3. **Não Confie no Cliente**: A interface pode esconder botões, mas a segurança real vive nas APIs. Todo teste deve validar o front-end manipulando o DOM/armazenamento local e, simultaneamente, disparar requisições diretas via API context (`request`).
+4. **Ciclo Completo: Descobrir → Provar → Corrigir → Blindar**:
+   - Descobre a vulnerabilidade no código ou arquitetura.
+   - Escreve o teste negativo que reproduz e falha se a brecha existir (Red).
+   - Corrige a vulnerabilidade na aplicação (Green).
+   - Mantém o teste no suíte de regressão de segurança permanente (Refactor/Shield).
 
-### 1. Inicializar e Mapear (Codegen)
-Se o fluxo for complexo, o agente pode utilizar o gerador de código do Playwright para mapear seletores ou gravar caminhos básicos de clique:
+---
+
+## 2. As Duas Frentes da Skill
+
+### Frente A: Auditoria de Código e Threat Modeling
+Ao inspecionar o código-fonte da aplicação, o agente audita:
+- **Autenticação & Sessões**: Armazenamento de tokens (cookies `HttpOnly; Secure; SameSite` vs `localStorage`), expiração e fluxo de logout.
+- **Autorização (RBAC/ABAC)**: Presença de middlewares de autorização em todas as rotas sensíveis; ausência de validação apenas por front-end.
+- **Validação de Entrada e Tipagem**: Uso de schemas estritos (Zod, Joi, Yup), sanitização de HTML e prevenção de injeções.
+- **Exposição de Dados e Segredos**: Ausência de segredos (`.env`, chaves privadas, senhas de teste) hardcoded no código ou expostos em endpoints públicos.
+- **Abuso de Taxa (Rate Limiting)**: Proteção em endpoints de login, recuperação de senha, geração de tokens e envio de mensagens.
+
+### Frente B: Testes Automatizados no Playwright (`*.spec.sec.ts`)
+Para diferenciar a intenção dos testes no projeto:
+- `*.spec.ts` ou `*.spec.func.ts` -> **Testes Funcionais**: Fluxos reais de usuário e caminhos felizes.
+- `*.spec.sec.ts` -> **Testes de Segurança**: Tentativas automatizadas de bypass, injeção, CSRF, IDOR/BOLA e abuso de fluxo.
+
+---
+
+## 3. O Fluxo de Execução com Playwright CLI
+
 ```bash
+# 1. Mapear formulários e seletores sensíveis (se necessário)
 npx playwright codegen http://localhost:3000
-```
-*Observação: O agente deve refatorar o código gerado pelo codegen para usar Page Objects ou seletores semânticos resilientes.*
 
-### 2. Construir o Teste Negativo (Security Spec)
-Os testes de segurança devem usar múltiplos contextos de navegador para validar que as fronteiras não vazam dados.
-Exemplo:
--   **Contexto A (Admin)**: Faz login, obtém e armazena os tokens de sessão.
--   **Contexto B (Usuário Básico)**: Tenta ler recursos reservados do Admin simulando requisições com tokens corrompidos ou IDs de outros usuários (IDOR).
-
-### 3. Rodar e Capturar Relatórios/Traces
-Execute o suíte de testes apontando para os testes específicos criados:
-```bash
+# 2. Executar apenas os testes de segurança
 npx playwright test --grep "@security"
-```
-Se o teste falhar por motivos desconhecidos, use o **Trace Viewer** para capturar o exato estado de tela e rede:
-```bash
+
+# 3. Diagnosticar falhas ou vazamentos via Trace Viewer
 npx playwright show-trace path/to/trace.zip
 ```
-O agente deve ler o output do trace para diagnosticar se o problema foi uma falha técnica (timeout) ou um erro real de segurança exposto.
 
-## Anti-Padrões a Evitar
+### Configuração Recomendada de Scripts (`package.json`)
+```json
+{
+  "scripts": {
+    "test:sec": "playwright test --grep \"@security\"",
+    "test:sec:report": "playwright test --grep \"@security\" --reporter=html"
+  }
+}
+```
 
--   ❌ **Mocks Excessivos**: Não mocke a API em testes de segurança. Se você mockar a API que valida a role do usuário, você não está testando a segurança da aplicação, está apenas testando seu próprio mock.
--   ❌ **Verificação Visual apenas**: Validar que "o botão admin não aparece na tela" para um usuário básico não é segurança de verdade. O teste deve validar que, se aquele usuário tentar disparar a request HTTP direta ou navegar na URL de admin, ele receberá um bloqueio HTTP 403.
--   ❌ **Deixar Credenciais em Texto Plano**: Não commite senhas de teste no código dos arquivos `*.spec.ts`. Use variáveis de ambiente (`process.env.TEST_ADMIN_PASSWORD`) ou carregue credenciais seguras a partir de fixtures locais não versionadas.
+---
+
+## 4. Anti-Padrões a Evitar
+
+- ❌ **Mocks em Validação de Acesso**: Nunca mocke permissões de usuário ou autenticação em testes de segurança. O teste deve bater contra os middlewares reais.
+- ❌ **Apenas Validação Visual**: Validar que "o botão admin sumiu da tela" não comprova segurança. O endpoint subjacente deve retornar HTTP 403.
+- ❌ **Credenciais Hardcoded**: Não utilize credenciais reais ou senhas estáticas no repositório. Utilize fixtures seguras e variáveis de ambiente (`process.env.TEST_USER_PASSWORD`).
+- ❌ **Poluição da Base de Testes**: Garanta que payloads de injeção ou usuários criados em testes negativos sejam isolados ou limpos ao final (fixtures de teardown).

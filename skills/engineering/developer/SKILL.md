@@ -125,11 +125,12 @@ O developer trabalha nas Issues criadas pelo Arquiteto em **loop sequencial e or
 
 ## Fase 5 - Verificação Final, Segurança e QA Completo
 
-Quando **todas as Issues do escopo forem concluídas no loop**, o Developer deve obrigatoriamente submeter o resultado integrado para os dois gates de qualidade e segurança:
+Quando **todas as Issues do escopo forem concluídas no loop**, o Developer deve obrigatoriamente submeter o resultado integrado na ordem estrita do pipeline de qualidade e segurança:
 
-1. **Gate 1 - Testes E2E e Segurança com `/secure-e2e`:**
-   - Executar os fluxos de ponta a ponta e testes de segurança/vulnerabilidade (OWASP, autenticação, autorização e regressão).
-2. **Gate 2 - Garantia de Qualidade com `/qa-analyst`:**
-   - O `/qa-analyst` deve confrontar todos os requisitos do ADD/SAD do `/architect`, as Issues fechadas, cobertura de testes e possíveis regressões.
-   - Se o QA apontar qualquer inconformidade, reabra a Issue ou crie uma tarefa corretiva e reexecute o ciclo.
-3. **Entrega / PR:** Somente após a aprovação com status verde de `/secure-e2e` e `/qa-analyst`, o Developer finaliza o trabalho e prepara o Pull Request para merge.
+1. **Gate 1 - Garantia de Qualidade Funcional com `/qa-analyst`:**
+   - O `/qa-analyst` deve confrontar todos os requisitos do ADD/SAD do `/architect`, as Issues fechadas, regras de negócio, testes exploratórios e possíveis regressões funcionais.
+   - Se o QA apontar qualquer inconformidade ou lacuna de regras, reabra a Issue ou crie uma tarefa corretiva e reexecute o ciclo.
+2. **Gate 2 - Auditoria de Código e Segurança E2E com `/secure-e2e`:**
+   - Uma vez aprovado no QA funcional, submeta o código à auditoria estática/dinâmica e execução dos fluxos ponta a ponta e testes de segurança de ataque (`*.spec.sec.ts`, OWASP, controle de acesso RBAC/ABAC, rate limiting e bypass de API).
+   - Se qualquer vulnerabilidade for encontrada, reproduza, corrija no código e blinde o teste antes do PR.
+3. **Entrega / PR:** Somente após a aprovação com status verde de `/qa-analyst` e `/secure-e2e`, o Developer finaliza o trabalho e prepara o Pull Request para merge.

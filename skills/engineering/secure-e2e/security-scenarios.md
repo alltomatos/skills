@@ -128,3 +128,103 @@ test.describe('Security Gate: SQL Injection Protection', () => {
   });
 });
 ```
+
+---
+
+## 5. Rate Limiting e Prevenção de Ataques de Força Bruta
+
+Garante que rotas sensíveis como login e solicitação de recuperação de senha bloqueiem requisições excessivas com código HTTP 429 Too Many Requests.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Security Gate: Rate Limiting & Brute Force Prevention', () => {
+  test('should block repeated invalid authentication attempts with HTTP 429', async ({ request }) => {
+    const attempts = 10;
+    let hitRateLimit = false;
+
+    for (let i = 0; i < attempts; i++) {
+      const response = await request.post('/api/auth/login', {
+        data: {
+          email: 'target-user@example.com',
+          password: `wrong-password-${i}`,
+        },
+      });
+
+      if (response.status() === 429) {
+        hitRateLimit = true;
+        break;
+      }
+    }
+
+    expect(hitRateLimit).toBe(true);
+  });
+});
+```
+
+---
+
+## 6. Open Redirect Prevention
+
+Garante que parâmetros de redirecionamento pós-login (`?redirect=` ou `?next=`) não possam ser manipulados por atacantes para redirecionar o usuário a domínios externos maliciosos (phishing).
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Security Gate: Open Redirect Protection', () => {
+  test('should disallow redirecting to external malicious domains after authentication', async ({ page }) => {
+    const evilUrl = 'https://attacker-controlled-site.com';
+    await page.goto(`/login?redirect=${encodeURIComponent(evilUrl)}`);
+
+    await page.fill('input[name="email"]', 'user@example.com');
+    await page.fill('input[name="password"]', 'CorrectPassword123!');
+    await page.click('button[type="submit"]');
+
+    await page.waitForNavigation();
+
+    // Deve redirecionar para a home ou dashboard interno padrão, NUNCA para o domínio externo
+    const currentUrl = page.url();
+    expect(currentUrl).not.toContain('attacker-controlled-site.com');
+    expect(currentUrl).toMatch(/\/(dashboard|home|$)/);
+  });
+});
+```
+
+---
+
+## 7. Exposição de Dados Sensíveis e Validação de Headers HTTP
+
+Valida que a aplicação não vaza dados confidenciais (PII, stack traces ou senhas criptografadas) na resposta da API e implementa cabeçalhos de segurança defensivos essenciais.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Security Gate: Sensitive Data Exposure & HTTP Security Headers', () => {
+  test('should not leak password hashes or internal secrets in user profile responses', async ({ request }) => {
+    const response = await request.get('/api/users/me', {
+      headers: {
+        Authorization: 'Bearer test-user-token',
+      },
+    });
+
+    expect(response.ok()).toBe(true);
+    const body = await response.json();
+
+    // Campos proibidos de resposta
+    expect(body).not.toHaveProperty('password');
+    expect(body).not.toHaveProperty('passwordHash');
+    expect(body).not.toHaveProperty('salt');
+    expect(body).not.toHaveProperty('secretKey');
+  });
+
+  test('should enforce strict HTTP security headers', async ({ page }) => {
+    const response = await page.goto('/');
+    expect(response).not.toBeNull();
+    const headers = response!.headers();
+
+    // Validação de cabeçalhos de proteção moderna
+    expect(headers['x-content-type-options']).toBe('nosniff');
+    expect(headers['x-frame-options']).toMatch(/DENY|SAMEORIGIN/i);
+  });
+});
+```
