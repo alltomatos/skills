@@ -47,7 +47,7 @@ Rules:
 
 - No answer means sequential.
 - An authorization covers only the task it was given for; a new task asks again.
-- Record the choice in `ESTADO_DEVELOPER.md` at the project root: `paralelismo: sequencial | paralelo (max N)`.
+- Record the choice in `ESTADO_DEVELOPER.md` at the project root: `paralelismo: sequencial | paralelo (max N) | paralelo sem limite`.
 - Write each task's completion to the state file before starting the next, so a stopped run resumes at the next pending task.
 - Re-check the `paralelismo:` field at every resume.
 - When a limit stops the run, report in one short message: what is done, what is pending, how to resume.

@@ -46,7 +46,7 @@ Rules:
 - Before spawning any subagent or running tasks in parallel, the agent asks the person once for that task, with the options: **sequential** (default), **parallel up to N workers**, or **parallel with no limit**.
 - Without an answer, the agent works sequentially, alone.
 - An authorization covers only the task it was given for. A new task asks again.
-- The answer is recorded in `ESTADO_DEVELOPER.md` as `paralelismo: sequencial | paralelo (max N)`.
+- The answer is recorded in `ESTADO_DEVELOPER.md` as `paralelismo: sequencial | paralelo (max N) | paralelo sem limite`.
 - Every task completion is written to the state file before the next one starts, so a run stopped by a limit resumes at the next pending task and does not repeat finished work.
 - When a limit stops the run, the agent reports what is done, what is pending and how to resume, in one short message.
 
