@@ -1,27 +1,27 @@
-# EAS Build, Submit e Workflows
+# EAS Build, Submit and Workflows
 
-Doc-âncora: `build/introduction.md`, `build/setup.md`, `build/eas-json.md`,
+Anchor docs: `build/introduction.md`, `build/setup.md`, `build/eas-json.md`,
 `build/internal-distribution.md`, `submit/android.md`, `submit/ios.md`, `submit/testflight.md`,
 `submit/eas-json.md`, `eas/workflows/introduction.md`, `.../get-started.md`, `.../syntax.md`,
 `.../pre-packaged-jobs.md`.
 
 ## EAS Build
 
-Serviço de build na nuvem da Expo. Compila `.apk`/`.aab` (Android) e `.ipa` (iOS) sem você manter
-toolchain local, com gerenciamento de credenciais integrado.
+Expo's cloud build service. Compiles `.apk`/`.aab` (Android) and `.ipa` (iOS) without you maintaining a
+local toolchain, with integrated credential management.
 
 ```bash
-npm i -g eas-cli          # ou: npx eas-cli@latest ...
+npm i -g eas-cli          # or: npx eas-cli@latest ...
 eas login
-eas build:configure       # cria/prepara o eas.json
+eas build:configure       # creates/prepares eas.json
 eas build --profile production --platform all
 eas build --profile preview --platform android
-eas build:list            # histórico
+eas build:list            # history
 ```
 
-### `eas.json` — build profiles
+### `eas.json` - build profiles
 
-O `eas.json` define **profiles** de build. Estrutura típica:
+`eas.json` defines build **profiles**. Typical structure:
 
 ```json
 {
@@ -46,48 +46,50 @@ O `eas.json` define **profiles** de build. Estrutura típica:
 }
 ```
 
-Conceitos-chave:
-- **`developmentClient: true`** → build com `expo-dev-client` (dev build). Ver
+Key concepts:
+
+- **`developmentClient: true`** -> build with `expo-dev-client` (dev build). See
   [cng-config-plugins.md](cng-config-plugins.md).
-- **`distribution: "internal"`** → distribuição interna (link/QR) sem passar pelas lojas; ótimo para
-  QA. Ver `build/internal-distribution.md`.
-- **`channel`** → conecta o build a um channel do EAS Update. Ver [eas-update.md](eas-update.md).
-- Profiles herdam via **`extends`**; use env vars por profile (`"env": { ... }`) e
-  **EAS Environment Variables / Secrets** para valores sensíveis (nunca commite chave no `eas.json`).
-- `autoIncrement` cuida do bump de `versionCode`/`buildNumber`.
+- **`distribution: "internal"`** -> internal distribution (link/QR) without going through the stores;
+  great for QA. See `build/internal-distribution.md`.
+- **`channel`** -> connects the build to an EAS Update channel. See [eas-update.md](eas-update.md).
+- Profiles inherit through **`extends`**; use per-profile env vars (`"env": { ... }`) and **EAS
+  Environment Variables / Secrets** for sensitive values (never commit a key in `eas.json`).
+- `autoIncrement` handles the `versionCode`/`buildNumber` bump.
 
-### Credenciais
+### Credentials
 
-- **Android**: EAS gera/gerencia o **keystore** por você (recomendado) ou você fornece o seu.
-- **iOS**: EAS gerencia certificados de distribuição e **provisioning profiles**; requer conta Apple
-  Developer paga. `eas credentials` inspeciona/edita.
-- **Regra**: deixe o EAS gerenciar salvo motivo forte. Guarde backup do keystore Android — perdê-lo
-  impede atualizar o app publicado.
+- **Android**: EAS generates/manages the **keystore** for you (recommended), or you provide your own.
+- **iOS**: EAS manages distribution certificates and **provisioning profiles**; requires a paid Apple
+  Developer account. `eas credentials` inspects/edits them.
+- **Rule**: let EAS manage it unless there is a strong reason not to. Keep a backup of the Android
+  keystore - losing it prevents you from updating the published app.
 
-### Build local com infra EAS
+### Local build with EAS infrastructure
 
-`eas build --local` compila na sua máquina usando a mesma pipeline — útil para debugar o build ou
-evitar a fila da nuvem.
+`eas build --local` compiles on your machine using the same pipeline - useful for debugging the build
+or avoiding the cloud queue.
 
 ## EAS Submit
 
-Automatiza o envio do binário para as lojas.
+Automates uploading the binary to the stores.
 
 ```bash
 eas submit --platform ios --profile production
-eas submit --platform android --latest    # envia o build mais recente
-eas build --auto-submit --profile production --platform all   # build + submit numa tacada
+eas submit --platform android --latest    # submits the most recent build
+eas build --auto-submit --profile production --platform all   # build + submit in one go
 ```
 
-- **iOS**: sobe para App Store Connect / TestFlight. Configure `submit.<profile>` no `eas.json`
-  (Apple ID/ASC App ID/API Key). Ver `submit/ios.md`, `submit/testflight.md`.
-- **Android**: sobe para o Google Play via **Service Account JSON**. Configure `serviceAccountKeyPath`
-  e `track` (`internal`/`alpha`/`beta`/`production`). Ver `submit/android.md`.
+- **iOS**: uploads to App Store Connect / TestFlight. Configure `submit.<profile>` in `eas.json`
+  (Apple ID/ASC App ID/API Key). See `submit/ios.md`, `submit/testflight.md`.
+- **Android**: uploads to Google Play through a **Service Account JSON**. Configure
+  `serviceAccountKeyPath` and `track` (`internal`/`alpha`/`beta`/`production`). See
+  `submit/android.md`.
 
 ## EAS Workflows (CI/CD)
 
-Pipelines de CI/CD nativas do EAS, definidas em YAML em `.eas/workflows/`. Automatizam build, submit,
-update, testes e jobs em resposta a eventos de git (push, PR).
+EAS-native CI/CD pipelines, defined in YAML under `.eas/workflows/`. They automate build, submit,
+update, tests and jobs in response to git events (push, PR).
 
 ```yaml
 # .eas/workflows/production-deploy.yml
@@ -108,26 +110,27 @@ jobs:
       platform: android
 ```
 
-- **Jobs pré-empacotados** (`pre-packaged-jobs.md`): `build`, `submit`, `update`, e outros — você
-  referencia por `type` em vez de escrever shell.
-- **`needs`** cria o grafo de dependências entre jobs (sequência/paralelo).
-- **Sintaxe completa** em `eas/workflows/syntax.md` (triggers, params, matrizes, control flow).
-- Rode local/manualmente com `eas workflow:run <arquivo.yml>`.
+- **Pre-packaged jobs** (`pre-packaged-jobs.md`): `build`, `submit`, `update` and others - you
+  reference them by `type` instead of writing shell.
+- **`needs`** builds the dependency graph between jobs (sequence/parallel).
+- **Full syntax** in `eas/workflows/syntax.md` (triggers, params, matrices, control flow).
+- Run locally/manually with `eas workflow:run <file.yml>`.
 
-### Testes E2E com Maestro
+### E2E tests with Maestro
 
-Workflows integram **Maestro** para testes de UI end-to-end em builds — o padrão para gate de
-qualidade antes de deploy. Fluxos Maestro (`.yaml` com `appId` + comandos `tapOn`, `assertVisible`,
-etc.) rodam contra o build num job de teste. Combine com **preview builds em Pull Requests**
-(um workflow disparado por PR que builda com `distribution: internal` e comenta o link) para revisão
-visual antes do merge.
+Workflows integrate **Maestro** for end-to-end UI tests on builds - the standard quality gate before
+deploy. Maestro flows (`.yaml` with `appId` + commands such as `tapOn`, `assertVisible`, etc.) run
+against the build in a test job. Combine it with **preview builds on Pull Requests** (a workflow
+triggered by a PR that builds with `distribution: internal` and comments the link) for visual review
+before merge.
 
-## Gotchas de sênior
+## Senior gotchas
 
-- **`eas.json` não é `app.json`.** `eas.json` = como buildar/submeter; `app.config` = o que o app é.
-  Não misture.
-- **Channel ≠ profile.** O `channel` liga build ao EAS Update; o profile é o preset de build. Um
-  profile pode setar um channel, mas são coisas distintas.
-- **Segredos**: use EAS Environment Variables/Secrets, nunca hardcode no `eas.json` (ele é commitado).
-- **Versão do CLI**: fixe `cli.version` no `eas.json` para builds reproduzíveis entre a equipe.
-- **iOS sem Mac**: EAS Build resolve isso — buildar/enviar iOS não exige macOS local.
+- **`eas.json` is not `app.json`.** `eas.json` = how to build/submit; `app.config` = what the app is.
+  Do not mix them.
+- **Channel != profile.** The `channel` links a build to EAS Update; the profile is the build preset. A
+  profile can set a channel, but they are distinct things.
+- **Secrets**: use EAS Environment Variables/Secrets, never hardcode them in `eas.json` (it is
+  committed).
+- **CLI version**: pin `cli.version` in `eas.json` for reproducible builds across the team.
+- **iOS without a Mac**: EAS Build solves it - building/submitting iOS does not require local macOS.

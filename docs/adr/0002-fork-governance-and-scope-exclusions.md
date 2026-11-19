@@ -1,6 +1,6 @@
 # Governance Rules for Fork: alltomatos/skills
 
-**Status**: Active  
+**Status**: Active (pipeline de instalação substituído pelo ADR-0003)  
 **Date**: 2026-06-04  
 **Authors**: Ronaldo Davi (@alltomatos)  
 **Context**: Fork of [mattpocock/skills](https://github.com/mattpocock/skills) with Brazilian Portuguese support

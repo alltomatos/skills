@@ -1,136 +1,164 @@
 ---
 name: developer
-description: Governa projetos com agentes, audita pre-condicoes, cria documentacao, transforma gaps em GitHub Issues e coordena execucao, testes e QA.
+description: Governs projects with agents, audits preconditions, creates documentation, turns gaps into GitHub Issues and coordinates execution, tests and QA. Use when running or orchestrating agent-driven development in a project with a GitHub remote.
 ---
 
-# DEVELOPER - Central de Controle
+# DEVELOPER - Control Center
 
-Planeja, governa, audita e delega execucao. Nao execute tarefas complexas diretamente quando uma skill especializada existir.
+Plans, governs, audits and delegates execution. Do not execute complex tasks directly when a specialized skill exists.
 
-## Fase - Atualizacao do framework
+## Phase - Framework update
 
-Esta verificacao deve ocorrer no inicio de toda execucao do developer, antes das pre-condicoes do projeto.
+This check runs at the start of every developer execution, before the project preconditions. There is no installer: the framework arrives through the repository link.
 
-1. Identifique de onde as skills foram instaladas. Para cada skill carregada, resolva o caminho real do link e procure o clone que contem `.claude-plugin/plugin.json` e `scripts/setup-alltomatos-skills.sh`.
-2. No clone encontrado, leia o remote `origin`, a branch atual e o commit local instalado.
-3. Consulte o remote do framework com `git fetch origin --quiet` ou mecanismo equivalente de leitura. Nunca faca `pull`, merge ou reset no clone do framework.
-4. Compare o commit local com `origin/<branch>` ou com a referencia remota equivalente.
-5. Se houver commits novos, informe imediatamente:
+1. Locate the framework source: the local clone in use, when there is one, or the `alltomatos/skills` repository on GitHub.
+2. With a local clone, read `origin`, the branch and the current commit, and run `git fetch origin --quiet`. Never `pull`, merge or reset the framework clone.
+3. Without a local clone (skills loaded by marketplace or by `npx skills add`), read the latest commit on `main` from the GitHub API (`https://api.github.com/repos/alltomatos/skills/commits/main`) and compare it with the revision you loaded.
+4. If there are new commits, report it immediately:
 
 ```text
-Atualizacao do framework disponivel
+Framework update available
 - Framework: alltomatos/skills
-- Instalado: <commit ou data>
-- Disponivel: <commit ou data>
-- Novidades: <resumo dos commits ou arquivos alterados>
-- Acao: deseja atualizar agora ou prosseguir sem atualizar?
+- Installed: <commit or date>
+- Available: <commit or date>
+- Changes: <summary of commits or changed files>
+- Action: update now or continue without updating?
 ```
 
-6. Se houver commits novos, pergunte ao usuario se deseja atualizar agora ou prosseguir sem atualizar. Nao execute o re-deploy sem essa confirmacao explicita.
-   - Se o usuario confirmar a atualizacao, execute o re-deploy das skills nos ambientes em uso. Use o instalador em modo nao interativo, por exemplo `scripts/setup-alltomatos-skills.sh --redeploy <diretorios-detectados>`. O re-deploy deve acontecer depois do `fetch`, sem sobrescrever backups existentes. Depois do re-deploy, confirme que `developer` aponta para a revisao nova e informe o resultado ao usuario antes de continuar.
-   - Se o usuario optar por prosseguir sem atualizar, registre a decisao e continue o fluxo normalmente com a revisao atual.
-8. Se nao houver mudancas, registre `Framework atualizado (<commit>)` sem interromper o fluxo.
-9. Se nao for possivel localizar o clone, o remote ou a rede, informe `Nao foi possivel verificar atualizacoes do framework` e continue apenas se as skills locais estiverem disponiveis. Nao faca re-deploy sem confirmar uma revisao nova.
+5. If the user chooses to update: in Claude Code, re-add the marketplace (`/plugin marketplace add alltomatos/skills`) and reinstall the plugin; in other CLIs, run `npx skills add alltomatos/skills` again. Never hand-edit an installed skill.
+6. If the user prefers to continue without updating, record the decision and carry on with the current revision.
+7. If nothing changed, record `Framework up to date (<commit>)` without interrupting the flow.
+8. If the remote or the network cannot be reached, report `Could not check for framework updates` and continue only if the local skills are available.
 
-Quando uma revisao nova for confirmada, o re-deploy so ocorre mediante confirmacao explicita do usuario nesta mesma execucao — nunca automaticamente. Para uma instalacao inicial ou troca de ambientes, a decisao continua sendo explicita do usuario por meio de `scripts/setup-alltomatos-skills.sh`.
+Updating is never automatic: it depends on the user's choice in this same execution.
 
-## Fase 0 - Pre-condicoes de governanca
+## Phase 0 - Governance preconditions
 
-Antes de criar arquivos ou delegar trabalho:
+Before creating files or delegating work:
 
-1. Verifique se o projeto tem Git inicializado.
-2. Verifique se existe um remote GitHub valido, preferencialmente `origin`.
-3. Verifique acesso ao repositorio com `gh repo view` ou mecanismo equivalente.
+1. Check that the project has Git initialized.
+2. Check that there is a valid GitHub remote, preferably `origin`.
+3. Check access to the repository with `gh repo view` or an equivalent mechanism.
 
-Se o ambiente estiver vazio, nao tiver Git ou nao tiver repositorio remoto no GitHub, pare o fluxo e oriente o usuario a:
+If the environment is empty, has no Git, or has no GitHub remote, stop the flow and guide the user to:
 
-1. criar o repositorio no GitHub;
-2. inicializar o repositorio local;
-3. configurar o remote `origin`;
-4. fazer o primeiro commit e push;
-5. retornar ao developer.
+1. create the repository on GitHub;
+2. initialize the local repository;
+3. configure the `origin` remote;
+4. make the first commit and push;
+5. return to the developer.
 
-Nao substitua o GitHub silenciosamente por tracker local. GitHub e a fonte de rastreabilidade, Issues, revisao e historico deste framework.
+Never silently replace GitHub with a local tracker. GitHub is the source of traceability, Issues, review and history in this framework.
 
-## Fase 1 - Provisionamento documental, arquitetura e estrategia
+## Phase 0.5 - Requirement gap check
 
-1. Se a arquitetura tecnica, ADD/SAD, C4, mockups ou design system ainda nao estiverem definidos, orientar ou invocar `/architect`.
-2. Invocar `/roadmap` para criar ou atualizar `DEVELOPER-ROADMAP.md` e Epics.
-3. Invocar `/grill-with-docs` para consolidar linguagem de dominio (`CONTEXT.md`, `docs/agents/`, `docs/adr/`) e decisoes arquiteturais.
-4. Em repositorio vazio, invocar `/scaffold-mvp` apos o alinhamento de dominio e arquitetura.
-5. Revisar e persistir a documentacao antes de iniciar implementacao.
+Before planning, identify what the person did not say and that changes the result: security, data and validation, performance (lazy loading, cache, pagination), stack fit, accessibility, operations and test coverage. A request such as "a login screen" has many valid versions.
 
-Documentacao nao e uma etapa opcional: o developer deve deixar um estado compreensivel para outro agent continuar o trabalho.
+1. List the gaps that change behavior, cost or data exposure, with a proposed default and a one-line reason for each.
+2. Ask them in **one batch**. The person accepts the defaults with one word.
+3. Record the decisions in `DEVELOPER-ROADMAP.md` or in an ADR.
 
-### Caso especial - projeto novo com apenas um PRD na pasta
+Details and categories: `developer-delegation-protocol.md`, section "Requirement gap check".
 
-Quando o repositorio for inicializado a partir de uma pasta que contem somente um PRD (sem codigo):
+## Phase 0.8 - Parallel work authorization
 
-1. Garantir repositorio GitHub inicializado, com remote `origin` configurado (Fase 0).
-2. Criar e fazer checkout da branch `develop` a partir da branch padrao.
-3. Transformar o PRD em Epics e registra-los como Issue(s) no GitHub (uma Issue por Epic, ou Issue mestre com os Epics listados).
-4. Invocar `/to-issues` para fatiar cada Epic em Issues atomicas (slices verticais, rastreaveis, com criterios de aceite), registrando o mapeamento Epic -> Issues conforme Fase 3.
-5. Seguir para a Fase 4 usando o modo de fila sequencial descrito abaixo.
+Subagents and parallel execution run only when the person authorizes them for the task. Token, plan and quota limits can stop a run mid-way, so the default is sequential.
 
-## Fase 2 - Triage, Auditoria & Leitura dos Artefatos
+Before dispatching any subagent or parallel tasks, ask once: **sequential** (default), **parallel up to N workers**, or **parallel without a limit**. No answer means sequential. Record the choice in `ESTADO_DEVELOPER.md` as `paralelismo: sequencial | paralelo (max N)`. The authorization covers only that task.
 
-1. **Triagem de Issues com `/triage`:**
-   - Execute o `/triage` para auditar e organizar o estado das Issues do GitHub, classificar prioridades e preparar as tarefas para o ciclo de desenvolvimento.
-2. **Leitura e Absorção dos Artefatos do Arquiteto:**
-   - Leia rigorosamente todos os artefatos gerados pelo `/architect`:
-     - ADD/SAD (`docs/architecture/ADD.md` ou `SAD.md`);
-     - Decisões registradas em `docs/adr/`;
-     - Design Tokens e Mockups em `design-system/MASTER.md` e `design-system/pages/`;
-     - Diagramas C4, DERs e contratos de API.
-3. **Checklist de Governança:**
+Details: `developer-delegation-protocol.md`, section "Parallel work authorization".
+
+## Phase 1 - Documentation provisioning, architecture and strategy
+
+1. If the technical architecture, ADD/SAD, C4, mockups or design system are not defined yet, guide the user or invoke `architect`.
+2. Invoke `roadmap` to create or update `DEVELOPER-ROADMAP.md` and the Epics.
+3. Invoke `grill-with-docs` to consolidate the domain language (`CONTEXT.md`, `docs/agents/`, `docs/adr/`) and the architectural decisions.
+4. In an empty repository, invoke `scaffold-mvp` after the domain and architecture alignment.
+5. Review and persist the documentation before starting implementation.
+
+Documentation is not optional: the developer must leave a state another agent can understand and continue from.
+
+### Special case - a brand-new project holding only a PRD
+
+When the repository is initialized from a folder that contains only a PRD (no code):
+
+1. Make sure the GitHub repository exists with the `origin` remote configured (Phase 0).
+2. Create and check out the `develop` branch from the default branch.
+3. Turn the PRD into Epics and register them as Issue(s) on GitHub (one Issue per Epic, or a master Issue listing the Epics).
+4. Invoke `to-issues` to slice each Epic into atomic Issues (vertical, traceable slices with acceptance criteria), recording the Epic -> Issues mapping as in Phase 3.
+5. Move to Phase 4 using the sequential queue mode described below.
+
+## Phase 2 - Triage, Audit & Artifact Reading
+
+1. **Issue triage with `triage`:**
+   - Run `triage` to audit and organize the state of the GitHub Issues, rank priorities and prepare the tasks for the development cycle.
+2. **Reading and absorbing the Architect's artifacts:**
+   - Read rigorously every artifact produced by `architect`:
+     - ADD/SAD (`docs/architecture/ADD.md` or `SAD.md`);
+     - decisions recorded in `docs/adr/`;
+     - design tokens and mockups in `design-system/MASTER.md` and `design-system/pages/`;
+     - C4 diagrams, DERs and API contracts.
+3. **Governance checklist:**
 
 ```text
-[ ] Git inicializado
-[ ] Remote GitHub configurado e acessivel
-[ ] AGENTS.md ou CLAUDE.md
-[ ] CONTEXT.md ou CONTEXT-MAP.md
-[ ] docs/architecture/ (ADD/SAD) e docs/adr/ produzidos pelo /architect
-[ ] design-system/ e mockups prontos
-[ ] docs/agents/ com tracker e labels
+[ ] Git initialized
+[ ] GitHub remote configured and reachable
+[ ] AGENTS.md or CLAUDE.md
+[ ] CONTEXT.md or CONTEXT-MAP.md
+[ ] docs/architecture/ (ADD/SAD) and docs/adr/ produced by `architect`
+[ ] design-system/ and mockups ready
+[ ] docs/agents/ with tracker and labels
 [ ] DEVELOPER-ROADMAP.md
-[ ] Issues fatiadas no GitHub prontas para execução
+[ ] Requirement gaps answered and recorded
+[ ] Parallel-work choice recorded (sequencial or paralelo max N)
+[ ] Issues sliced on GitHub and ready for execution
 ```
 
-Classifique gaps como P1 (seguranca/tipos), P2 (arquitetura), P3 (performance) ou P4 (higiene/documentacao). Use `/improve-codebase-architecture`, `/diagnose`, `/query-docs` ou `/zoom-out` conforme o caso.
+Classify gaps as P1 (security/types), P2 (architecture), P3 (performance) or P4 (hygiene/documentation). Use `improve-codebase-architecture`, `diagnose`, `query-docs` or `zoom-out` as the case requires.
 
-## Fase 3 - Fragmentacao no GitHub
+## Phase 3 - Slicing on GitHub
 
-Os gaps aprovados devem ser transformados em Issues por `/to-issues`. O GitHub e a fonte persistente de escopo, criterios de aceite, dependencias e status; `ESTADO_DEVELOPER.md` e apenas a visao operacional da DAG.
+Approved gaps must be turned into Issues by `to-issues`. GitHub is the persistent source of scope, acceptance criteria, dependencies and status; `ESTADO_DEVELOPER.md` is only the operational view of the DAG.
 
-1. Passe para `/to-issues` os gaps, roadmap e documentacao aprovados.
-2. Apresente a decomposicao para aprovacao quando houver decisao HITL.
-3. Publique as Issues em ordem de dependencia, usando IDs reais em `Blocked by`.
-4. Registre o mapeamento `Tarefa -> Issue GitHub -> branch/worktree`.
-5. Nunca crie uma DAG apenas em memoria ou apenas em arquivo local quando a tarefa puder ser rastreada no GitHub.
+1. Hand the gaps, roadmap and approved documentation to `to-issues`.
+2. Present the breakdown for approval when there is a HITL decision.
+3. Publish the Issues in dependency order, using real IDs in `Blocked by`.
+4. Record the mapping `Task -> GitHub Issue -> branch/worktree`.
+5. Never build a DAG only in memory or only in a local file when the task can be tracked on GitHub.
 
-## Fase 4 - Execução em Loop com TDD
+## Phase 4 - Loop Execution with TDD
 
-O developer trabalha nas Issues criadas pelo Arquiteto em **loop sequencial e ordenado** (respeitando o grafo de dependências e `Blocked by`), até que **todas as Issues do escopo sejam implementadas e fechadas**.
+The developer works through the Issues created by the Architect in a **sequential, ordered loop** (respecting the dependency graph and `Blocked by`), until **every Issue in scope is implemented and closed**. Parallel execution inside this phase happens only when the person authorized it (Phase 0.8).
 
-### Loop de Desenvolvimento por Issue:
-1. **Seleção da Próxima Issue Desbloqueada:** Escolha a próxima Issue elegível na melhor ordem de dependência.
-2. **Desenvolvimento Orientado a Testes com `/tdd`:**
-   - **TDD Obrigatório:** Toda funcionalidade ou correção deve ser construída pelo ciclo Red-Green-Refactor do `/tdd` (escrever teste de unidade/integração que falha -> implementar a solução mínima -> refatorar mantendo os testes verdes).
-   - Invoque skills especializadas complementares conforme o domínio:
-     - `/query-docs` para APIs e bibliotecas de terceiros;
-     - `/expo-expert` para stack Expo/React Native;
-     - `/diagnose` diante de bugs ou regressões imprevistas.
-3. **Validação Atômica:** Garanta que a suite de testes da Issue passou e que o build está íntegro.
-4. **Fechamento da Issue & Avanço:** Faça o commit semântico (`feat:`, `fix:`), feche/atualize a Issue no GitHub e avance para a próxima Issue do loop até esgotar todas as pendências criadas pelo Arquiteto.
+### Parallelism gate (before the loop starts)
 
-## Fase 5 - Verificação Final, Segurança e QA Completo
+Before the first Issue, check the state file for the `paralelismo:` field:
 
-Quando **todas as Issues do escopo forem concluídas no loop**, o Developer deve obrigatoriamente submeter o resultado integrado na ordem estrita do pipeline de qualidade e segurança:
+- If it is `paralelo (max N)` or `paralelo sem limite` **for this task**, run only Issues whose dependencies are resolved, and never more than N workers.
+- If the field is missing, empty or `sequencial`, or the authorization was given for a different task, ask once (sequential, parallel up to N, or parallel without a limit) and record the answer before dispatching any subagent. No answer means sequential.
+- Re-check the field at each resume. A run stopped by a limit must not assume the earlier authorization still holds for pending work.
 
-1. **Gate 1 - Garantia de Qualidade Funcional com `/qa-analyst`:**
-   - O `/qa-analyst` deve confrontar todos os requisitos do ADD/SAD do `/architect`, as Issues fechadas, regras de negócio, testes exploratórios e possíveis regressões funcionais.
-   - Se o QA apontar qualquer inconformidade ou lacuna de regras, reabra a Issue ou crie uma tarefa corretiva e reexecute o ciclo.
-2. **Gate 2 - Auditoria de Código e Segurança E2E com `/secure-e2e`:**
-   - Uma vez aprovado no QA funcional, submeta o código à auditoria estática/dinâmica e execução dos fluxos ponta a ponta e testes de segurança de ataque (`*.spec.sec.ts`, OWASP, controle de acesso RBAC/ABAC, rate limiting e bypass de API).
-   - Se qualquer vulnerabilidade for encontrada, reproduza, corrija no código e blinde o teste antes do PR.
-3. **Entrega / PR:** Somente após a aprovação com status verde de `/qa-analyst` e `/secure-e2e`, o Developer finaliza o trabalho e prepara o Pull Request para merge.
+### Per-Issue development loop:
+
+1. **Select the next unblocked Issue:** pick the next eligible Issue in the best dependency order.
+2. **Test-driven development with `tdd`:**
+   - **TDD is mandatory:** every feature or fix must be built through the `tdd` Red-Green-Refactor cycle (write a failing unit/integration test -> implement the minimal solution -> refactor while keeping the tests green).
+   - Invoke complementary specialized skills as the domain requires:
+     - `query-docs` for third-party APIs and libraries;
+     - `expo-expert` for the Expo/React Native stack;
+     - `diagnose` on unexpected bugs or regressions.
+3. **Atomic validation:** make sure the Issue's test suite passed and the build is intact.
+4. **Closing the Issue & moving on:** make the semantic commit (`feat:`, `fix:`), close/update the Issue on GitHub, record the completion in `ESTADO_DEVELOPER.md` and advance to the next Issue in the loop until every pending item created by the Architect is exhausted.
+5. **Stopped by a limit?** Report what is done, what is pending and how to resume. The next run starts at the first pending Issue.
+
+## Phase 5 - Final verification, security and full QA
+
+When **every Issue in scope is closed in the loop**, the Developer must submit the integrated result in the strict order of the quality and security pipeline:
+
+1. **Gate 1 - Functional Quality Assurance with `qa-analyst`:**
+   - `qa-analyst` must confront every requirement in the Architect's ADD/SAD, the closed Issues, the business rules, exploratory tests and possible functional regressions.
+   - If QA reports any nonconformity or rule gap, reopen the Issue or create a corrective task and rerun the cycle.
+2. **Gate 2 - Code Audit and E2E Security with `secure-e2e`:**
+   - Once functional QA approves, submit the code to the static/dynamic audit, the end-to-end flow execution and the attack security tests (`*.spec.sec.ts`, OWASP, RBAC/ABAC access control, rate limiting and API bypass).
+   - If any vulnerability is found, reproduce it, fix it in the code and harden the test before the PR.
+3. **Delivery / PR:** only after the green approval of `qa-analyst` and `secure-e2e` does the Developer finish the work and prepare the Pull Request for merge.

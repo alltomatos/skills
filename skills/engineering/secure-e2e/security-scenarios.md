@@ -1,12 +1,12 @@
 # Security Testing Scenarios - Playwright Examples
 
-Este guia mostra exemplos práticos de como escrever testes no formato `*.spec.sec.ts` usando o Playwright para combater e validar as principais vulnerabilidades listadas no OWASP Top 10.
+This guide shows practical examples of how to write `*.spec.sec.ts` tests with Playwright to fight and validate the main vulnerabilities listed in the OWASP Top 10.
 
 ---
 
-## 1. Cross-Site Scripting (XSS) - Validação de Entrada Defensiva
+## 1. Cross-Site Scripting (XSS) - defensive input validation
 
-O teste tenta submeter tags HTML e payloads Javascript em campos de formulário e valida se a renderização no front-end os exibe de forma sanitizada ou codificada, prevenindo execução arbitrária.
+The test tries to submit HTML tags and JavaScript payloads into form fields and checks whether the front end renders them sanitized or encoded, preventing arbitrary execution.
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -16,22 +16,22 @@ test.describe('Security Gate: Cross-Site Scripting (XSS) Prevention', () => {
     await page.goto('/product/123');
 
     const commentInput = page.locator('textarea[name="comment"]');
-    const submitBtn = page.getByRole('button', { name: /enviar/i });
+    const submitBtn = page.getByRole('button', { name: /send/i });
 
-    // Payload clássico de XSS
+    // Classic XSS payload
     const maliciousPayload = '<script>window.alert("xss")</script><img src="x" onerror="window.XSS_TRIGGERED=true">';
 
     await commentInput.fill(maliciousPayload);
     await submitBtn.click();
 
-    // Recarregar a página para certificar que a persistência foi sanitizada
+    // Reload the page to confirm persistence was sanitized
     await page.reload();
 
-    // Valida que o alerta não disparou e que a tag não executou
+    // Assert the alert never fired and the tag never executed
     const isXSS = await page.evaluate(() => (window as any).XSS_TRIGGERED);
     expect(isXSS).toBeUndefined();
 
-    // O texto deve ser renderizado como texto plano no DOM, nunca como elemento HTML ativo
+    // The text must render as plain text in the DOM, never as an active HTML element
     const renderedComment = page.locator('.comment-text').last();
     await expect(renderedComment).toHaveText(maliciousPayload);
   });
@@ -42,55 +42,55 @@ test.describe('Security Gate: Cross-Site Scripting (XSS) Prevention', () => {
 
 ## 2. Insecure Direct Object References (IDOR / BOLA)
 
-Este cenário simula um usuário de baixo privilégio tentando acessar e manipular dados de outros usuários apenas alterando identificadores numéricos ou UUIDs nas requisições.
+This scenario simulates a low-privilege user trying to access and manipulate another user's data by only changing numeric identifiers or UUIDs in the requests.
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
 test.describe('Security Gate: Broken Object Level Authorization (BOLA)', () => {
-  // Configura um usuário autenticado com conta básica (ex: User ID 999)
+  // Authenticate as a basic account (e.g. User ID 999)
   test.use({
     storageState: 'playwright/.auth/basic-user.json',
   });
 
   test('should forbid accessing invoice details of another user', async ({ page, request }) => {
-    // ID da fatura que pertence a outro usuário (ex: User ID 111)
+    // Invoice ID that belongs to another user (e.g. User ID 111)
     const victimInvoiceId = 'invoice-111-secret';
 
-    // 1. Validar segurança na navegação E2E
+    // 1. Validate security in E2E navigation
     await page.goto(`/dashboard/invoices/${victimInvoiceId}`);
-    
-    // Deve redirecionar ou exibir tela de erro apropriada, nunca os detalhes
-    await expect(page).toHaveURL(/.*error|forbidden|unauthorized/);
-    await expect(page.locator('text=/não autorizado|acesso negado/i')).toBeVisible();
 
-    // 2. Validar segurança no transporte de dados da API (Prevenção de bypass de front-end)
+    // It must redirect or show the proper error screen, never the details
+    await expect(page).toHaveURL(/.*error|forbidden|unauthorized/);
+    await expect(page.locator('text=/unauthorized|access denied/i')).toBeVisible();
+
+    // 2. Validate security at the API data layer (front-end bypass prevention)
     const apiResponse = await request.get(`/api/invoices/${victimInvoiceId}`);
-    expect(apiResponse.status()).toBe(403); // Ou 401/404 para ocultação de recurso
+    expect(apiResponse.status()).toBe(403); // Or 401/404 to hide the resource
   });
 });
 ```
 
 ---
 
-## 3. Broken Authentication (Quebra de Controle de Acesso)
+## 3. Broken Authentication (access control bypass)
 
-Este cenário garante que requisições administrativas enviadas ao backend da API através do Playwright context ou via navegação direta sejam sumariamente bloqueadas se o usuário estiver deslogado ou não possuir a chave de token válida.
+This scenario ensures that administrative requests sent to the backend through the Playwright context or direct navigation are summarily blocked when the user is logged out or lacks a valid token.
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
 test.describe('Security Gate: Access Control Enforcement', () => {
-  // Certifica contexto limpo, sem cookies ou tokens autorizados
+  // Ensure a clean context, with no authorized cookies or tokens
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test('should restrict administrative configuration pages to admins only', async ({ page }) => {
     await page.goto('/admin/settings');
 
-    // Deve redirecionar imediatamente para a tela de login
+    // It must redirect immediately to the login screen
     await expect(page).toHaveURL(/\/login/);
-    
-    // Tentar acessar a API diretamente sem token deve retornar Forbidden ou Unauthorized
+
+    // Hitting the API directly without a token must return Forbidden or Unauthorized
     const context = page.request;
     const response = await context.post('/api/admin/settings', {
       data: { maintenanceMode: true }
@@ -103,9 +103,9 @@ test.describe('Security Gate: Access Control Enforcement', () => {
 
 ---
 
-## 4. SQL Injection (SQLi) - Injeção via Formulários/Filtros
+## 4. SQL Injection (SQLi) - injection through forms/filters
 
-Garante que entradas de filtros ou buscas contendo caracteres de escape do SQL não quebrem o runner da query ou exponham dados não mapeados.
+Ensures that filter or search input containing SQL escape characters does not break the query runner or expose unmapped data.
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -115,14 +115,14 @@ test.describe('Security Gate: SQL Injection Protection', () => {
     await page.goto('/search');
 
     const searchInput = page.locator('input[type="search"]');
-    
-    // Injeção de SQL clássica para extrair todos os registros
+
+    // Classic SQL injection to extract every record
     const sqliPayload = "' OR '1'='1";
     await searchInput.fill(sqliPayload);
     await searchInput.press('Enter');
 
-    // O sistema deve tratar amigavelmente (exibir mensagem de nenhum resultado)
-    // Se retornar as faturas ou todos os produtos do banco, o gate falha.
+    // The system must handle it gracefully (e.g. show an empty-result message)
+    // If it returns invoices or every product in the database, the gate fails.
     await expect(page.locator('.search-error-message')).not.toBeVisible();
     await expect(page.locator('.search-results')).toHaveCount(0);
   });
@@ -131,9 +131,9 @@ test.describe('Security Gate: SQL Injection Protection', () => {
 
 ---
 
-## 5. Rate Limiting e Prevenção de Ataques de Força Bruta
+## 5. Rate limiting and brute force prevention
 
-Garante que rotas sensíveis como login e solicitação de recuperação de senha bloqueiem requisições excessivas com código HTTP 429 Too Many Requests.
+Ensures that sensitive routes such as login and password recovery block excessive requests with HTTP 429 Too Many Requests.
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -164,9 +164,9 @@ test.describe('Security Gate: Rate Limiting & Brute Force Prevention', () => {
 
 ---
 
-## 6. Open Redirect Prevention
+## 6. Open redirect prevention
 
-Garante que parâmetros de redirecionamento pós-login (`?redirect=` ou `?next=`) não possam ser manipulados por atacantes para redirecionar o usuário a domínios externos maliciosos (phishing).
+Ensures that post-login redirect parameters (`?redirect=` or `?next=`) cannot be manipulated by attackers to send the user to malicious external domains (phishing).
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -182,7 +182,7 @@ test.describe('Security Gate: Open Redirect Protection', () => {
 
     await page.waitForNavigation();
 
-    // Deve redirecionar para a home ou dashboard interno padrão, NUNCA para o domínio externo
+    // It must redirect to the internal home or dashboard, NEVER to the external domain
     const currentUrl = page.url();
     expect(currentUrl).not.toContain('attacker-controlled-site.com');
     expect(currentUrl).toMatch(/\/(dashboard|home|$)/);
@@ -192,9 +192,9 @@ test.describe('Security Gate: Open Redirect Protection', () => {
 
 ---
 
-## 7. Exposição de Dados Sensíveis e Validação de Headers HTTP
+## 7. Sensitive data exposure and HTTP header validation
 
-Valida que a aplicação não vaza dados confidenciais (PII, stack traces ou senhas criptografadas) na resposta da API e implementa cabeçalhos de segurança defensivos essenciais.
+Validates that the application does not leak confidential data (PII, stack traces or encrypted passwords) in the API response and implements the essential defensive security headers.
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -210,7 +210,7 @@ test.describe('Security Gate: Sensitive Data Exposure & HTTP Security Headers', 
     expect(response.ok()).toBe(true);
     const body = await response.json();
 
-    // Campos proibidos de resposta
+    // Forbidden response fields
     expect(body).not.toHaveProperty('password');
     expect(body).not.toHaveProperty('passwordHash');
     expect(body).not.toHaveProperty('salt');
@@ -222,7 +222,7 @@ test.describe('Security Gate: Sensitive Data Exposure & HTTP Security Headers', 
     expect(response).not.toBeNull();
     const headers = response!.headers();
 
-    // Validação de cabeçalhos de proteção moderna
+    // Modern protection headers
     expect(headers['x-content-type-options']).toBe('nosniff');
     expect(headers['x-frame-options']).toMatch(/DENY|SAMEORIGIN/i);
   });

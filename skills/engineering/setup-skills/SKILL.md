@@ -1,46 +1,46 @@
 ---
 name: setup-skills
-description: Provisiona a governanca documental do projeto e valida o GitHub como tracker obrigatorio antes do uso das skills de engenharia.
+description: Provisions the project's documentation governance and validates GitHub as the mandatory tracker before the engineering skills are used. Use when starting work in a project that is not yet set up for the closed-loop flow.
 ---
 
 # Setup Skills
 
-## Processo
+## Process
 
-### 1. Explorar
+### 1. Explore
 
-Verifique `git status`, `git remote -v`, `AGENTS.md` ou `CLAUDE.md`, `CONTEXT.md`, `docs/adr/` e `docs/agents/`.
+Check `git status`, `git remote -v`, `AGENTS.md` or `CLAUDE.md`, `CONTEXT.md`, `docs/adr/` and `docs/agents/`.
 
-### 2. Governanca GitHub
+### 2. GitHub governance
 
-Este framework usa GitHub como fonte de Issues, rastreabilidade e revisao.
+This framework uses GitHub as the source of Issues, traceability and review.
 
-- Se nao houver Git, oriente a inicializacao local.
-- Se nao houver remote GitHub, oriente a criacao do repositorio e a configuracao de `origin`.
-- Valide acesso com `gh repo view` ou ferramenta equivalente.
-- Nao configure tracker local como fallback silencioso.
+- If there is no Git, guide local initialization.
+- If there is no GitHub remote, guide repository creation and `origin` configuration.
+- Validate access with `gh repo view` or an equivalent tool.
+- Never configure a local tracker as a silent fallback.
 
-### 3. Escolhas do projeto
+### 3. Project choices
 
-Pergunte apenas o que ainda nao puder ser descoberto:
+Ask only what cannot be discovered yet:
 
-- vocabulario de triage, usando `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human` e `wontfix` como defaults;
-- layout de dominio: `CONTEXT.md` + `docs/adr/` ou `CONTEXT-MAP.md`;
-- convencoes de branches, testes e deploy.
+- triage vocabulary, using `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human` and `wontfix` as defaults;
+- domain layout: `CONTEXT.md` + `docs/adr/` or `CONTEXT-MAP.md`;
+- branch, test and deploy conventions.
 
-### 4. Artefatos
+### 4. Artifacts
 
-Crie ou atualize, sem apagar conteudo existente:
+Create or update, without deleting existing content:
 
-- `AGENTS.md` ou `CLAUDE.md` com a secao `## Agent skills`;
-- `CONTEXT.md` ou `CONTEXT-MAP.md`;
+- `AGENTS.md` or `CLAUDE.md` with the `## Agent skills` section;
+- `CONTEXT.md` or `CONTEXT-MAP.md`;
 - `docs/agents/issue-tracker.md`;
 - `docs/agents/triage-labels.md`;
 - `docs/agents/domain.md`;
-- `docs/adr/` quando houver decisoes arquiteturais.
+- `docs/adr/` when there are architectural decisions.
 
-Registre o remote GitHub e as escolhas feitas. A instalacao das skills ocorre pelo script do framework e nao deve ser presumida neste projeto.
+Record the GitHub remote and the choices made. Skills arrive through the framework's repository link and that should not be assumed inside this project.
 
-### 5. Conclusao
+### 5. Completion
 
-Informe os arquivos criados, a URL do GitHub, o tracker configurado e os proximos passos. Se a pre-condicao GitHub falhar, encerre com instrucoes de desbloqueio.
+Report the files created, the GitHub URL, the configured tracker and the next steps. If the GitHub precondition fails, close with unblocking instructions.

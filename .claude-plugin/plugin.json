@@ -1,5 +1,23 @@
 {
   "name": "alltomatos-skills",
+  "displayName": "Skills Para Engenheiros de Verdade",
+  "description": "Skills de engenharia, produtividade e utilitarios para agentes de codigo, com governanca por GitHub Issues e portoes obrigatorios de QA e seguranca.",
+  "author": {
+    "name": "Ronaldo Davi",
+    "url": "https://github.com/alltomatos"
+  },
+  "homepage": "https://github.com/alltomatos/skills",
+  "repository": "https://github.com/alltomatos/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "agent",
+    "developer",
+    "architect",
+    "tdd",
+    "qa",
+    "security"
+  ],
   "skills": [
     "./skills/engineering/architect",
     "./skills/engineering/diagnose",
@@ -12,6 +30,7 @@
     "./skills/engineering/to-prd",
     "./skills/engineering/zoom-out",
     "./skills/engineering/prototype",
+    "./skills/engineering/scaffold-mvp",
     "./skills/productivity/caveman",
     "./skills/productivity/grill-me",
     "./skills/productivity/handoff",
@@ -19,6 +38,7 @@
     "./skills/engineering/developer",
     "./skills/engineering/orchestrator",
     "./skills/engineering/roadmap",
+    "./skills/engineering/setup-skills",
     "./skills/engineering/secure-e2e",
     "./skills/engineering/qa-analyst",
     "./skills/engineering/query-docs",
@@ -30,12 +50,5 @@
     "./skills/misc/setup-pre-commit",
     "./skills/misc/scaffold-exercises",
     "./skills/misc/git-guardrails-claude-code"
-  ],
-  "plugins": [
-    {
-      "name": "scaffold-mvp",
-      "description": "Initialize a new project with an agile, high-productivity MVP stack. Focused on clean engineering boundaries, atomic configurations, and system stability without rush or architectural shortcuts. Use when starting a new project in an empty repository.",
-      "path": "../skills/engineering/scaffold-mvp"
-    }
   ]
 }

@@ -1,71 +1,71 @@
-# Templates de QA
+# QA Templates
 
-## Caso de Teste
+## Test case
 
 ```md
-### TC-<área>-<número> — <título curto>
+### TC-<area>-<number> - <short title>
 
-- **Prioridade**: P0 (crítico) | P1 (alto) | P2 (médio) | P3 (baixo)
-- **Tipo**: funcional | erro | inesperado | segurança | regressão
-- **Pré-condições**: estado necessário antes do teste (usuário logado, dado X existente…)
-- **Passos**:
-  1. …
-  2. …
-- **Resultado esperado**: comportamento observável e verificável
-- **Resultado obtido**: (preencher na execução) ✅ passou | ❌ falhou → BUG-<id>
+- **Priority**: P0 (critical) | P1 (high) | P2 (medium) | P3 (low)
+- **Type**: functional | error | unexpected | security | regression
+- **Preconditions**: state required before the test (logged-in user, existing record X...)
+- **Steps**:
+  1. ...
+  2. ...
+- **Expected result**: observable, verifiable behavior
+- **Actual result**: (fill in during execution) ✅ passed | ❌ failed → BUG-<id>
 ```
 
-## Relato de Bug
+## Bug report
 
 ```md
-### BUG-<número> — <título: sintoma observável, não causa presumida>
+### BUG-<number> - <title: observable symptom, not presumed cause>
 
-- **Severidade**: S1 (bloqueia uso) | S2 (função quebrada, com workaround) | S3 (degradação) | S4 (cosmético)
-- **Prioridade**: P0–P3 (urgência de correção — pode divergir da severidade)
-- **Ambiente**: SO, browser/versão, branch/commit, dados usados
-- **Passos de reprodução** (mínimos):
-  1. …
-  2. …
-- **Resultado esperado**: …
-- **Resultado observado**: … (colar mensagem de erro / status HTTP literal)
-- **Evidência**: screenshot, log, response body
-- **Frequência**: sempre | intermitente (X de Y tentativas)
-- **Caso de teste relacionado**: TC-…
+- **Severity**: S1 (blocks use) | S2 (broken function, with workaround) | S3 (degradation) | S4 (cosmetic)
+- **Priority**: P0-P3 (fix urgency - may differ from severity)
+- **Environment**: OS, browser/version, branch/commit, data used
+- **Reproduction steps** (minimal):
+  1. ...
+  2. ...
+- **Expected result**: ...
+- **Observed result**: ... (paste the literal error message / HTTP status)
+- **Evidence**: screenshot, log, response body
+- **Frequency**: always | intermittent (X of Y attempts)
+- **Related test case**: TC-...
 ```
 
-## Plano de Testes
+## Test plan
 
 ```md
-# Plano de Testes — <feature>
+# Test Plan - <feature>
 
-## Escopo
-- **Dentro**: …
-- **Fora** (com justificativa): …
+## Scope
+- **In**: ...
+- **Out** (with justification): ...
 
-## Riscos priorizados
-| # | Risco | Impacto | Cobertura planejada |
-|---|-------|---------|---------------------|
+## Prioritized risks
+| # | Risk | Impact | Planned coverage |
+|---|------|--------|------------------|
 
-## Estratégia por camada
-| Camada | Ferramenta | O que cobre |
-|--------|-----------|-------------|
-| Unitário | … | … |
-| Integração/API | … | … |
-| E2E | Playwright | … |
-| Manual exploratório | — | … |
+## Strategy per layer
+| Layer | Tool | What it covers |
+|-------|------|----------------|
+| Unit | ... | ... |
+| Integration/API | ... | ... |
+| E2E | Playwright | ... |
+| Exploratory manual | - | ... |
 
-## Critérios de saída
-- Todos os casos P0/P1 executados e passando
-- Nenhum bug S1/S2 aberto
+## Exit criteria
+- All P0/P1 cases executed and passing
+- No open S1/S2 bug
 ```
 
-## Análise de Causa Raiz (pós-ciclo)
+## Root cause analysis (post-cycle)
 
 ```md
-### RCA — BUG-<número>
+### RCA - BUG-<number>
 
-- **Causa raiz** (5 porquês, resumido): …
-- **Por que não foi detectado antes**: lacuna em <camada/processo>
-- **Ação preventiva concreta**: <lint rule | teste de contrato | item de checklist | gate de CI>
-- **Teste de regressão criado**: <path do teste> | pendente
+- **Root cause** (five whys, summarized): ...
+- **Why it was not detected earlier**: gap in <layer/process>
+- **Concrete preventive action**: <lint rule | contract test | checklist item | CI gate>
+- **Regression test created**: <test path> | pending
 ```

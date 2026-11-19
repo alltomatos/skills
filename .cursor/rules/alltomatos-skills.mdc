@@ -1,0 +1,8 @@
+﻿---
+description: Skills do repositorio alltomatos/skills
+alwaysApply: true
+---
+
+Este projeto usa as skills de https://github.com/alltomatos/skills.
+
+Leia `AGENTS.md` (organizacao e contrato) e `SKILLS.md` (catalogo: nome, quando usar, caminho e arquivos de apoio). Carregue so as skills que a tarefa pedir, pelo `SKILL.md` de cada uma, e nunca invente uma skill fora do catalogo.

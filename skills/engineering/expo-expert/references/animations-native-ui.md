@@ -1,14 +1,15 @@
-# Animação, gestos e Native UI
+# Animation, gestures and Native UI
 
-Doc-âncora: `versions/latest/sdk/reanimated.md`, `develop/user-interface/animation.md`,
+Anchor docs: `versions/latest/sdk/reanimated.md`, `develop/user-interface/animation.md`,
 `versions/latest/sdk/skia.md`, `versions/latest/sdk/gesture-handler.md`,
 `versions/latest/sdk/ui.md`, `.../ui/swift-ui.md`, `.../ui/jetpack-compose.md`,
 `.../ui/drop-in-replacements.md`, `.../ui/universal.md`, `guides/tailwind.md`.
 
-## Animação: React Native Reanimated
+## Animation: React Native Reanimated
 
-**Reanimated** é a lib padrão para animação performática em Expo — roda no *UI thread* (não no JS
-thread), então não trava com o JS ocupado. É o alicerce da maioria das animações sérias em produção.
+**Reanimated** is the standard library for performant animation in Expo - it runs on the *UI thread*
+(not the JS thread), so it does not stutter when the JS side is busy. It is the foundation of most
+serious production animations.
 
 ```bash
 npx expo install react-native-reanimated
@@ -26,17 +27,17 @@ function Box() {
 }
 ```
 
-- **`useSharedValue`** guarda estado que anima sem re-render React; **`useAnimatedStyle`** deriva o
-  style no UI thread; **`withSpring`/`withTiming`** são as curvas de animação.
-- Requer o **babel plugin** (`react-native-reanimated/plugin`) no `babel.config.js` — já vem
-  configurado pelo `expo install` na maioria dos casos; confirme se animações não disparam.
-- Compatível com Nova Arquitetura (ver [performance.md](performance.md)); versões antigas de libs
-  de terceiro que dependem de Reanimated podem não suportar Fabric — cheque compatibilidade.
+- **`useSharedValue`** holds state that animates without a React re-render; **`useAnimatedStyle`**
+  derives the style on the UI thread; **`withSpring`/`withTiming`** are the animation curves.
+- It requires the **babel plugin** (`react-native-reanimated/plugin`) in `babel.config.js` - usually
+  already configured by `expo install`; confirm it if animations do not fire.
+- Compatible with the New Architecture (see [performance.md](performance.md)); old third-party
+  libraries that depend on Reanimated may not support Fabric - check compatibility.
 
-## Gestos: React Native Gesture Handler
+## Gestures: React Native Gesture Handler
 
-Sistema de gestos nativo (pan, pinch, swipe, long-press) que substitui `PanResponder`. Compõe bem
-com Reanimated para gestos que animam em tempo real (drag-to-dismiss, swipe-to-delete).
+A native gesture system (pan, pinch, swipe, long-press) that replaces `PanResponder`. It composes well
+with Reanimated for gestures that animate in real time (drag-to-dismiss, swipe-to-delete).
 
 ```bash
 npx expo install react-native-gesture-handler
@@ -49,50 +50,50 @@ const pan = Gesture.Pan().onChange((e) => { translateX.value += e.changeX; });
 <GestureDetector gesture={pan}><Animated.View style={style} /></GestureDetector>;
 ```
 
-Precisa envolver a raiz do app com `GestureHandlerRootView` (o template do Expo Router já faz isso).
+You must wrap the app root with `GestureHandlerRootView` (the Expo Router template already does it).
 
-## Gráficos e canvas: Skia
+## Graphics and canvas: Skia
 
-**`@shopify/react-native-skia`** (redistribuído como `expo-skia`/SDK package) traz um motor de
-render 2D de alta performance para desenhos custom, gráficos, efeitos e animações complexas que
-`View`/`Animated` não cobrem bem — paths, shaders, filtros de imagem.
+**`@shopify/react-native-skia`** (redistributed as the `expo-skia`/SDK package) brings a
+high-performance 2D render engine for custom drawings, charts, effects and complex animations that
+`View`/`Animated` do not cover well - paths, shaders, image filters.
 
 ```bash
 npx expo install @shopify/react-native-skia
 ```
 
-Use quando: gráficos de dados custom, editores de desenho, efeitos visuais ricos. Não é o default
-para UI comum — para isso, prefira RN puro + Reanimated.
+Use it for: custom data charts, drawing editors, rich visual effects. It is not the default for
+ordinary UI - for that, prefer plain RN + Reanimated.
 
 ## Native UI: Expo UI (SwiftUI / Jetpack Compose)
 
-**Expo UI** (`expo-ui`) expõe **views nativas reais** — SwiftUI no iOS, Jetpack Compose no Android —
-como componentes React, em vez de recriar o look nativo com `View`/`Text`. Dois modos de uso:
+**Expo UI** (`expo-ui`) exposes **real native views** - SwiftUI on iOS, Jetpack Compose on Android - as
+React components, instead of recreating the native look with `View`/`Text`. Two usage modes:
 
-1. **Drop-in replacements**: componentes prontos (`Button`, `Switch`, `Slider`, `ContextMenu`, …)
-   que renderizam o widget *nativo* da plataforma. Ver `sdk/ui/drop-in-replacements.md`.
-2. **Universal / custom SwiftUI-Compose**: escrever a UI diretamente em SwiftUI (`sdk/ui/swift-ui.md`)
-   ou Jetpack Compose (`sdk/ui/jetpack-compose.md`) e expor como view via a Expo Modules API — ver
-   também `guides/expo-ui-swift-ui/extending.md` e `guides/expo-ui-jetpack-compose/extending.md`
-   para estender com view nativa própria. Cruze com [native-modules.md](native-modules.md).
+1. **Drop-in replacements**: ready-made components (`Button`, `Switch`, `Slider`, `ContextMenu`, ...)
+   that render the platform's *native* widget. See `sdk/ui/drop-in-replacements.md`.
+2. **Universal / custom SwiftUI-Compose**: write the UI directly in SwiftUI (`sdk/ui/swift-ui.md`) or
+   Jetpack Compose (`sdk/ui/jetpack-compose.md`) and expose it as a view through the Expo Modules API -
+   see also `guides/expo-ui-swift-ui/extending.md` and `guides/expo-ui-jetpack-compose/extending.md` to
+   extend it with your own native view. Cross-reference [native-modules.md](native-modules.md).
 
-**Quando usar Expo UI vs componentes RN puros**: use Expo UI quando a fidelidade 100% nativa importa
-(configurações do sistema, menus de contexto, controles que devem parecer exatamente com o SO). Para
-UI de marca/custom cross-platform, RN puro (+ NativeWind/Tailwind) continua sendo o caminho mais
-simples e mais compartilhável entre iOS/Android/web.
+**When to use Expo UI vs pure RN components**: use Expo UI when 100% native fidelity matters (system
+settings, context menus, controls that must look exactly like the OS). For brand/custom cross-platform
+UI, pure RN (+ NativeWind/Tailwind) remains the simplest and most shareable path across
+iOS/Android/web.
 
 ## Styling: Tailwind / NativeWind
 
-O próprio Expo tem suporte **nativo a CSS/Tailwind na web** via Metro (não cobre iOS/Android
-diretamente):
+Expo itself supports **CSS/Tailwind natively on the web** through Metro (it does not cover iOS/Android
+directly):
 
 ```json
-// app.json — pré-requisito
+// app.json - prerequisite
 { "expo": { "web": { "bundler": "metro" } } }
 ```
 
 ```bash
-# Tailwind v4 (recomendado em projetos novos)
+# Tailwind v4 (recommended for new projects)
 npx expo install tailwindcss @tailwindcss/postcss postcss --dev
 ```
 ```js
@@ -103,20 +104,20 @@ export default { plugins: { "@tailwindcss/postcss": {} } };
 /* global.css */
 @import "tailwindcss";
 ```
-Importe `global.css` no layout raiz. Em elementos RN (`View`/`Text`), a classe passa via
-`style={{ $$css: true, _: "bg-slate-100 rounded-xl" }}` — isso é o suporte **nativo do Expo, só web**.
+Import `global.css` in the root layout. On RN elements (`View`/`Text`), the class goes through
+`style={{ $$css: true, _: "bg-slate-100 rounded-xl" }}` - that is **Expo's native support, web only**.
 
-**Para Tailwind funcionar de fato em iOS/Android**, use **NativeWind** (ou **Uniwind**) — libs
-separadas que compilam classes Tailwind para `StyleSheet` nativo. Não confunda os dois: o suporte
-CSS nativo do Expo é escopo web; NativeWind é o caminho universal (web + iOS + Android).
+**For Tailwind to actually work on iOS/Android**, use **NativeWind** (or **Uniwind**) - separate
+libraries that compile Tailwind classes to native `StyleSheet`. Do not confuse the two: Expo's native
+CSS support is web-scoped; NativeWind is the universal path (web + iOS + Android).
 
-## Gotchas de sênior
+## Senior gotchas
 
-- **Reanimated sem o babel plugin** = animações silenciosamente não funcionam (sem erro óbvio) —
-  primeiro lugar a checar quando "a animação não anima".
-- **Envolva a raiz com `GestureHandlerRootView`** — gestos falham silenciosamente sem isso.
-- **Skia é pesado**: não use pra UI comum; reserve para gráficos/efeitos que realmente precisam.
-- **Expo UI drop-in muda a aparência por plataforma** por design (é o nativo de cada SO) — não
-  espere pixel-parity entre iOS e Android com esses componentes.
-- **NativeWind ≠ suporte CSS web do Expo** — são mecanismos diferentes; escolha com base em querer
-  ou não paridade mobile.
+- **Reanimated without the babel plugin** = animations silently do not work (with no obvious error) -
+  the first place to check when "the animation does not animate".
+- **Wrap the root with `GestureHandlerRootView`** - gestures fail silently without it.
+- **Skia is heavy**: do not use it for ordinary UI; reserve it for charts/effects that really need it.
+- **Expo UI drop-in changes appearance per platform** by design (it is each OS's native widget) - do not
+  expect pixel parity between iOS and Android with those components.
+- **NativeWind != Expo's web CSS support** - they are different mechanisms; choose based on whether you
+  want mobile parity.

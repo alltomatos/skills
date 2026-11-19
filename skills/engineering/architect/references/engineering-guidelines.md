@@ -1,97 +1,97 @@
-# Diretrizes Técnicas e Regras Inegociáveis de Arquitetura e Engenharia
+# Technical Guidelines and Non-Negotiable Architecture and Engineering Rules
 
-Este documento consolida as diretrizes inegociáveis para o **Arquiteto de Software**, seus artefatos (ADD/SAD, ADRs, PRDs técnicos) e a atuação dos agentes de desenvolvimento (`/developer`).
-
----
-
-## 1. Production-Readiness (Caminho para Produção)
-
-- **Maturidade Corporativa:** Todo plano e ADD deve mapear explicitamente os passos faltantes para atingir maturidade de nível corporativo (Enterprise Grade), indicando o "caminho ideal" sem atalhos frágeis.
-- **Análise de Trade-offs com Empatia:** Explicar claramente prós e contras de cada escolha arquitetural (ex.: acoplamento vs coesão, gargalos de I/O, custos de infraestrutura). Abordagens frágeis devem ser corrigidas com didática e embasamento técnico.
-- **Design para o Ciclo de Vida Completo:** Toda solução deve ser projetada desde o dia zero para:
-  1. *Testabilidade:* Módulos profundos com interfaces fáceis de mockar/testar.
-  2. *Build & CI:* Pipelines atômicos e rápidos.
-  3. *Deploy:* Zero-downtime (Blue/Green ou Canary), rollback simplificado.
-  4. *Monitoramento & SRE:* Métricas de ouro (Latência, Tráfego, Erros, Saturação), logs estruturados e rastreamento distribuído.
+This document consolidates the non-negotiable guidelines for the **Software Architect**, its artifacts (ADD/SAD, ADRs, technical PRDs) and the work of the development agents (`developer`).
 
 ---
 
-## 2. Engenharia e Refatoração Segura
+## 1. Production-Readiness (the path to production)
 
-- **Padrões & Limites:** Clean Architecture, Domain-Driven Design (DDD) e SOLID aplicados com equilíbrio e bom senso (KISS e YAGNI). Evitar over-engineering desnecessário.
-- **Segurança na Refatoração:**
-  - Proibido quebrar contratos públicos ou realizar breaking changes brutais.
-  - As migrações devem ser em passos incrementais (Expand & Contract / Strangler Fig Pattern).
-  - APIs com contratos consistentes e versionados (REST com OpenAPI ou gRPC com Protobuf).
-- **Arqueologia de Código Obrigatória:**
-  - Ler e compreender rotas existentes, padrões de concorrência, tratamento de erros e convenções de nomenclatura locais **ANTES** de propor ou refatorar.
-  - Respeitar padrões estabelecidos da base de código. Desvios substanciais exigem registro prévio em ADR (`docs/adr/`).
-- **Engenharia de Teste Reversa:**
-  - Diante de bugs ou novas features, inspecionar primeiro a suite de testes existente.
-  - Tratar testes automatizados como especificação viva do sistema.
-  - Toda alteração deve garantir **regressão zero**.
+- **Corporate maturity:** every plan and ADD must explicitly map the missing steps to reach enterprise-grade maturity, pointing to the "ideal path" without fragile shortcuts.
+- **Trade-off analysis with empathy:** explain clearly the pros and cons of each architectural choice (e.g. coupling vs cohesion, I/O bottlenecks, infrastructure costs). Fragile approaches must be corrected with pedagogy and technical grounding.
+- **Design for the full lifecycle:** every solution must be designed from day zero for:
+  1. *Testability:* deep modules with interfaces that are easy to mock and test.
+  2. *Build & CI:* atomic, fast pipelines.
+  3. *Deploy:* zero-downtime (blue/green or canary), simplified rollback.
+  4. *Monitoring & SRE:* golden metrics (latency, traffic, errors, saturation), structured logs and distributed tracing.
 
 ---
 
-## 3. DBA, Concorrência e Segurança OWASP
+## 2. Engineering and safe refactoring
 
-- **Estratégia de Banco de Dados:**
-  - Dimensionamento de volumetria e plano de crescimento de dados.
-  - Indexação criteriosa (B-Tree, GIN, índices compostos), planos de execução (`EXPLAIN ANALYZE`).
-  - Prevenção ativa de consultas N+1 (uso de `JOIN FETCH`, batch loading ou DataLoaders).
-  - Pooling de conexões dimensionado para concorrência e estratégias de cache (Redis com TTL adequado).
-- **Segurança OWASP Top 10:**
-  - Prevenção estrita a SQL Injection (queries parametrizadas/ORM), XSS (sanitização de inputs e headers CSP), CSRF e vazamento de credenciais.
-  - Rotas e fluxos críticos (autenticação, pagamento, permissões) devem ter especificações e testes negativos de ataque (ex.: `*.spec.sec.ts` via Playwright CLI / `/secure-e2e`).
-
----
-
-## 4. Proatividade Full-Stack & Revelação de Lacunas Ocultas
-
-- **Mapeamento Ponta-a-Ponta:** Quando o usuário fornecer requisitos vagos ou abstratos, o arquiteto deve mapear todo o fluxo ponta-a-ponta e autodeclarar módulos "invisíveis" indispensáveis (auditoria/logs, rate limiting, SLAs, transações distribuídas, circuit breakers, concorrência e idempotência).
-- **Ecossistema Frontend/Backend:** Ao desenhar uma feature de interface, garantir simultaneamente:
-  1. Contrato da API e validação de schema (Zod/OpenAPI);
-  2. Gerenciamento de estado global e assíncrono (React Query / Zustand / SWR);
-  3. Transporte seguro de credenciais (HttpOnly Cookies / Bearer tokens);
-  4. Persistência de sessão resiliente e tratamento global de erros (Error Boundaries + Toasts).
-- **Desafio Técnico & Mentoria:** Se o usuário ignorar riscos de segurança, falhas de consistência ou problemas de escalabilidade, atuar ativamente como mentor, apresentando os componentes e salvaguardas necessários.
+- **Patterns & boundaries:** Clean Architecture, Domain-Driven Design (DDD) and SOLID applied with balance and common sense (KISS and YAGNI). Avoid unnecessary over-engineering.
+- **Safety when refactoring:**
+  - Breaking public contracts or making brutal breaking changes is forbidden.
+  - Migrations must be incremental (expand & contract / strangler fig pattern).
+  - APIs must have consistent, versioned contracts (REST with OpenAPI or gRPC with Protobuf).
+- **Mandatory code archaeology:**
+  - Read and understand the existing routes, concurrency patterns, error handling and local naming conventions **BEFORE** proposing or refactoring.
+  - Respect the established patterns of the codebase. Substantial deviations require prior record in an ADR (`docs/adr/`).
+- **Reverse test engineering:**
+  - For bugs or new features, inspect the existing test suite first.
+  - Treat automated tests as the living specification of the system.
+  - Every change must guarantee **zero regression**.
 
 ---
 
-## 5. Rigor de Código e Edição Cirúrgica
+## 3. DBA, concurrency and OWASP security
 
-- **ZERO Pseudocódigo:** É expressamente **proibido** utilizar `// ...`, `// resto do código` ou `/* implementação futura */`. Todo código gerado em artefatos ou refatorações deve ser real, completo, tipado e auto-contido.
-- **Edição Cirúrgica e Atômica:**
-  - Em ferramentas de edição (`edit`), selecionar o menor bloco exato possível (`old_string` único e conciso). Nunca reescrever arquivos ou funções inteiras quando apenas algumas linhas mudaram.
-- **Contexto Real e Diagnóstico de Erros:**
-  - Diante de erros de compilação ou execução, inspecionar as linhas exatas da stack trace antes de alterar código. Proibido tentar adivinhar sem ler o arquivo real.
-- **Injeção de Dependências Explícita:**
-  - Proibido usar Service Locators globais ou Singletons arbitrários acoplados.
-  - Dependências devem ser instanciadas na camada de composição (Main/Bootstrap) e injetadas explicitamente via construtor/parâmetro.
-- **Rito de Modificação Seguro:**
+- **Database strategy:**
+  - Size the data volume and the growth plan.
+  - Careful indexing (B-Tree, GIN, composite indexes) and execution plans (`EXPLAIN ANALYZE`).
+  - Active prevention of N+1 queries (`JOIN FETCH`, batch loading or DataLoaders).
+  - Connection pooling sized for concurrency and caching strategies (Redis with an appropriate TTL).
+- **OWASP Top 10 security:**
+  - Strict prevention of SQL injection (parameterized queries/ORM), XSS (input sanitization and CSP headers), CSRF and credential leaks.
+  - Critical routes and flows (authentication, payment, permissions) must have security specifications and negative attack tests (e.g. `*.spec.sec.ts` through the Playwright CLI / `secure-e2e`).
+
+---
+
+## 4. Full-stack proactivity and revealing hidden gaps
+
+- **End-to-end mapping:** when the user gives vague or abstract requirements, the architect must map the whole end-to-end flow and declare the indispensable "invisible" modules (auditing/logs, rate limiting, SLAs, distributed transactions, circuit breakers, concurrency and idempotency).
+- **Frontend/backend ecosystem:** when designing an interface feature, guarantee at the same time:
+  1. the API contract and schema validation (Zod/OpenAPI);
+  2. global and asynchronous state management (React Query / Zustand / SWR);
+  3. secure credential transport (HttpOnly cookies / bearer tokens);
+  4. resilient session persistence and global error handling (error boundaries + toasts).
+- **Technical challenge & mentoring:** if the user ignores security risks, consistency failures or scalability problems, act actively as a mentor and present the required components and safeguards.
+
+---
+
+## 5. Code rigor and surgical editing
+
+- **ZERO pseudocode:** using `// ...`, `// rest of the code` or `/* future implementation */` is expressly **forbidden**. All code generated in artifacts or refactors must be real, complete, typed and self-contained.
+- **Surgical, atomic editing:**
+  - In editing tools (`edit`), select the smallest exact block possible (a unique, concise `old_string`). Never rewrite whole files or functions when only a few lines changed.
+- **Real context and error diagnosis:**
+  - On compilation or runtime errors, inspect the exact lines of the stack trace before changing code. Guessing without reading the real file is forbidden.
+- **Explicit dependency injection:**
+  - Global service locators or arbitrary coupled singletons are forbidden.
+  - Dependencies must be instantiated at the composition layer (Main/Bootstrap) and injected explicitly through the constructor/parameter.
+- **Safe modification rite:**
   ```text
-  Ler estado real -> Edição cirúrgica -> Compilar / Rodar testes locais (Fast Feedback)
+  Read the real state -> Surgical edit -> Compile / run local tests (fast feedback)
   ```
 
 ---
 
-## 6. Modularidade, Leitura e Quebra de Loops
+## 6. Modularity, reading and loop breaking
 
-- **Fronteira SRP e Arquivos Extensos:**
-  - Arquivos extensos (>250 linhas) aumentam o risco de alucinação e cegueira de contexto.
-  - Propor e aplicar o desmembramento em arquivos focados no pacote (ex.: em Go separar `models.go`, `interfaces.go`, `service.go` no mesmo pacote; em TypeScript separar `types.ts`, `schema.ts`, `service.ts`).
-- **Leitura Cirúrgica:**
-  - Em arquivos grandes, usar leituras paginadas com `offset` e `limit`. Proibido ler cegamente arquivos de milhares de linhas sem necessidade.
-- **Quebra de Loop Imediata (Safety Valve):**
-  - Se uma edição falhar 2 vezes seguidas ou o build quebrar repetidamente, **PARE IMEDIATAMENTE**.
-  - Aborte novas tentativas cegas, gere um diagnóstico detalhado do erro e requisite alinhamento com o usuário no ambiente/IDE.
+- **SRP boundary and long files:**
+  - Long files (>250 lines) increase the risk of hallucination and context blindness.
+  - Propose and apply the split into package-focused files (e.g. in Go, separate `models.go`, `interfaces.go`, `service.go` in the same package; in TypeScript, separate `types.ts`, `schema.ts`, `service.ts`).
+- **Surgical reading:**
+  - In large files, use paginated reads with `offset` and `limit`. Reading thousands of lines blindly without need is forbidden.
+- **Immediate loop breaking (safety valve):**
+  - If an edit fails twice in a row or the build breaks repeatedly, **STOP IMMEDIATELY**.
+  - Abort further blind attempts, produce a detailed error diagnosis and request alignment with the user in the environment/IDE.
 
 ---
 
-## 7. Governança e Versionamento Git
+## 7. Governance and Git versioning
 
-- **Conventional Commits:** Todo commit deve ser atômico, semântico e focado em uma única unidade lógica (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`).
-- **Clean Branches:** Proibido comitar diretamente na branch principal (`main`/`master`). Todo desenvolvimento ocorre em branch efêmera/feature branch, com merge condicionado à aprovação dos testes e do portão de QA (`/qa-analyst`).
-- **Shift-Left Security & Git Guardrails:**
-  - Zero vazamento de segredos: chaves de API, senhas, certificados ou arquivos `.env` jamais entram no controle de versão.
-  - Uso de hooks de pre-commit (Husky / lint-staged) e regras do `git-guardrails`.
+- **Conventional Commits:** every commit must be atomic, semantic and focused on a single logical unit (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`).
+- **Clean branches:** committing directly on the main branch (`main`/`master`) is forbidden. All development happens on an ephemeral/feature branch, with the merge conditional on passing tests and the QA gate (`qa-analyst`).
+- **Shift-left security & Git guardrails:**
+  - Zero secret leakage: API keys, passwords, certificates or `.env` files never enter version control.
+  - Use pre-commit hooks (Husky / lint-staged) and `git-guardrails` rules.

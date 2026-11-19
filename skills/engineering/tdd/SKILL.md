@@ -5,53 +5,56 @@ description: Test-driven development with red-green-refactor loop. Use when user
 
 # TDD - Test Driven Development
 
-## PRINCÍPIO
-Testar comportamento via interfaces públicas. Não testar detalhes de implementação. Testes devem resistir a refatoraçoes.
-* **Bons testes (Integração)**: Exercitam fluxos por APIs públicas. Funcionam como especificação viva. 
-* **Bad tests**: Acoplados a métodos privados ou mocks internos. Quebram se código interno muda mesmo sem alteração de comportamento.
+## PRINCIPLE
+Test behavior through public interfaces. Do not test implementation details. Tests must survive refactoring.
 
-*Exemplos em [tests.md](tests.md) e regras de mock em [mocking.md](mocking.md).*
+* **Good tests (integration)**: exercise flows through public APIs. They work as a living specification.
+* **Bad tests**: coupled to private methods or internal mocks. They break when internal code changes even without a behavior change.
+
+*Examples in [tests.md](tests.md) and mock rules in [mocking.md](mocking.md).*
 
 ## ANTI-PATTERN: HORIZONTAL SLICES
-Proibido escrever todos os testes de uma vez antes de codificar.
-* **Razão**: Testes em lote adivinham comportamento, testando tipo/shape em vez de valor de negócio.
+Writing all the tests at once before coding is forbidden.
 
-## RITO DE EXECUÇÃO: VERTICAL SLICES
+* **Reason**: batch tests guess behavior, testing type/shape instead of business value.
 
-### 1. Scope (Alinhamento)
-Mapear comportamentos críticos com usuário. Focar apenas em caminhos felizes e regras principais.
+## EXECUTION RITE: VERTICAL SLICES
 
-### 2. Tracer Bullet (Primeiro Fluxo)
-Escrever UM teste para confirmar UM comportamento end-to-end:
+### 1. Scope (alignment)
+Map the critical behaviors with the user. Focus only on happy paths and the main rules.
+
+### 2. Tracer bullet (first flow)
+Write ONE test to confirm ONE end-to-end behavior:
 ```
-RED:   Escrever teste para fluxo 1 -> teste quebra
-GREEN: Código mínimo para passar -> teste passa
+RED:   Write the test for flow 1 -> the test fails
+GREEN: Minimum code to pass   -> the test passes
 ```
 
-### 3. Loop Incremental
-Para os comportamentos seguintes:
+### 3. Incremental loop
+For the following behaviors:
 ```
-RED:   Novo teste -> quebra
-GREEN: Código mínimo -> passa
+RED:   New test -> fails
+GREEN: Minimum code -> passes
 ```
-* **Regras**: 1 teste por vez. Código apenas para passar teste atual. Não prever futuro.
+* **Rules**: one test at a time. Code only to pass the current test. Do not anticipate the future.
 
 ### 4. Refactor
-Em GREEN (passando):
-* Eliminar duplicações.
-* Ocultar complexidade por interfaces simples.
-* Aplicar SOLID.
-* **Regra Ouro**: Proibido refatorar em RED.
+While GREEN (passing):
+* Remove duplication.
+* Hide complexity behind simple interfaces.
+* Apply SOLID.
+* **Golden rule**: refactoring while RED is forbidden.
 
 ```checklist
-[ ] Teste valida comportamento por API pública
-[ ] Teste resiste a refatoramento interno
-[ ] Código é o mínimo para aprovar teste
-[ ] Sem features especulativas
+[ ] The test validates behavior through a public API
+[ ] The test survives internal refactoring
+[ ] The code is the minimum to pass the test
+[ ] No speculative features
 ```
 
-## FECHAMENTO OBRIGATÓRIO
-GREEN alcançado -> registrar a evidencia e aguardar o portão obrigatório de `/qa-analyst`. Só depois da aprovação do QA orientar o fluxo de PR disponível no ambiente:
-* Commit semântico (`feat:`, `fix:`, `refactor:`).
-* Branch organizada.
-* Template de PR preenchido.
+## MANDATORY CLOSURE
+GREEN reached -> record the evidence and wait for the mandatory `qa-analyst` gate. Only after QA approval, guide the PR flow available in the environment:
+
+* Semantic commit (`feat:`, `fix:`, `refactor:`).
+* Organized branch.
+* PR template filled in.

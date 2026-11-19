@@ -1,40 +1,40 @@
 ---
 name: roadmap
-description: Gerencia o estado estrategico e as Epics do projeto, mantendo IDs estaveis e links diretos para GitHub Issues. Deve ser consultado por qualquer skill de planejamento.
+description: Manages the project's strategic state and Epics, keeping stable IDs and direct links to GitHub Issues. Must be consulted by any planning skill. Use when the roadmap, the Epics or their status need creating, updating or validating.
 ---
 
 # Roadmap
 
-Gerencie `DEVELOPER-ROADMAP.md` como a bussola estrategica do projeto. O roadmap resume o plano; o GitHub Issue da Epic e a fonte detalhada de contexto e rastreabilidade.
+Manage `DEVELOPER-ROADMAP.md` as the project's strategic compass. The roadmap summarizes the plan; the Epic's GitHub Issue is the detailed source of context and traceability.
 
-## Estrutura obrigatoria
+## Required structure
 
-O arquivo deve conter:
+The file must contain:
 
-1. **Epics**: grandes objetivos, cada um com ID estavel `E##` e GitHub Issue vinculada;
-2. **Milestones**: marcos entregaveis compostos por tarefas;
-3. **Estado**: `todo`, `in_progress`, `done`;
-4. **Links**: sempre no formato `[**[E10] Titulo**](https://github.com/OWNER/REPO/issues/123)`.
+1. **Epics**: large objectives, each with a stable `E##` ID and a linked GitHub Issue;
+2. **Milestones**: deliverable markers composed of tasks;
+3. **State**: `todo`, `in_progress`, `done`;
+4. **Links**: always in the format `[**[E10] Title**](https://github.com/OWNER/REPO/issues/123)`.
 
-## Fluxo
+## Flow
 
-1. Leia o roadmap atual e liste todos os Epics.
-2. Preserve IDs existentes e atribua o proximo ID disponivel a Epics novas.
-3. Valide o remote GitHub e localize ou crie a Issue de cada Epic.
-4. Atualize cada titulo para conter o identificador e o link direto.
-5. Sincronize estado, objetivo e criterios de sucesso entre roadmap e Issue.
-6. Valide duplicidades e links quebrados antes de concluir.
+1. Read the current roadmap and list every Epic.
+2. Preserve existing IDs and assign the next available ID to new Epics.
+3. Validate the GitHub remote and locate or create each Epic's Issue.
+4. Update each title to carry the identifier and the direct link.
+5. Sync state, objective and success criteria between roadmap and Issue.
+6. Check for duplicates and broken links before finishing.
 
-## Checklist de integridade
+## Integrity checklist
 
 ```text
-[ ] Todo Epic tem ID E##
-[ ] IDs nao se repetem
-[ ] Todo Epic tem Issue GitHub
-[ ] Todo Epic tem link direto /issues/<numero>
-[ ] Nenhum Epic ficou sem link
-[ ] Milestones apontam para Epics existentes
-[ ] Estados refletem a realidade atual
+[ ] Every Epic has an E## ID
+[ ] IDs do not repeat
+[ ] Every Epic has a GitHub Issue
+[ ] Every Epic has a direct /issues/<number> link
+[ ] No Epic was left without a link
+[ ] Milestones point to existing Epics
+[ ] States reflect the current reality
 ```
 
-Se `DEVELOPER-ROADMAP.md` nao existir, crie-o somente depois de confirmar GitHub e o contexto do projeto. Se nao houver Epics, registre essa situacao; nao crie Epics ficticias.
+If `DEVELOPER-ROADMAP.md` does not exist, create it only after confirming GitHub and the project context. If there are no Epics, record that situation; never invent Epics.

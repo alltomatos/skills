@@ -1,104 +1,104 @@
 ---
 name: to-issues
-description: Transforma planos, specs, PRDs e Epics em GitHub Issues rastreaveis usando IDs estaveis, links diretos, slices verticais, dependencias e criterios de aceite verificaveis.
+description: Turns plans, specs, PRDs and Epics into traceable GitHub Issues using stable IDs, direct links, vertical slices, dependencies and verifiable acceptance criteria. Use when work must be sliced into GitHub Issues.
 ---
 
 # To Issues
 
-Use GitHub como tracker obrigatorio. Se o remote ou acesso nao estiver configurado, pare e oriente a configuracao do repositorio GitHub.
+Use GitHub as the mandatory tracker. If the remote or access is not configured, stop and guide the setup of the GitHub repository.
 
-## Contrato de rastreabilidade de Epics
+## Epic traceability contract
 
-Cada Epic do `DEVELOPER-ROADMAP.md` deve possuir:
+Every Epic in `DEVELOPER-ROADMAP.md` must have:
 
-1. um identificador estavel no formato `E10`, `E11`, `E12`;
-2. uma GitHub Issue correspondente;
-3. um link direto para essa Issue no titulo ou linha principal do roadmap;
-4. descricao, estado e criterios de sucesso sincronizados com a Issue.
+1. a stable identifier in the `E10`, `E11`, `E12` format;
+2. a corresponding GitHub Issue;
+3. a direct link to that Issue in the roadmap title or main line;
+4. description, state and success criteria synced with the Issue.
 
-Formato obrigatorio no roadmap:
+Required format in the roadmap:
 
 ```markdown
 ## Epics
 
-- [**[E10] Fundacao do produto**](https://github.com/OWNER/REPO/issues/101) - `in_progress`
-- [**[E11] Fluxo de notificacoes**](https://github.com/OWNER/REPO/issues/102) - `todo`
+- [**[E10] Product foundation**](https://github.com/OWNER/REPO/issues/101) - `in_progress`
+- [**[E11] Notification flow**](https://github.com/OWNER/REPO/issues/102) - `todo`
 ```
 
-O identificador `E##` nao pode ser reutilizado, mesmo quando uma Epic for concluida. O numero da Issue GitHub nao substitui o identificador da Epic: `E10` permanece estavel mesmo se a Issue for editada.
+The `E##` identifier cannot be reused, even after an Epic is done. The GitHub Issue number does not replace the Epic identifier: `E10` stays stable even if the Issue is edited.
 
-## Processo
+## Process
 
-1. Leia `DEVELOPER-ROADMAP.md`, contexto, ADRs, requisitos e comentarios da Issue pai, quando houver.
-2. Liste todas as Epics existentes e extraia seus IDs, estados e links.
-3. Para cada Epic sem ID, atribua o proximo ID disponivel sem renumerar Epics existentes.
-4. Para cada Epic sem link, localize a Issue correspondente por titulo, labels e corpo; se nao existir, crie uma Issue no GitHub.
-5. Atualize o roadmap com o link direto no formato `[**[E10] Titulo**](URL)`.
-6. Valide que nao restaram Epics sem ID, sem Issue ou sem link.
-7. Divida a Epic aprovada em slices verticais completos, pequenos e verificaveis.
-8. Marque cada slice como HITL ou AFK e defina dependencias.
-9. Apresente a proposta ao usuario quando houver decisao de granularidade, risco ou arquitetura.
-10. Publique as Issues em ordem de dependencia e use IDs reais no campo `Blocked by`.
-11. Atualize a Issue da Epic com links para as slices filhas e mantenha o roadmap sincronizado.
-12. Nunca feche ou altere uma Issue pai sem autorizacao explicita.
+1. Read `DEVELOPER-ROADMAP.md`, the context, the ADRs, the requirements and the parent Issue comments, when there are any.
+2. List every existing Epic and extract its IDs, states and links.
+3. For each Epic without an ID, assign the next available ID without renumbering existing Epics.
+4. For each Epic without a link, locate the corresponding Issue by title, labels and body; if it does not exist, create an Issue on GitHub.
+5. Update the roadmap with the direct link in the `[**[E10] Title**](URL)` format.
+6. Verify that no Epic is left without an ID, an Issue or a link.
+7. Break the approved Epic into complete, small and verifiable vertical slices.
+8. Mark each slice as HITL or AFK and define dependencies.
+9. Present the proposal to the user when there is a decision about granularity, risk or architecture.
+10. Publish the Issues in dependency order and use real IDs in the `Blocked by` field.
+11. Update the Epic Issue with links to its child slices and keep the roadmap in sync.
+12. Never close or change a parent Issue without explicit authorization.
 
-## Validacao obrigatoria
+## Mandatory validation
 
-Antes de concluir, confirme:
+Before finishing, confirm:
 
 ```text
-[ ] Todo Epic possui identificador E##
-[ ] Todo Epic possui uma GitHub Issue
-[ ] Todo Epic possui link direto no roadmap
-[ ] Todo link aponta para /issues/<numero>
-[ ] Nenhum ID de Epic esta duplicado
-[ ] Issue da Epic referencia suas slices filhas
-[ ] Estados do roadmap e GitHub estao coerentes
+[ ] Every Epic has an E## identifier
+[ ] Every Epic has a GitHub Issue
+[ ] Every Epic has a direct link in the roadmap
+[ ] Every link points to /issues/<number>
+[ ] No Epic ID is duplicated
+[ ] The Epic Issue references its child slices
+[ ] Roadmap and GitHub states agree
 ```
 
-Se o roadmap estiver ausente, informe que nao ha Epics locais para mapear e nao invente Epics. Se o GitHub estiver indisponivel, pare antes de publicar ou declarar uma Epic como rastreada.
+If the roadmap is missing, report that there are no local Epics to map and do not invent Epics. If GitHub is unavailable, stop before publishing or declaring an Epic as tracked.
 
-## Template da Issue de Epic
+## Epic Issue template
 
 ```markdown
 ## Epic
 
-E10 - Nome da Epic
+E10 - Epic name
 
-## Objetivo
+## Objective
 
-Resultado de negocio ou tecnico esperado.
+Expected business or technical outcome.
 
-## Criterios de sucesso
+## Success criteria
 
-- [ ] Criterio verificavel 1
-- [ ] Criterio verificavel 2
+- [ ] Verifiable criterion 1
+- [ ] Verifiable criterion 2
 
 ## Slices
 
-- [ ] #123 - Slice vertical 1
-- [ ] #124 - Slice vertical 2
+- [ ] #123 - Vertical slice 1
+- [ ] #124 - Vertical slice 2
 
-## Estado
+## State
 
 todo | in_progress | done
 ```
 
-## Template da Issue de slice
+## Slice Issue template
 
 ```markdown
 ## Parent
 
-Epic: E10 - [link para a Issue da Epic]
+Epic: E10 - [link to the Epic Issue]
 
 ## What to build
 
-Descricao concisa do comportamento completo da slice.
+Concise description of the slice's complete behavior.
 
 ## Acceptance criteria
 
-- [ ] Criterio verificavel 1
-- [ ] Criterio verificavel 2
+- [ ] Verifiable criterion 1
+- [ ] Verifiable criterion 2
 
 ## Blocked by
 
@@ -106,5 +106,5 @@ Descricao concisa do comportamento completo da slice.
 
 ## Verification
 
-Comandos, testes ou evidencia esperada.
+Commands, tests or expected evidence.
 ```

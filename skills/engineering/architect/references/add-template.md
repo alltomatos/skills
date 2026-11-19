@@ -1,79 +1,79 @@
 # Template: Architecture Design Document (ADD / SAD)
 
-Use este template para criar o documento mestre em `docs/architecture/ADD.md`.
+Use this template to create the master document at `docs/architecture/ADD.md`.
 
 ```markdown
-# Architecture Design Document (ADD) - [Nome do Projeto]
+# Architecture Design Document (ADD) - [Project Name]
 
-## 1. Visão Geral e Contexto de Negócio
-- **Objetivo:** O que este sistema resolve e qual valor entrega ao negócio.
-- **Escopo do Projeto:** Limites do sistema, personas de usuários e fluxos críticos.
-- **Stakeholders:** Equipes envolvidas, clientes e sistemas consumidores.
+## 1. Overview and Business Context
+- **Objective:** What this system solves and which value it delivers to the business.
+- **Project scope:** System boundaries, user personas and critical flows.
+- **Stakeholders:** Teams involved, customers and consuming systems.
 
-## 2. Requisitos Não Funcionais (NFRs) e Restrições
-- **Escalabilidade e Carga:** Ex: suportar até 5.000 RPS com p95 < 200ms.
-- **Disponibilidade:** Ex: 99.9% de uptime com failover multi-AZ.
-- **Segurança & Compliance:** LGPD/GDPR, encriptação at-rest/in-transit, auditoria e RBAC.
-- **Custos/FinOps:** Restrições orçamentárias de infraestrutura em nuvem.
+## 2. Non-Functional Requirements (NFRs) and Constraints
+- **Scalability and load:** e.g. support up to 5,000 RPS with p95 < 200ms.
+- **Availability:** e.g. 99.9% uptime with multi-AZ failover.
+- **Security & compliance:** GDPR/LGPD, encryption at-rest/in-transit, auditing and RBAC.
+- **Cost/FinOps:** cloud infrastructure budget constraints.
 
-## 3. Padrões e Estilo Arquitetural
-- **Padrão Principal:** (Ex: Clean Architecture, Modular Monolith, Event-Driven, Microservices).
-- **Justificativa:** Por que este padrão atende melhor aos NFRs do que as alternativas.
-- **Convenções de Código:** Estrutura de pastas, camadas e limites de responsabilidade.
+## 3. Patterns and Architectural Style
+- **Main pattern:** (e.g. Clean Architecture, Modular Monolith, Event-Driven, Microservices).
+- **Rationale:** Why this pattern meets the NFRs better than the alternatives.
+- **Code conventions:** Folder structure, layers and responsibility boundaries.
 
-## 4. Visão de Arquitetura (C4 Model)
+## 4. Architecture View (C4 Model)
 
-### 4.1 C4 Nível 1 - Diagrama de Contexto
+### 4.1 C4 Level 1 - Context Diagram
 ```mermaid
 C4Context
-    title Diagrama de Contexto do Sistema
-    Person(user, "Usuário Final", "Usuário do aplicativo")
-    System(coreSystem, "Core System", "Processa regras de negócio e dados")
-    System_Ext(paymentGateway, "Gateway de Pagamento", "Processa cobranças")
+    title System Context Diagram
+    Person(user, "End User", "Application user")
+    System(coreSystem, "Core System", "Processes business rules and data")
+    System_Ext(paymentGateway, "Payment Gateway", "Processes charges")
 
-    Rel(user, coreSystem, "Utiliza", "HTTPS")
-    Rel(coreSystem, paymentGateway, "Autoriza pagamento", "REST/JSON")
+    Rel(user, coreSystem, "Uses", "HTTPS")
+    Rel(coreSystem, paymentGateway, "Authorizes payment", "REST/JSON")
 ```
 
-### 4.2 C4 Nível 2 - Diagrama de Contêineres
+### 4.2 C4 Level 2 - Container Diagram
 ```mermaid
 C4Container
-    title Diagrama de Contêineres
-    Person(user, "Cliente")
-    Container(spa, "Single Page App", "React", "Interface do usuário")
-    Container(api, "API Gateway / Backend", "Node.js / Go", "Expõe endpoints REST/gRPC")
-    ContainerDb(db, "Banco de Dados Principal", "PostgreSQL", "Armazena dados transacionais")
-    ContainerQueue(queue, "Message Broker", "Redis / RabbitMQ", "Fila de tarefas assíncronas")
+    title Container Diagram
+    Person(user, "Customer")
+    Container(spa, "Single Page App", "React", "User interface")
+    Container(api, "API Gateway / Backend", "Node.js / Go", "Exposes REST/gRPC endpoints")
+    ContainerDb(db, "Primary Database", "PostgreSQL", "Stores transactional data")
+    ContainerQueue(queue, "Message Broker", "Redis / RabbitMQ", "Asynchronous task queue")
 
-    Rel(user, spa, "Navega", "HTTPS")
-    Rel(spa, api, "Chama endpoints", "JSON/HTTPS")
-    Rel(api, db, "Lê e escreve", "TCP")
-    Rel(api, queue, "Publica eventos", "AMQP/TCP")
+    Rel(user, spa, "Browses", "HTTPS")
+    Rel(spa, api, "Calls endpoints", "JSON/HTTPS")
+    Rel(api, db, "Reads and writes", "TCP")
+    Rel(api, queue, "Publishes events", "AMQP/TCP")
 ```
 
-## 5. Estratégia de Dados e Persistência
-- **Bancos de Dados Primários:** Tecnologias selecionadas e modelo de dados.
-- **Isolamento Multitenant:** Estratégia (ex: Row-Level Security vs Database per Tenant).
-- **Consistência:** Modelo ACID para transações críticas e Eventual Consistency para leitura/relatórios.
-- **Estratégia de Cache:** Políticas de TTL, invalidação e tecnologias (ex: Redis).
+## 5. Data and Persistence Strategy
+- **Primary databases:** Selected technologies and data model.
+- **Multitenant isolation:** Strategy (e.g. Row-Level Security vs Database per Tenant).
+- **Consistency:** ACID model for critical transactions and eventual consistency for reads/reports.
+- **Caching strategy:** TTL policies, invalidation and technologies (e.g. Redis).
 
-## 6. Comunicação, APIs e Integrações
-- **APIs Públicas/Privadas:** REST (OpenAPI 3.0), gRPC ou GraphQL.
-- **Mensageria Assíncrona:** Tópicos, dead-letter queues (DLQ), idempotência e retry policies.
-- **Segurança de APIs:** OAuth2, JWT Bearer tokens, API Keys, Rate Limiting.
+## 6. Communication, APIs and Integrations
+- **Public/private APIs:** REST (OpenAPI 3.0), gRPC or GraphQL.
+- **Asynchronous messaging:** Topics, dead-letter queues (DLQ), idempotency and retry policies.
+- **API security:** OAuth2, JWT bearer tokens, API keys, rate limiting.
 
-## 7. Infraestrutura e Implantação
-- **Cloud Provider:** AWS / GCP / Azure / On-Premise.
-- **Topologia de Rede:** VPC, subnets públicas/privadas, Load Balancer, Cloudflare/WAF.
-- **Estratégia de Deploy:** Containers Docker, orquestração (Kubernetes / ECS / Fly.io), Blue/Green deploy.
-- **CI/CD:** Pipelines de teste automatizado, análise estática e deploy contínuo.
+## 7. Infrastructure and Deployment
+- **Cloud provider:** AWS / GCP / Azure / On-premise.
+- **Network topology:** VPC, public/private subnets, load balancer, Cloudflare/WAF.
+- **Deployment strategy:** Docker containers, orchestration (Kubernetes / ECS / Fly.io), blue/green deploy.
+- **CI/CD:** Automated test pipelines, static analysis and continuous deployment.
 
-## 8. Observabilidade e Operações
-- **Logs Estruturados:** Formato JSON com `correlation_id` / `trace_id` propagado.
-- **Métricas & Dashboards:** Prometheus / Datadog / Grafana (Golden Signals: Latência, Tráfego, Erros, Saturação).
-- **Tracing Distribuído:** OpenTelemetry.
-- **Alertas:** Canais de notificação para incidentes críticos.
+## 8. Observability and Operations
+- **Structured logs:** JSON format with `correlation_id` / `trace_id` propagated.
+- **Metrics & dashboards:** Prometheus / Datadog / Grafana (golden signals: latency, traffic, errors, saturation).
+- **Distributed tracing:** OpenTelemetry.
+- **Alerts:** Notification channels for critical incidents.
 
-## 9. Riscos e Débitos Técnicos Antecipados
-- Riscos arquiteturais conhecidos e planos de mitigação.
+## 9. Anticipated Risks and Technical Debt
+- Known architectural risks and mitigation plans.
 ```

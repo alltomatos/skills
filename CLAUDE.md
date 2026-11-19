@@ -1,43 +1,43 @@
-# Governança de Skills
+# Skill Governance
 
-Skills são organizadas em pastas de buckets sob `skills/`:
+Skills are organized into bucket folders under `skills/`:
 
-- `engineering/` — trabalho diário de código
-- `productivity/` — ferramentas para workflow não relacionadas a código
-- `misc/` — mantidas mas raramente usadas
-- `personal/` — vinculadas ao setup pessoal, não promovidas
-- `in-progress/` — rascunhos não prontos para distribuição
-- `deprecated/` — não utilizadas
+- `engineering/` - day-to-day code work
+- `productivity/` - workflow tools not tied to code
+- `misc/` - maintained but rarely used
+- `personal/` - tied to personal setup, not promoted
+- `in-progress/` - drafts not ready for distribution
+- `deprecated/` - retired
 
-Toda skill em `engineering/`, `productivity/` ou `misc/` deve ter referência no `README.md` raiz e entrada em `.claude-plugin/plugin.json`. Skills em `personal/`, `in-progress/` e `deprecated/` não devem aparecer em ambos.
+Every skill under `engineering/`, `productivity/` or `misc/` must be referenced in the root `README.md` and listed in `.claude-plugin/plugin.json`. In practice the `plugin.json` entry is what counts: after adding or changing a skill, `node scripts/build-catalog.mjs` regenerates `SKILLS.md` and `llms.txt`, which are derived and must not be edited by hand. Skills under `personal/`, `in-progress/` and `deprecated/` must not appear in either.
 
-## Neutralidade de harness
+## Harness neutrality
 
-O conteúdo de uma skill (`SKILL.md` e arquivos de apoio) não deve nomear mecanismos exclusivos do Claude Code — por exemplo `Agent` tool, `subagent_type=Explore` ou `Task` tool. Descreva a forma da delegação (ex.: "spawn subagentes em paralelo", "subagente de exploração read-only") e deixe o mecanismo a cargo do harness em uso (Claude Code, Codex, Hermes).
+A skill's content (`SKILL.md` and support files) must not name mechanisms exclusive to Claude Code - for example the `Agent` tool, `subagent_type=Explore` or the `Task` tool. Describe the shape of the delegation (e.g. "spawn subagents in parallel", "read-only exploration subagent") and leave the mechanism to whichever harness is running (Claude Code, Codex, Hermes).
 
-Toda skill distribuída deve ter `agents/openai.yaml` ao lado do `SKILL.md`, com `interface.display_name` e `interface.short_description` para o picker do Codex. Skills cujo `SKILL.md` tenha `disable-model-invocation: true` (ou que sejam inerentemente específicas de um harness, como `git-guardrails-claude-code`) devem espelhar isso com `policy.allow_implicit_invocation: false`.
+Every distributed skill must have an `agents/openai.yaml` next to its `SKILL.md`, with `interface.display_name` and `interface.short_description` for the Codex picker. Skills whose `SKILL.md` sets `disable-model-invocation: true` (or that are inherently harness-specific, such as `git-guardrails-claude-code`) must mirror that with `policy.allow_implicit_invocation: false`.
 
-## Protocolo de Agentic Workflow (/developer)
+## Agentic workflow protocol (`developer`)
 
-Este repositório utiliza um modelo de delegação hierárquica focado em conformidade:
+This repository uses a hierarchical delegation model focused on compliance:
 
-1. **Entrada**: `/developer` audita o ambiente (fases 1-4).
-2. **Delegação**: O `developer` atua como Arquiteto (não executa código pesado).
-3. **Execução**: Delega para skills especializadas (`diagnose`, `tdd`, etc.).
-4. **Portão de QA (mandatório)**: ao final de todo desenvolvimento — para qualquer Tier de risco, sem exceção — o `developer` **deve** invocar obrigatoriamente a skill `/qa-analyst` para analisar o código gerado/alterado antes de abrir o PR. Bugs ou gaps encontrados reabrem a DAG como novas tarefas; só após a análise de QA aprovar é que o `/git-flow-pr-standard` pode ser acionado.
-5. **Expansão**: Gargalos não mapeados → invocação automática do `/write-a-skill`.
+1. **Entry**: `developer` audits the environment (phases 1-4).
+2. **Delegation**: `developer` acts as the Architect (it does not run heavy code work).
+3. **Execution**: delegates to specialized skills (`diagnose`, `tdd`, etc.).
+4. **QA gate (mandatory)**: at the end of any development - at every risk tier, without exception - `developer` **must** invoke the `qa-analyst` skill to analyze the generated/changed code before opening the PR. Bugs or gaps found reopen the DAG as new tasks; only after QA analysis approves may the PR flow available in the environment be triggered. Never invoke a PR skill that is not installed.
+5. **Expansion**: unmapped bottlenecks -> automatic invocation of `write-a-skill`.
 
-## Arquitetura do Sistema
+## System architecture
 
 ```mermaid
 graph TD
-    User[/Usuário/] -->|1. Inicia| Developer[/Developer - Mestra/]
-    Developer -->|2. Estratégia/Domínio| Roadmap[/roadmap/]
-    Developer -->|3. Delega Trabalho| Specialized[Skills Especializadas]
-    Specialized -->|4. Resolve| Codebase[Base de Código]
-    Specialized -->|5. Portão de QA obrigatório| QAAnalyst[/qa-analyst/]
-    QAAnalyst -->|Aprovado| GitFlow[/git-flow-pr-standard/]
+    User[/User/] -->|1. Starts| Developer[/Developer - Master/]
+    Developer -->|2. Strategy/Domain| Roadmap[/roadmap/]
+    Developer -->|3. Delegates Work| Specialized[Specialized Skills]
+    Specialized -->|4. Delivers| Codebase[Codebase]
+    Specialized -->|5. Mandatory QA gate| QAAnalyst[/qa-analyst/]
+    QAAnalyst -->|Approved| GitFlow[/PR flow in the environment/]
     QAAnalyst -->|Bugs/gaps| Specialized
-    Specialized -->|Se gargalo| WriteSkill[/write-a-skill/]
-    WriteSkill -->|Nova Skill| Specialized
+    Specialized -->|If bottleneck| WriteSkill[/write-a-skill/]
+    WriteSkill -->|New Skill| Specialized
 ```

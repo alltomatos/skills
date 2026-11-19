@@ -1,0 +1,15 @@
+{
+  "name": "alltomatos-skills",
+  "description": "Skills de engenharia, produtividade e utilitarios para agentes de codigo.",
+  "owner": {
+    "name": "Ronaldo Davi",
+    "url": "https://github.com/alltomatos"
+  },
+  "plugins": [
+    {
+      "name": "alltomatos-skills",
+      "source": "./",
+      "description": "Skills de engenharia, produtividade e utilitarios para agentes de codigo, com governanca por GitHub Issues e portoes obrigatorios de QA e seguranca."
+    }
+  ]
+}

@@ -1,104 +1,104 @@
-# Referência de Diagramas: C4 Model, Sequência e DER
+# Diagram Reference: C4 Model, Sequence and DER
 
-Use diagramas Mermaid em todos os documentos arquiteturais para garantir renderização nativa em Markdown no GitHub/GitLab e documentações de código.
+Use Mermaid diagrams in every architectural document so they render natively in Markdown on GitHub/GitLab and in code documentation.
 
 ---
 
-## 1. C4 Model (Contexto e Contêineres)
+## 1. C4 Model (Context and Containers)
 
-### C4 Nível 1 - Contexto do Sistema
-Ilustra os limites do sistema, seus usuários e sistemas externos.
+### C4 Level 1 - System Context
+Shows the system boundaries, its users and external systems.
 
 ```mermaid
 C4Context
-    title C4 Nível 1 - Contexto Geral do Sistema
-    Enterprise_Boundary(b0, "Ecossistema da Empresa") {
-        Person(customer, "Cliente", "Acessa os serviços e faz compras")
-        Person(admin, "Operador / Suporte", "Gerencia pedidos e configurações")
-        System(coreSystem, "Plataforma Core", "Orquestra operações de negócio e regras centrais")
+    title C4 Level 1 - Overall System Context
+    Enterprise_Boundary(b0, "Company Ecosystem") {
+        Person(customer, "Customer", "Uses the services and places orders")
+        Person(admin, "Operator / Support", "Manages orders and settings")
+        System(coreSystem, "Core Platform", "Orchestrates business operations and central rules")
     }
 
-    System_Ext(emailService, "Provedor de Email (Sendgrid)", "Envia emails transacionais")
-    System_Ext(erp, "ERP Legado", "Armazena contabilidade e estoque central")
+    System_Ext(emailService, "Email Provider (Sendgrid)", "Sends transactional emails")
+    System_Ext(erp, "Legacy ERP", "Stores central accounting and inventory")
 
-    Rel(customer, coreSystem, "Realiza pedidos e consultas", "HTTPS")
-    Rel(admin, coreSystem, "Opera painel de administração", "HTTPS")
-    Rel(coreSystem, emailService, "Dispara notificações", "HTTPS/REST")
-    Rel(coreSystem, erp, "Sincroniza dados fiscais", "gRPC/VPN")
+    Rel(customer, coreSystem, "Places orders and queries", "HTTPS")
+    Rel(admin, coreSystem, "Operates the admin panel", "HTTPS")
+    Rel(coreSystem, emailService, "Dispatches notifications", "HTTPS/REST")
+    Rel(coreSystem, erp, "Syncs fiscal data", "gRPC/VPN")
 ```
 
 ---
 
-### C4 Nível 2 - Contêineres
-Expõe as aplicações, bancos de dados, microsserviços e mensageria.
+### C4 Level 2 - Containers
+Reveals the applications, databases, microservices and messaging.
 
 ```mermaid
 C4Container
-    title C4 Nível 2 - Contêineres e Comunicação
-    Person(user, "Usuário")
+    title C4 Level 2 - Containers and Communication
+    Person(user, "User")
 
-    Container_Boundary(c1, "Plataforma") {
-        Container(webApp, "Frontend SPA", "React / Next.js", "Interface web interativa")
-        Container(mobileApp, "Mobile App", "React Native / Expo", "App mobile iOS/Android")
-        Container(apiGateway, "API Gateway / BFF", "Go / Node.js", "Roteamento, autenticação e rate limit")
-        Container(orderService, "Order Service", "TypeScript", "Processamento e ciclo de vida de pedidos")
-        Container(paymentService, "Payment Service", "Go", "Integração segura com gateways financeiros")
-        ContainerDb(db, "Primary DB", "PostgreSQL", "Armazenamento relacional com RLS")
-        ContainerQueue(broker, "Event Broker", "RabbitMQ / Kafka", "Fila assíncrona de eventos")
+    Container_Boundary(c1, "Platform") {
+        Container(webApp, "SPA Frontend", "React / Next.js", "Interactive web interface")
+        Container(mobileApp, "Mobile App", "React Native / Expo", "iOS/Android mobile app")
+        Container(apiGateway, "API Gateway / BFF", "Go / Node.js", "Routing, authentication and rate limit")
+        Container(orderService, "Order Service", "TypeScript", "Order processing and lifecycle")
+        Container(paymentService, "Payment Service", "Go", "Secure integration with financial gateways")
+        ContainerDb(db, "Primary DB", "PostgreSQL", "Relational storage with RLS")
+        ContainerQueue(broker, "Event Broker", "RabbitMQ / Kafka", "Asynchronous event queue")
     }
 
-    Rel(user, webApp, "Acessa", "HTTPS")
-    Rel(user, mobileApp, "Acessa", "HTTPS")
-    Rel(webApp, apiGateway, "Chama API", "JSON/HTTPS")
-    Rel(mobileApp, apiGateway, "Chama API", "JSON/HTTPS")
-    Rel(apiGateway, orderService, "Encaminha chamadas", "gRPC")
-    Rel(orderService, db, "Persiste pedidos", "TCP")
-    Rel(orderService, broker, "Publica 'OrderCreated'", "AMQP")
-    Rel(broker, paymentService, "Consome 'OrderCreated'", "AMQP")
+    Rel(user, webApp, "Accesses", "HTTPS")
+    Rel(user, mobileApp, "Accesses", "HTTPS")
+    Rel(webApp, apiGateway, "Calls the API", "JSON/HTTPS")
+    Rel(mobileApp, apiGateway, "Calls the API", "JSON/HTTPS")
+    Rel(apiGateway, orderService, "Forwards calls", "gRPC")
+    Rel(orderService, db, "Persists orders", "TCP")
+    Rel(orderService, broker, "Publishes 'OrderCreated'", "AMQP")
+    Rel(broker, paymentService, "Consumes 'OrderCreated'", "AMQP")
 ```
 
 ---
 
-## 2. Diagrama de Sequência (Fluxos e Protocolos)
+## 2. Sequence Diagram (Flows and Protocols)
 
-Essencial para explicitar chamadas síncronas, assíncronas, webhooks e idempotência.
+Essential to make synchronous calls, asynchronous calls, webhooks and idempotency explicit.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Client as Cliente (Web/Mobile)
+    actor Client as Customer (Web/Mobile)
     participant Gateway as API Gateway
     participant OrderSvc as Order Service
     participant Broker as Message Broker (Queue)
     participant PaySvc as Payment Service
-    participant GatewayExt as Gateway Pagamento Externo
+    participant GatewayExt as External Payment Gateway
 
     Client->>Gateway: POST /v1/orders (payload + idempotency_key)
-    Gateway->>OrderSvc: Validar e criar pedido
-    OrderSvc->>OrderSvc: Persiste status 'PENDING' no DB
-    OrderSvc->>Broker: Publicar evento 'order.created'
-    OrderSvc-->>Gateway: Retorna 201 Created (order_id)
+    Gateway->>OrderSvc: Validate and create the order
+    OrderSvc->>OrderSvc: Persist 'PENDING' status in the DB
+    OrderSvc->>Broker: Publish 'order.created' event
+    OrderSvc-->>Gateway: Returns 201 Created (order_id)
     Gateway-->>Client: 201 Created
 
-    par Processamento Assíncrono
-        Broker->>PaySvc: Consumir evento 'order.created'
-        PaySvc->>GatewayExt: POST /charges (processa cartão/PIX)
-        GatewayExt-->>PaySvc: 200 OK (Transação aprovada)
-        PaySvc->>Broker: Publicar evento 'payment.succeeded'
+    par Asynchronous processing
+        Broker->>PaySvc: Consume 'order.created' event
+        PaySvc->>GatewayExt: POST /charges (processes card/PIX)
+        GatewayExt-->>PaySvc: 200 OK (transaction approved)
+        PaySvc->>Broker: Publish 'payment.succeeded' event
     end
 ```
 
 ---
 
-## 3. Diagrama de Entidade-Relacionamento (DER / Esquema de Dados)
+## 3. Entity-Relationship Diagram (DER / data schema)
 
 ```mermaid
 erDiagram
-    TENANT ||--o{ USER : possui
-    TENANT ||--o{ ORDER : possui
-    USER ||--o{ ORDER : realiza
-    ORDER ||--|{ ORDER_ITEM : contem
-    PRODUCT ||--o{ ORDER_ITEM : referencia
+    TENANT ||--o{ USER : has
+    TENANT ||--o{ ORDER : has
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    PRODUCT ||--o{ ORDER_ITEM : referenced_by
 
     TENANT {
         uuid id PK

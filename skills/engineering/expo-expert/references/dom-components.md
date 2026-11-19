@@ -1,16 +1,16 @@
-# DOM Components — `'use dom'`
+# DOM Components - `'use dom'`
 
-Doc-âncora: `guides/dom-components.md`.
+Anchor docs: `guides/dom-components.md`.
 
-## O que são
+## What they are
 
-DOM components deixam você renderizar um componente que usa **APIs web** (`<div>`, `<img>`, CSS)
-dentro de um app nativo Expo. O componente marcado roda **dentro de uma WebView** (via
-`@expo/dom-webview`, default a partir do SDK 56); o restante do app continua 100% nativo. É a ponte
-oficial para reaproveitar uma lib/component web (ex.: um editor rich-text, um player de terceiro só
-disponível em JS web) sem portar tudo pra RN.
+DOM components let you render a component that uses **web APIs** (`<div>`, `<img>`, CSS) inside a
+native Expo app. The marked component runs **inside a WebView** (through `@expo/dom-webview`, the
+default since SDK 56); the rest of the app stays 100% native. It is the official bridge to reuse a
+**web** library/component (e.g. a rich-text editor, a third-party player only available as web JS)
+without porting everything to RN.
 
-## A diretiva
+## The directive
 
 ```tsx
 'use dom';
@@ -24,41 +24,41 @@ export default function DOMComponent({ name }: { name: string }) {
 }
 ```
 
-No lado nativo, você importa e usa como um componente React normal — o runtime embrulha
-transparentemente numa `WebView`:
+On the native side, you import it and use it like a normal React component - the runtime wraps it
+transparently in a `WebView`:
 
 ```tsx
-import DOMComponent from "./my-component"; // arquivo com 'use dom'
+import DOMComponent from "./my-component"; // the file with 'use dom'
 
 export default function App() {
-  return <DOMComponent name="Europa" />;
+  return <DOMComponent name="Europe" />;
 }
 ```
 
-## Como dados cruzam a fronteira nativo↔WebView
+## How data crosses the native<->WebView boundary
 
-- **Props**: só dados **serializáveis em JSON** (`string`, `number`, `boolean`, array, objeto,
-  `null`/`undefined`) cruzam. As atualizações de prop são **assíncronas** — não espere sincronia
-  quadro-a-quadro como em Reanimated.
-- **Callbacks nativos**: props de função no nível raiz (não aninhadas) permitem que o DOM component
-  chame código nativo — mas **sempre assíncrono**:
+- **Props**: only **JSON-serializable** data (`string`, `number`, `boolean`, array, object,
+  `null`/`undefined`) crosses. Prop updates are **asynchronous** - do not expect frame-by-frame
+  synchrony like Reanimated.
+- **Native callbacks**: function props at the root level (not nested) let the DOM component call
+  native code - but **always asynchronous**:
 
 ```tsx
-// lado nativo
+// native side
 <DomComponent hello={(data: string) => console.log("Hello", data)} />
 
-// dentro do DOM component
+// inside the DOM component
 'use dom';
 export default function MyComponent({ hello }: { hello: (data: string) => Promise<void> }) {
   return <p onClick={() => hello("world")}>Click me</p>;
 }
 ```
 
-- **Refs**: use `useDOMImperativeHandle` (SDK 53+) para expor métodos imperativos do DOM component
-  ao lado nativo:
+- **Refs**: use `useDOMImperativeHandle` (SDK 53+) to expose imperative methods from the DOM
+  component to the native side:
 
 ```tsx
-// lado nativo
+// native side
 const ref = useRef<DOMRef>(null);
 <MyComponent ref={ref} />
 <Button title="focus" onPress={() => ref.current?.focus()} />
@@ -74,30 +74,30 @@ export default function MyComponent(props: { ref: Ref<DOMRef> }) {
 }
 ```
 
-- **Config da WebView**: prop especial `dom` repassa props nativas de `WebView` (ex.:
-  `<DOMComponent dom={{ scrollEnabled: false }} />`), tipada dentro do componente via
+- **WebView config**: the special `dom` prop forwards native `WebView` props (e.g.
+  `<DOMComponent dom={{ scrollEnabled: false }} />`), typed inside the component through
   `dom?: import("expo/dom").DOMProps`.
-- **Feature detection**: `import { IS_DOM } from "expo/dom"` e
-  `process.env.EXPO_DOM_HOST_OS` (`"ios" | "android" | undefined`) para saber se o código roda
-  dentro de um DOM component e em qual host.
+- **Feature detection**: `import { IS_DOM } from "expo/dom"` and `process.env.EXPO_DOM_HOST_OS`
+  (`"ios" | "android" | undefined`) to know whether the code runs inside a DOM component and on which
+  host.
 
-## Limitações — leia antes de recomendar
+## Limitations - read before recommending
 
-- **Sem `children`**: não dá pra passar children React para um DOM component.
-- **Sem views nativas dentro do DOM component**: você não embute `View`/componentes RN dentro dele —
-  é um mundo web isolado.
-- **Estado isolado por instância**: cada DOM component tem seu próprio engine JS; estado global não
-  atravessa a fronteira (não compartilha store com o app nativo automaticamente).
-- **Sem SSR/SSG**: renderiza só como SPA dentro da WebView.
-- **Sem OTA hoje**: o conteúdo do DOM component vem embutido no build; não é atualizado por EAS
-  Update na forma atual (RSC pode mudar isso no futuro — confirme status na doc).
-- **APIs síncronas de roteamento** (ex.: `useLocalSearchParams()` do Expo Router) não funcionam
-  direto dentro de um DOM component — exigem repassar os valores via prop manualmente.
+- **No `children`**: you cannot pass React children into a DOM component.
+- **No native views inside the DOM component**: you do not embed `View`/RN components in it - it is
+  an isolated web world.
+- **State isolated per instance**: each DOM component has its own JS engine; global state does not
+  cross the boundary (it does not automatically share a store with the native app).
+- **No SSR/SSG**: it renders only as an SPA inside the WebView.
+- **No OTA today**: the DOM component's content is embedded in the build; it is not updated by EAS
+  Update in the current form (RSC may change that in the future - confirm status in the docs).
+- **Synchronous routing APIs** (e.g. Expo Router's `useLocalSearchParams()`) do not work directly
+  inside a DOM component - you must pass the values in manually through props.
 
-## Quando usar (e quando não)
+## When to use it (and when not to)
 
-Use DOM components para: reaproveitar uma lib/UI **essencialmente web** que não tem equivalente RN
-maduro (editores WYSIWYG, certas libs de canvas/chart web-only, embeds de terceiros). **Não** use
-como atalho geral para "escrever a UI em HTML/CSS" — isso joga fora performance nativa, gestos
-nativos e a integração com o resto do app; para UI comum, RN + [animations-native-ui.md](animations-native-ui.md)
-continua sendo o caminho certo.
+Use DOM components to: reuse an **essentially web** library/UI that has no mature RN equivalent
+(WYSIWYG editors, certain web-only canvas/chart libraries, third-party embeds). Do **not** use it as a
+general shortcut to "write the UI in HTML/CSS" - that throws away native performance, native gestures
+and integration with the rest of the app; for ordinary UI, RN plus
+[animations-native-ui.md](animations-native-ui.md) remains the right path.

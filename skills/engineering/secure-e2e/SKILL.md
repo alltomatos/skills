@@ -1,60 +1,65 @@
 ---
 name: secure-e2e
-description: Suíte de testes E2E e segurança ofensiva/defensiva com Playwright e auditoria de código. Realiza auditoria estática e dinâmica de vulnerabilidades (OWASP), pensa como um atacante para encontrar brechas, gera testes de regressão de segurança (*.spec.sec.ts) e orienta a remediação do código. Use quando precisar auditar código em busca de falhas, criar testes de segurança, validar autenticação/permissões ou prevenir regressões.
+description: E2E and offensive/defensive security test suite with Playwright plus code audit. Performs static and dynamic vulnerability auditing (OWASP), thinks like an attacker to find gaps, generates security regression tests (*.spec.sec.ts) and guides the code remediation. Use when you need to audit code for flaws, create security tests, validate authentication/permissions or prevent regressions.
 ---
 
-# Secure E2E & Protocolo de Auditoria e Segurança Ofensiva/Defensiva
+# Secure E2E & Offensive/Defensive Audit and Security Protocol
 
-> **Crédito**: Arquitetura original inspirada por Matt Pocock ([mattpocock/skills](https://github.com/mattpocock/skills)). Expandido para incorporar cultura completa de Segurança por Design, Auditoria de Código e Testes Negativos Defensivos no framework `alltomatos/skills`.
+> **Credit**: original architecture inspired by Matt Pocock ([mattpocock/skills](https://github.com/mattpocock/skills)). Expanded to bring a full Security-by-Design culture, code auditing and defensive negative testing into the `alltomatos/skills` framework.
 
-A maioria dos testes de ponta a ponta (E2E) valida apenas o "caminho feliz" (Happy Path). Esta skill capacita o agente a **pensar com mentalidade de auditor/analista de segurança (White-Hat)**: investigar superfícies de ataque no código-fonte, descobrir vetores de falha, comprovar a vulnerabilidade via testes de segurança negativos automatizados (`*.spec.sec.ts`) e aplicar a correção definitiva no código.
-
----
-
-## 1. Filosofia: Mentalidade de Atacante e Defesa em Profundidade
-
-1. **Auditar Antes de Executar**: Analisar controllers, rotas, middlewares de autenticação, parsers de dados e queries de banco antes de criar testes.
-2. **Testar o Caminho Infeliz (Negative Testing)**: Se uma rota exige perfil de administrador, o teste deve tentar burlá-la com múltiplos perfis e tokens forjados, garantindo que o servidor rejeite ativamente (HTTP 401/403).
-3. **Não Confie no Cliente**: A interface pode esconder botões, mas a segurança real vive nas APIs. Todo teste deve validar o front-end manipulando o DOM/armazenamento local e, simultaneamente, disparar requisições diretas via API context (`request`).
-4. **Ciclo Completo: Descobrir → Provar → Corrigir → Blindar**:
-   - Descobre a vulnerabilidade no código ou arquitetura.
-   - Escreve o teste negativo que reproduz e falha se a brecha existir (Red).
-   - Corrige a vulnerabilidade na aplicação (Green).
-   - Mantém o teste no suíte de regressão de segurança permanente (Refactor/Shield).
+Most end-to-end (E2E) tests validate only the "happy path". This skill enables the agent to **think like a security auditor/analyst (white hat)**: investigate attack surfaces in the source code, discover failure vectors, prove the vulnerability through automated negative security tests (`*.spec.sec.ts`) and apply the definitive fix in the code.
 
 ---
 
-## 2. As Duas Frentes da Skill
+## 1. Philosophy: attacker mindset and defense in depth
 
-### Frente A: Auditoria de Código e Threat Modeling
-Ao inspecionar o código-fonte da aplicação, o agente audita:
-- **Autenticação & Sessões**: Armazenamento de tokens (cookies `HttpOnly; Secure; SameSite` vs `localStorage`), expiração e fluxo de logout.
-- **Autorização (RBAC/ABAC)**: Presença de middlewares de autorização em todas as rotas sensíveis; ausência de validação apenas por front-end.
-- **Validação de Entrada e Tipagem**: Uso de schemas estritos (Zod, Joi, Yup), sanitização de HTML e prevenção de injeções.
-- **Exposição de Dados e Segredos**: Ausência de segredos (`.env`, chaves privadas, senhas de teste) hardcoded no código ou expostos em endpoints públicos.
-- **Abuso de Taxa (Rate Limiting)**: Proteção em endpoints de login, recuperação de senha, geração de tokens e envio de mensagens.
-
-### Frente B: Testes Automatizados no Playwright (`*.spec.sec.ts`)
-Para diferenciar a intenção dos testes no projeto:
-- `*.spec.ts` ou `*.spec.func.ts` -> **Testes Funcionais**: Fluxos reais de usuário e caminhos felizes.
-- `*.spec.sec.ts` -> **Testes de Segurança**: Tentativas automatizadas de bypass, injeção, CSRF, IDOR/BOLA e abuso de fluxo.
+1. **Audit before executing**: analyze controllers, routes, authentication middlewares, data parsers and database queries before writing tests.
+2. **Test the unhappy path (negative testing)**: if a route requires an admin profile, the test must try to bypass it with multiple profiles and forged tokens, ensuring the server actively rejects (HTTP 401/403).
+3. **Do not trust the client**: the interface can hide buttons, but real security lives in the APIs. Every test must validate the front end by manipulating the DOM/local storage and, at the same time, fire direct requests through the API context (`request`).
+4. **Full cycle: discover -> prove -> fix -> harden**:
+   - finds the vulnerability in the code or architecture;
+   - writes the negative test that reproduces it and fails while the gap exists (red);
+   - fixes the vulnerability in the application (green);
+   - keeps the test in the permanent security regression suite (refactor/shield).
 
 ---
 
-## 3. O Fluxo de Execução com Playwright CLI
+## 2. The two fronts of this skill
+
+### Front A: code audit and threat modeling
+
+While inspecting the application source code, the agent audits:
+
+- **Authentication & sessions**: token storage (`HttpOnly; Secure; SameSite` cookies vs `localStorage`), expiration and logout flow.
+- **Authorization (RBAC/ABAC)**: presence of authorization middlewares on every sensitive route; no validation left to the front end only.
+- **Input validation and typing**: strict schemas (Zod, Joi, Yup), HTML sanitization and injection prevention.
+- **Data and secret exposure**: no secrets (`.env`, private keys, test passwords) hardcoded in the code or exposed on public endpoints.
+- **Rate limiting**: protection on login, password recovery, token generation and message sending endpoints.
+
+### Front B: automated Playwright tests (`*.spec.sec.ts`)
+
+To distinguish the intent of tests in the project:
+
+- `*.spec.ts` or `*.spec.func.ts` -> **functional tests**: real user flows and happy paths.
+- `*.spec.sec.ts` -> **security tests**: automated attempts at bypass, injection, CSRF, IDOR/BOLA and flow abuse.
+
+---
+
+## 3. Execution flow with the Playwright CLI
 
 ```bash
-# 1. Mapear formulários e seletores sensíveis (se necessário)
+# 1. Map sensitive forms and selectors (if needed)
 npx playwright codegen http://localhost:3000
 
-# 2. Executar apenas os testes de segurança
+# 2. Run only the security tests
 npx playwright test --grep "@security"
 
-# 3. Diagnosticar falhas ou vazamentos via Trace Viewer
+# 3. Diagnose failures or leaks through the Trace Viewer
 npx playwright show-trace path/to/trace.zip
 ```
 
-### Configuração Recomendada de Scripts (`package.json`)
+### Recommended script configuration (`package.json`)
+
 ```json
 {
   "scripts": {
@@ -66,9 +71,9 @@ npx playwright show-trace path/to/trace.zip
 
 ---
 
-## 4. Anti-Padrões a Evitar
+## 4. Anti-patterns to avoid
 
-- ❌ **Mocks em Validação de Acesso**: Nunca mocke permissões de usuário ou autenticação em testes de segurança. O teste deve bater contra os middlewares reais.
-- ❌ **Apenas Validação Visual**: Validar que "o botão admin sumiu da tela" não comprova segurança. O endpoint subjacente deve retornar HTTP 403.
-- ❌ **Credenciais Hardcoded**: Não utilize credenciais reais ou senhas estáticas no repositório. Utilize fixtures seguras e variáveis de ambiente (`process.env.TEST_USER_PASSWORD`).
-- ❌ **Poluição da Base de Testes**: Garanta que payloads de injeção ou usuários criados em testes negativos sejam isolados ou limpos ao final (fixtures de teardown).
+- ❌ **Mocks in access validation**: never mock user permissions or authentication in security tests. The test must hit the real middlewares.
+- ❌ **Visual validation only**: confirming that "the admin button disappeared from the screen" proves nothing about security. The underlying endpoint must return HTTP 403.
+- ❌ **Hardcoded credentials**: do not use real credentials or static passwords in the repository. Use safe fixtures and environment variables (`process.env.TEST_USER_PASSWORD`).
+- ❌ **Test database pollution**: ensure injection payloads and users created in negative tests are isolated or cleaned up at the end (teardown fixtures).

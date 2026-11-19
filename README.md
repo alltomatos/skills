@@ -6,203 +6,184 @@
 <img alt="Skills" src="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png" width="369">
 </picture>
 </a>
-</p>
 
-# Skills Para Engenheiros de Verdade (Fork)
+# Skills for Real Engineers (Fork)
 
 [![skills.sh](https://skills.sh/b/alltomatos/skills)](https://skills.sh/alltomatos/skills)
 
-Este repositorio e um fork de [mattpocock/skills](https://github.com/mattpocock/skills). Todo credito pela concepcao e arquitetura original vai para **Matt Pocock** e para os contribuidores do projeto original.
+This repository is a fork of [mattpocock/skills](https://github.com/mattpocock/skills). All credit for the original design and architecture goes to **Matt Pocock** and the contributors of the original project.
 
-Este fork adiciona governanca orientada a GitHub, documentacao persistente, planejamento por Issues, verificacao automatica do framework, re-deploy das skills e um portao obrigatorio de QA. A ideia e tornar o desenvolvimento com agents rapido sem perder rastreabilidade, feedback e controle humano.
+This fork adds GitHub-driven governance, persistent documentation, planning by Issues, automatic framework verification, skill re-deploy and a mandatory QA gate. The idea is to make agent-assisted development fast without losing traceability, feedback and human control.
 
-As skills sao pequenas, compostas e adaptaveis. Funcionam com diferentes modelos e CLIs de agents. Hackeie, adapte e faca delas as suas.
+The skills are small, composable and adaptable. They work across models and agent CLIs. Hack them, adapt them, make them yours.
 
-## Quickstart
+## Use it (no install)
 
-Nao e necessario clonar este repositorio. A instalacao pode ser executada diretamente:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/alltomatos/skills/main/scripts/setup-alltomatos-skills.sh | bash
-```
-
-O script pergunta em qual ambiente instalar e aceita mais de um destino:
-
-| Opcao | Ambiente | Diretorio padrao |
-| --- | --- | --- |
-| `1` | Codex | `~/.codex/skills` |
-| `2` | Claude | `~/.claude/skills` |
-| `3` | Hermes | `~/.hermes/skills` |
-| `4` | Outro CLI | caminho informado pelo usuario |
-
-Para instalar em Codex e Claude, informe `1 2`. O script baixa o framework temporariamente, instala as skills nos ambientes escolhidos e nao cria um clone permanente.
-
-### Instalacao a partir de um clone
-
-Tambem e possivel usar um clone local:
-
-```bash
-git clone https://github.com/alltomatos/skills.git
-cd skills
-chmod +x scripts/setup-alltomatos-skills.sh
-./scripts/setup-alltomatos-skills.sh
-```
-
-### Re-deploy das skills
-
-Quando o `/developer` detectar uma nova revisao, ele pergunta se voce deseja atualizar agora ou prosseguir sem atualizar; o re-deploy so ocorre com confirmacao explicita. Para executar manualmente:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/alltomatos/skills/main/scripts/setup-alltomatos-skills.sh | bash -s -- --redeploy
-```
-
-Ou, a partir de um clone:
-
-```bash
-./scripts/setup-alltomatos-skills.sh --redeploy ~/.codex/skills ~/.claude/skills
-```
-
-As instalacoes existentes sao preservadas em backups quando necessario (`<skill>.backup.<timestamp>`). A cada redeploy, o script mantem apenas o backup mais recente por skill e remove automaticamente os anteriores — nao ha acumulo indefinido de backups nos ambientes instalados.
-
-## Primeiro uso
-
-Depois da instalacao, abra um projeto no agent e execute o arquiteto para conduzir o alinhamento de escopo, design system e arquitetura tecnica:
+The repository is the source. Paste the link and ask for the skills you want: there is no installer, no permanent clone and no environment variable.
 
 ```text
-/architect
+https://github.com/alltomatos/skills
 ```
 
-*(O comando `/architect` atua na fase de descoberta, questionamento ativo, geracao de mockups/ADD e preparacao dos artefatos arquiteturais antes de repassar para execucao).*
+| Where you are | What to do |
+| --- | --- |
+| Claude Code | `/plugin marketplace add alltomatos/skills` then `/plugin install alltomatos-skills@alltomatos-skills` |
+| Codex, OpenCode, Cursor, Gemini, Copilot and other CLIs | `npx skills add alltomatos/skills` |
+| Any agent, no CLI | Ask: "use the skills from https://github.com/alltomatos/skills - read SKILLS.md and load only the ones I ask for" |
 
-O projeto consumidor precisa estar versionado no Git e possuir um repositorio remoto no GitHub. Em um projeto novo:
+`SKILLS.md` is the full catalog (name, when to use it, path, raw URL and support files). `llms.txt` is the compact index agents read first. Both are generated from `.claude-plugin/plugin.json`, which is the single source of truth for which skills ship.
+
+### Language
+
+Skill instructions are written in **English**, and there is a single copy of each skill. The language of the output is a separate matter and follows whoever is using the skill: reply in Portuguese and everything that comes back — PRDs, ADRs, QA reports, mockups — is in Portuguese. Set `output_language` in your project's `AGENTS.md` to pin it. The full contract is in `AGENTS.md`.
+
+### Adding or changing a skill
+
+1. Create the folder under `skills/<bucket>/<name>/` with the `SKILL.md` and its support files beside it.
+2. Add the path to `skills` in `.claude-plugin/plugin.json`.
+3. Run `node scripts/build-catalog.mjs` to regenerate `SKILLS.md` and `llms.txt`.
+
+Skills under `skills/personal/` are not distributed and do not appear in the manifest.
+
+## First run
+
+With the skills loaded, open a project in your agent and run the architect to drive scope alignment, design system and technical architecture:
+
+```text
+architect
+```
+
+*(The `architect` skill covers discovery, active questioning, mockup/ADD generation and preparation of the architectural artifacts before handing off to execution.)*
+
+The consuming project must be versioned in Git and have a remote repository on GitHub. In a new project:
 
 ```bash
 git init
 git add .
 git commit -m "chore: initialize repository"
-gh repo create <nome> --source . --remote origin --push
+gh repo create <name> --source . --remote origin --push
 ```
 
-Se o ambiente estiver vazio, sem Git ou sem remote GitHub, o arquiteto/developer deve parar e orientar esse processo antes de implementar qualquer coisa.
+If the environment is empty, without Git or without a GitHub remote, the architect/developer must stop and guide that process before implementing anything.
 
-## Fluxo de trabalho: engenharia de ciclo fechado
+## Workflow: closed-loop engineering
 
-1. **Atualizacao do framework**: localiza o clone de origem associado as skills instaladas, consulta o remote GitHub, informa commits novos e faz o re-deploy nos ambientes em uso.
-2. **Governanca e Escopo**: valida Git, remote GitHub, autenticacao e estado do projeto.
-3. **Arquitetura e Design (/architect)**: conduz interrogatorio ativo (/grill), projeta a solucao (ADD/SAD, C4, ADRs, esquemas DER), define tokens de design e mockups de tela (`MASTER.md` + overrides), User Guides e obtém aprovação HITL obrigatória do usuário.
-4. **Fragmentacao em Issues (/to-issues)**: fatiar os Epics e especificações aprovadas em slices verticais no GitHub com critérios de aceite verificáveis e dependências (`Blocked by`).
-5. **Orquestracao (/developer)**: coordena a fila de tarefas e o loop de desenvolvimento por Issue, gerenciando branches/worktrees.
-6. **Desenvolvimento Orientado a Testes (/tdd)**: aplica ciclo estrito Red-Green-Refactor para cada issue (com apoio de `/query-docs`, `/expo-expert`, `/diagnose`).
-7. **Garantia de Qualidade Funcional (/qa-analyst)**: portão obrigatório pré-segurança; confronta requisitos, casos de borda, testes funcionais e critérios de aceite.
-8. **Auditoria e Seguranca E2E (/secure-e2e)**: portão obrigatório pré-PR; auditoria de código (OWASP), testes ofensivos/negativos em browser e API (`*.spec.sec.ts`).
-9. **Entrega (PR)**: somente apos QA e Seguranca verdes, executa o fluxo de Pull Request com confirmacao humana.
+1. **Framework update**: checks the repository (local clone, when present, or GitHub) and reports new commits. No installer: update by re-adding the marketplace or running `npx skills add` again.
+2. **Governance and Scope**: validates Git, GitHub remote, authentication and project state.
+3. **Architecture and Design (`architect`)**: runs active questioning, designs the solution (ADD/SAD, C4, ADRs, DER schemas), defines design tokens and screen mockups (`MASTER.md` + overrides), User Guides, and obtains the mandatory HITL approval from the user.
+4. **Slicing into Issues (`to-issues`)**: cuts the Epics and approved specifications into vertical slices on GitHub with verifiable acceptance criteria and `Blocked by` dependencies.
+5. **Orchestration (`developer`)**: coordinates the task queue and the per-Issue development loop, managing branches/worktrees.
+6. **Test-Driven Development (`tdd`)**: applies a strict Red-Green-Refactor cycle to each issue (with support from `query-docs`, `expo-expert`, `diagnose`).
+7. **Functional Quality Assurance (`qa-analyst`)**: mandatory pre-security gate; confronts requirements, edge cases, functional tests and acceptance criteria.
+8. **E2E Audit and Security (`secure-e2e`)**: mandatory pre-PR gate; code audit (OWASP) and offensive/negative tests against browser and API (`*.spec.sec.ts`).
+9. **Delivery (PR)**: only after QA and Security are green, runs the Pull Request flow with human confirmation.
 
-O GitHub e a fonte persistente de Issues, escopo, criterios de aceite, dependencias, revisao e historico. `ESTADO_DEVELOPER.md` e somente a visao operacional da DAG.
+GitHub is the persistent source of Issues, scope, acceptance criteria, dependencies, review and history. `ESTADO_DEVELOPER.md` is only the operational view of the DAG.
 
-## O Developer
+## The Developer
 
-O `/developer` e a Skill Mestra deste fork (renomeada de `orchestrator`), um conceito que nao existe no repositorio original. Ele avalia, documenta, delega, fiscaliza e expande o fluxo de engenharia.
+`developer` is the master skill of this fork (renamed from `orchestrator`), a concept that does not exist in the original repository. It evaluates, documents, delegates, supervises and expands the engineering flow.
 
-`/orchestrator` continua funcionando como atalho de compatibilidade — chama exatamente a mesma skill, para nao quebrar instalacoes feitas antes do rename.
+`orchestrator` keeps working as a compatibility shortcut — it calls exactly the same skill, so installations made before the rename do not break.
 
-### Regra de ouro
+### Golden rule
 
-O developer nao executa trabalho pesado diretamente. Ele identifica o problema e delega para a skill correta. Se nao existe skill para o gargalo, invoca `/write-a-skill` para cria-la.
+The developer does not do heavy work directly. It identifies the problem and delegates to the right skill. If no skill covers the bottleneck, it invokes `write-a-skill` to create one.
 
-### Tiers de risco
+### Risk tiers
 
-| Tier | Uso | Comportamento |
+| Tier | Use | Behavior |
 | --- | --- | --- |
-| T1 | typo, lint, documentacao simples | execucao atomica e verificacao local |
-| T2 | testes, pequenos ADRs, mudancas limitadas | valida roadmap e reporta evidencia |
-| T3 | schema, autenticacao, dados ou API publica | pausa e exige aprovacao humana |
+| T1 | typo, lint, simple documentation | atomic execution and local verification |
+| T2 | tests, small ADRs, limited changes | validates the roadmap and reports evidence |
+| T3 | schema, authentication, data or public API | pauses and requires human approval |
 
-## Por que estas skills existem
+## Why these skills exist
 
-### 1. O agent nao fez o que eu queria
+### 1. The agent did not do what I wanted
 
-O modo de falha mais comum e o desalinhamento. `grill-me`, `grill-with-docs` e `grill-feature-with-docs` conduzem uma sessao de perguntas para transformar intencao em requisitos, linguagem de dominio e decisoes registradas.
+The most common failure mode is misalignment. `grill-me`, `grill-with-docs` and `grill-feature-with-docs` run a question session that turns intent into requirements, domain language and recorded decisions.
 
-### 2. O agent e muito verboso
+### 2. The agent is too verbose
 
-Uma linguagem compartilhada reduz ambiguidades, melhora nomes de arquivos e funcoes e torna a base de codigo mais navegavel. O `/grill-with-docs` registra essa linguagem em `CONTEXT.md` e ADRs. Consulte tambem o exemplo de [`CONTEXT.md`](https://github.com/mattpocock/course-video-manager/blob/076a5a7a182db0fe1e62971dd7a68bcadf010f1c/CONTEXT.md) do repositorio `course-video-manager` original.
+A shared language reduces ambiguity, improves file and function names and makes the codebase easier to navigate. `grill-with-docs` records that language in `CONTEXT.md` and ADRs. See also the [`CONTEXT.md`](https://github.com/mattpocock/course-video-manager/blob/076a5a7a182db0fe1e62971dd7a68bcadf010f1c/CONTEXT.md) example from the original `course-video-manager` repository.
 
-### 3. O codigo nao funciona
+### 3. The code does not work
 
-O agent precisa de loops de feedback: tipos, browser, testes automatizados e reproducoes minimas. `/tdd` aplica red-green-refactor e `/diagnose` conduz o ciclo reproduzir, minimizar, hipotetizar, instrumentar, corrigir e testar regressao.
+The agent needs feedback loops: types, browser, automated tests and minimal reproductions. `tdd` applies red-green-refactor and `diagnose` runs the cycle reproduce, minimise, hypothesise, instrument, fix and regression-test.
 
-### 4. Construimos uma bola de lama
+### 4. We built a ball of mud
 
-Agents aceleram a codificacao e tambem podem acelerar a entropia. `/improve-codebase-architecture` promove design continuo, limites claros e uma base mais testavel e navegavel.
+Agents speed up coding and can speed up entropy too. `improve-codebase-architecture` promotes continuous design, clear boundaries and a more testable, navigable base.
 
-### 5. Risco do desenvolvimento autonomo
+### 5. The risk of autonomous development
 
-Roadmap, GitHub Issues, documentacao, worktrees e QA formam um ciclo de governanca que limita deriva de escopo e torna as decisoes auditaveis.
+Roadmap, GitHub Issues, documentation, worktrees and QA form a governance loop that limits scope drift and makes decisions auditable.
 
-## Tabela de delegacao
+## Delegation table
 
-| Problema | Skill |
+| Problem | Skill |
 | --- | --- |
-| Governanca e orquestracao | [`/developer`](./skills/engineering/developer/SKILL.md) |
-| Arquitetura de sistemas, ADD/SAD, C4, Mockups/UI e ADRs | [`/architect`](./skills/engineering/architect/SKILL.md) |
-| Roadmap e Epics | [`/roadmap`](./skills/engineering/roadmap/SKILL.md) |
-| Triagem e gestao de issues | [`/triage`](./skills/engineering/triage/SKILL.md) |
-| Linguagem de dominio e ADRs | [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md) |
-| Modulo ou feature especifica | [`/grill-feature-with-docs`](./skills/engineering/grill-feature-with-docs/SKILL.md) |
-| Fragmentacao em GitHub Issues | [`/to-issues`](./skills/engineering/to-issues/SKILL.md) |
-| PRD | [`/to-prd`](./skills/engineering/to-prd/SKILL.md) |
-| Bug dificil ou regressao | [`/diagnose`](./skills/engineering/diagnose/SKILL.md) |
-| Codigo sem testes | [`/tdd`](./skills/engineering/tdd/SKILL.md) |
-| APIs de terceiros | [`/query-docs`](./skills/engineering/query-docs/SKILL.md) |
-| Apps Expo/React Native (EAS, Router, config plugins, upgrade) | [`/expo-expert`](./skills/engineering/expo-expert/SKILL.md) |
-| E2E e seguranca | [`/secure-e2e`](./skills/engineering/secure-e2e/SKILL.md) |
-| Analise de qualidade | [`/qa-analyst`](./skills/engineering/qa-analyst/SKILL.md) |
-| Arquitetura degradada | [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) |
-| Prototipo descartavel | [`/prototype`](./skills/engineering/prototype/SKILL.md) |
-| Bootstrap de MVP | [`/scaffold-mvp`](./skills/engineering/scaffold-mvp/SKILL.md) |
-| Falta de contexto | [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) |
-| Servidores MCP | [`/mcp-builder`](./skills/engineering/mcp-builder/SKILL.md) |
-| Deploy e monitoramento SuperKuma | [`/superkuma-monitoring`](./skills/engineering/superkuma-monitoring/SKILL.md) |
-| Pre-commit hooks com Husky/Prettier | [`/setup-pre-commit`](./skills/misc/setup-pre-commit/SKILL.md) |
-| Travas de seguranca Git no agent | [`/git-guardrails-claude-code`](./skills/misc/git-guardrails-claude-code/SKILL.md) |
-| Criacao, eval e otimizacao de skills | [`/skill-creator`](./skills/productivity/skill-creator/SKILL.md) |
-| Comunicacao ultra-comprimida (economia de tokens) | [`/caveman`](./skills/productivity/caveman/SKILL.md) |
-| Gargalo nao mapeado | [`/write-a-skill`](./skills/productivity/write-a-skill/SKILL.md) |
-| Alinhamento de plano | [`/grill-me`](./skills/productivity/grill-me/SKILL.md) |
-| Handoff | [`/handoff`](./skills/productivity/handoff/SKILL.md) |
+| Governance and orchestration | [`developer`](./skills/engineering/developer/SKILL.md) |
+| System architecture, ADD/SAD, C4, Mockups/UI and ADRs | [`architect`](./skills/engineering/architect/SKILL.md) |
+| Roadmap and Epics | [`roadmap`](./skills/engineering/roadmap/SKILL.md) |
+| Triage and issue management | [`triage`](./skills/engineering/triage/SKILL.md) |
+| Domain language and ADRs | [`grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md) |
+| A specific module or feature | [`grill-feature-with-docs`](./skills/engineering/grill-feature-with-docs/SKILL.md) |
+| Slicing into GitHub Issues | [`to-issues`](./skills/engineering/to-issues/SKILL.md) |
+| PRD | [`to-prd`](./skills/engineering/to-prd/SKILL.md) |
+| Hard bug or regression | [`diagnose`](./skills/engineering/diagnose/SKILL.md) |
+| Code without tests | [`tdd`](./skills/engineering/tdd/SKILL.md) |
+| Third-party APIs | [`query-docs`](./skills/engineering/query-docs/SKILL.md) |
+| Expo/React Native apps (EAS, Router, config plugins, upgrade) | [`expo-expert`](./skills/engineering/expo-expert/SKILL.md) |
+| E2E and security | [`secure-e2e`](./skills/engineering/secure-e2e/SKILL.md) |
+| Quality analysis | [`qa-analyst`](./skills/engineering/qa-analyst/SKILL.md) |
+| Degraded architecture | [`improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) |
+| Throwaway prototype | [`prototype`](./skills/engineering/prototype/SKILL.md) |
+| MVP bootstrap | [`scaffold-mvp`](./skills/engineering/scaffold-mvp/SKILL.md) |
+| Missing context | [`zoom-out`](./skills/engineering/zoom-out/SKILL.md) |
+| MCP servers | [`mcp-builder`](./skills/engineering/mcp-builder/SKILL.md) |
+| SuperKuma deploy and monitoring | [`superkuma-monitoring`](./skills/engineering/superkuma-monitoring/SKILL.md) |
+| Pre-commit hooks with Husky/Prettier | [`setup-pre-commit`](./skills/misc/setup-pre-commit/SKILL.md) |
+| Git safety guards in the agent | [`git-guardrails-claude-code`](./skills/misc/git-guardrails-claude-code/SKILL.md) |
+| Creating, evaluating and optimizing skills | [`skill-creator`](./skills/productivity/skill-creator/SKILL.md) |
+| Ultra-compressed communication (token savings) | [`caveman`](./skills/productivity/caveman/SKILL.md) |
+| Unmapped bottleneck | [`write-a-skill`](./skills/productivity/write-a-skill/SKILL.md) |
+| Plan alignment | [`grill-me`](./skills/productivity/grill-me/SKILL.md) |
+| Handoff | [`handoff`](./skills/productivity/handoff/SKILL.md) |
 
-## Referencia de skills
+## Skills reference
 
 ### Engineering
 
-Skills para trabalho diario com codigo: `architect`, `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert`, `mcp-builder`, `superkuma-monitoring` e `developer`.
+Skills for daily code work: `architect`, `diagnose`, `grill-with-docs`, `grill-feature-with-docs`, `triage`, `improve-codebase-architecture`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `scaffold-mvp`, `prototype`, `roadmap`, `secure-e2e`, `qa-analyst`, `query-docs`, `expo-expert`, `mcp-builder`, `superkuma-monitoring` and `developer`.
 
-`architect` atua como Arquiteto de Software, Solucoes e Engenharia senior: projeta sistemas para nivel corporativo (Production-Readiness), conduz alinhamento de escopo via interrogatorio ativo (/grill), define design tokens/mockups de tela (padrao MASTER+Overrides) para orientar os desenvolvedores, garante rigor de engenharia (Clean Arch, DDD, sem N+1, OWASP, regressao zero) e gera artefatos chave (ADD/SAD, C4 Model em Mermaid, ADRs, esquemas DER/MER, contratos OpenAPI/gRPC e topologias de nuvem/infraestrutura).
+`architect` acts as a senior Software, Solutions and Engineering Architect: designs systems for corporate level (production-readiness), runs scope alignment through active questioning, defines design tokens and screen mockups (MASTER+Overrides pattern) to guide developers, enforces engineering rigor (Clean Architecture, DDD, no N+1, OWASP, zero regression) and produces the key artifacts (ADD/SAD, C4 Model in Mermaid, ADRs, DER/MER schemas, OpenAPI/gRPC contracts and cloud/infrastructure topologies).
 
-`orchestrator` e um atalho de compatibilidade: mesma skill que `developer` (nome antigo, mantido para nao quebrar instalacoes existentes).
+`orchestrator` is a compatibility shortcut: the same skill as `developer` (old name, kept so existing installations do not break).
 
-`expo-expert` e conhecimento especializado de stack (Expo/React Native): CNG e config plugins, Expo Modules API, EAS Build/Submit/Update/Workflows, Expo Router, Nova Arquitetura, animacao (Reanimated/Skia), Native UI, DOM components, data fetching e upgrade de SDK. Ensina o agent a consultar a documentacao viva do Expo (`llms.txt` + `.md`) em vez de confiar em conhecimento de treino desatualizado.
+`expo-expert` is stack-specific knowledge (Expo/React Native): CNG and config plugins, Expo Modules API, EAS Build/Submit/Update/Workflows, Expo Router, New Architecture, animation (Reanimated/Skia), Native UI, DOM components, data fetching and SDK upgrades. It teaches the agent to consult the living Expo documentation (`llms.txt` + `.md`) instead of trusting outdated training knowledge.
 
-`mcp-builder` e guia para construcao de servidores MCP (Model Context Protocol) de alta qualidade em Python (FastMCP) e Node/TypeScript, com esquemas rigorosos, tratamento de erros orientados ao agente e scripts de avaliacao/benchmark.
+`mcp-builder` is a guide for building high-quality MCP (Model Context Protocol) servers in Python (FastMCP) and Node/TypeScript, with strict schemas, agent-oriented error handling and evaluation/benchmark scripts.
 
-`superkuma-monitoring` cobre o ciclo completo de monitoramento SuperKuma: deploy de uma instancia nova (VM Proxmox, Docker Compose + MariaDB), update/upgrade de instancia existente, e operacao do servidor MCP SuperKuma para descobrir a infraestrutura de um site (AD, Proxmox, VMware, Linux, pfSense, Mikrotik, switches, UniFi, TrueNAS, cameras) e transforma-la em monitors, tags, notificacoes e status pages.
+`superkuma-monitoring` covers the full SuperKuma monitoring cycle: deploying a new instance (Proxmox VM, Docker Compose + MariaDB), updating/upgrading an existing one, and operating the SuperKuma MCP server to discover a site's infrastructure (AD, Proxmox, VMware, Linux, pfSense, Mikrotik, switches, UniFi, TrueNAS, cameras) and turn it into monitors, tags, notifications and status pages.
 
 ### Productivity
 
-Skills de workflow geral: `caveman`, `grill-me`, `handoff`, `write-a-skill` e `skill-creator`.
+General workflow skills: `caveman`, `grill-me`, `handoff`, `write-a-skill` and `skill-creator`.
 
-`skill-creator` e uma meta-skill para criar, testar, avaliar (qualitativamente e quantitativamente com evals/viewer HTML) e otimizar a acuracia de acionamento das descricoes de novas skills.
+`skill-creator` is a meta-skill for creating, testing, evaluating (qualitatively and quantitatively with evals/HTML viewer) and optimizing the trigger accuracy of new skill descriptions.
 
 ### Misc
 
-Skills mantidas para casos especificos: `git-guardrails-claude-code`, `migrate-to-shoehorn`, `scaffold-exercises` e `setup-pre-commit`.
+Skills kept for specific cases: `git-guardrails-claude-code`, `migrate-to-shoehorn`, `scaffold-exercises` and `setup-pre-commit`.
 
-Skills em `personal/`, `in-progress/` e `deprecated/` nao sao instaladas pelo script.
+Skills under `personal/`, `in-progress/` and `deprecated/` are not distributed.
 
-## Governanca documental
+## Documentation governance
 
-O projeto consumidor deve manter `AGENTS.md` ou `CLAUDE.md`, `CONTEXT.md` ou `CONTEXT-MAP.md`, `DEVELOPER-ROADMAP.md`, `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md` e `docs/adr/` quando houver decisoes relevantes.
+The consuming project should keep `AGENTS.md` or `CLAUDE.md`, `CONTEXT.md` or `CONTEXT-MAP.md`, `DEVELOPER-ROADMAP.md`, `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md` and `docs/adr/` when there are relevant decisions.
 
-## Creditos e origem
+## Credits and origin
 
-Este projeto e um fork de [mattpocock/skills](https://github.com/mattpocock/skills). A arquitetura original, a inspiracao e grande parte das skills vieram de Matt Pocock. Consulte tambem a [newsletter de skills](https://www.aihero.dev/s/skills-newsletter) para acompanhar o trabalho original.
+This project is a fork of [mattpocock/skills](https://github.com/mattpocock/skills). The original architecture, the inspiration and much of the skills came from Matt Pocock. See also the [skills newsletter](https://www.aihero.dev/s/skills-newsletter) to follow the original work.

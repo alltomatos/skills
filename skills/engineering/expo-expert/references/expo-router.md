@@ -1,60 +1,61 @@
-# Expo Router — file-based routing universal
+# Expo Router - universal file-based routing
 
-Doc-âncora: `router/introduction.md`, `router/basics/core-concepts.md`,
+Anchor docs: `router/introduction.md`, `router/basics/core-concepts.md`,
 `router/basics/navigation.md`, `router/advanced/stack.md`, `router/advanced/authentication.md`.
-Para recursos web (API Routes, SSR, RSC), baixe as páginas específicas via `llms.txt` — evoluem
-rápido e algumas são experimentais.
+For web features (API Routes, SSR, RSC), download the specific pages through `llms.txt` - they evolve
+fast and some are experimental.
 
-## Modelo
+## Model
 
-Expo Router é roteamento **baseado em arquivos** sobre React Navigation: cada arquivo em `app/`
-vira uma rota. Funciona igual em iOS, Android e web (universal). O bundler é o Metro.
+Expo Router is **file-based** routing on top of React Navigation: every file in `app/` becomes a
+route. It works the same on iOS, Android and web (universal). The bundler is Metro.
 
 ```
 app/
-  _layout.tsx        # layout raiz (providers, Stack/Tabs)
-  index.tsx          # rota "/"
-  about.tsx          # rota "/about"
-  (tabs)/            # grupo (não aparece na URL) — normalmente abas nativas
-    _layout.tsx      # define <Tabs>
+  _layout.tsx        # root layout (providers, Stack/Tabs)
+  index.tsx          # route "/"
+  about.tsx          # route "/about"
+  (tabs)/            # group (not in the URL) - usually native tabs
+    _layout.tsx      # defines <Tabs>
     home.tsx         # "/home"
     profile.tsx      # "/profile"
   blog/
-    [slug].tsx       # rota dinâmica "/blog/:slug"
+    [slug].tsx       # dynamic route "/blog/:slug"
     [...rest].tsx    # catch-all
   +not-found.tsx     # 404
-  +html.tsx          # (web) shell HTML do SSR
+  +html.tsx          # (web) SSR HTML shell
 ```
 
-Convenções essenciais:
-- **`_layout.tsx`** — define o navigator daquele nível (`Stack`, `Tabs`, `Drawer`) e envolve as
-  rotas filhas. O layout raiz é onde vão providers globais.
-- **`(grupo)`** — parênteses agrupam rotas **sem** virar segmento de URL. Use para organizar e para
-  ter navigators distintos (ex.: `(auth)` vs `(app)`).
-- **`[param]`** dinâmico, **`[...catchAll]`** catch-all.
-- **`+`-prefixados** são rotas especiais (`+not-found`, `+html`, `+native-intent`).
+Essential conventions:
 
-## Navegação
+- **`_layout.tsx`** - defines that level's navigator (`Stack`, `Tabs`, `Drawer`) and wraps the child
+  routes. The root layout is where global providers go.
+- **`(group)`** - parentheses group routes **without** becoming a URL segment. Use them to organize
+  and to have distinct navigators (e.g. `(auth)` vs `(app)`).
+- **`[param]`** dynamic, **`[...catchAll]`** catch-all.
+- **`+`-prefixed** files are special routes (`+not-found`, `+html`, `+native-intent`).
+
+## Navigation
 
 ```tsx
 import { Link, router, useRouter, useLocalSearchParams } from "expo-router";
 
-<Link href="/blog/hello">Ler post</Link>
-<Link href={{ pathname: "/blog/[slug]", params: { slug: "hello" } }}>Ler</Link>;
+<Link href="/blog/hello">Read post</Link>
+<Link href={{ pathname: "/blog/[slug]", params: { slug: "hello" } }}>Read</Link>;
 
-// imperativo:
+// imperative:
 router.push("/profile");
 router.replace("/login");
 router.back();
 
-// ler params:
+// read params:
 const { slug } = useLocalSearchParams<{ slug: string }>();
 ```
 
-- `push`/`replace`/`back`/`navigate` cobrem os casos; `replace` para fluxos onde não quer voltar
-  (ex.: pós-login). Ver `router/basics/navigation.md`.
-- **Typed routes**: habilite `experiments.typedRoutes` no `app.config` para autocompletar e checar
-  `href` em tempo de tipo.
+- `push`/`replace`/`back`/`navigate` cover the cases; `replace` for flows where you do not want to go
+  back (e.g. after login). See `router/basics/navigation.md`.
+- **Typed routes**: enable `experiments.typedRoutes` in `app.config` for autocomplete and type-time
+  checking of `href`.
 
 ## Layouts: Stack, Tabs, Drawer
 
@@ -64,25 +65,25 @@ import { Tabs } from "expo-router";
 export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="home" options={{ title: "Início" }} />
-      <Tabs.Screen name="profile" options={{ title: "Perfil" }} />
+      <Tabs.Screen name="home" options={{ title: "Home" }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
     </Tabs>
   );
 }
 ```
 
-Para abas verdadeiramente **nativas**, o Expo Router oferece componentes de native tabs
-(mais próximos do comportamento de plataforma) — confira a doc de tabs, pois a API tem evoluído.
-`Stack` (`router/advanced/stack.md`) cobre header nativo, `presentation: "modal"`, gestos, etc.
+For truly **native** tabs, Expo Router offers native tabs components (closer to platform behavior) -
+check the tabs documentation, since the API has been evolving. `Stack` (`router/advanced/stack.md`)
+covers the native header, `presentation: "modal"`, gestures, etc.
 
-## Rotas protegidas (autenticação)
+## Protected routes (authentication)
 
-Padrão idiomático: um provider de auth no layout raiz + **redirecionamento por grupo**. A doc
-(`router/advanced/authentication.md`) descreve o uso de **Protected routes** (`<Stack.Protected>`
-/ guards) e/ou redirect declarativo:
+Idiomatic pattern: an auth provider in the root layout + **redirect by group**. The docs
+(`router/advanced/authentication.md`) describe the use of **Protected routes** (`<Stack.Protected>` /
+guards) and/or a declarative redirect:
 
 ```tsx
-// app/_layout.tsx (esboço)
+// app/_layout.tsx (sketch)
 import { Redirect, Stack } from "expo-router";
 import { useAuth } from "../lib/auth";
 
@@ -91,7 +92,7 @@ export default function RootLayout() {
   if (loading) return null;         // splash
   return (
     <Stack>
-      {/* grupo (app) só acessível logado; senão redireciona */}
+      {/* group (app) only reachable when logged in; otherwise redirect */}
       <Stack.Screen name="(app)" />
       <Stack.Screen name="(auth)" />
     </Stack>
@@ -99,42 +100,44 @@ export default function RootLayout() {
 }
 ```
 
-Na prática, faça o gate com `<Redirect href="/(auth)/login" />` quando `!user`, ou use os guards de
-Protected routes conforme a versão do router instalada. **Confirme a API na doc** — este é um ponto
-que mudou entre versões.
+In practice, gate with `<Redirect href="/(auth)/login" />` when `!user`, or use the Protected route
+guards according to the installed router version. **Confirm the API in the docs** - this is a point
+that changed between versions.
 
-## Recursos web (universal)
+## Web features (universal)
 
-O mesmo `app/` gera site. Recursos avançados (todos com páginas próprias na doc — busque via
-`llms.txt`, e note quais são experimentais):
+The same `app/` produces a website. Advanced features (all with their own doc pages - search through
+`llms.txt`, and note which are experimental):
 
-- **API Routes**: arquivos `app/**/<nome>+api.ts` exportam handlers (`GET`, `POST`, …) e viram
-  endpoints server-side no mesmo projeto. Requer output server.
-- **Rendering modes**: `web.output` no `app.config` — `"single"` (SPA), `"static"` (SSG) ou
+- **API Routes**: files `app/**/<name>+api.ts` export handlers (`GET`, `POST`, ...) and become
+  server-side endpoints in the same project. Requires server output.
+- **Rendering modes**: `web.output` in `app.config` - `"single"` (SPA), `"static"` (SSG) or
   `"server"` (SSR + API Routes).
-- **Data loaders** e **React Server Components (RSC)**: recursos mais novos/experimentais para
-  carregar dados no servidor e enviar componentes renderizados. Estado e disponibilidade variam por
-  versão — **sempre verifique a doc** antes de recomendar em produção.
+- **Data loaders** and **React Server Components (RSC)**: newer/experimental features to load data on
+  the server and send rendered components. Status and availability vary by version - **always check
+  the docs** before recommending them for production.
 
-## Gotchas de sênior
+## Senior gotchas
 
-- **Estrutura de pastas É a navegação.** Refatorar rotas = mover arquivos; não há tabela central.
-- **`_layout` esquecido**: sem `_layout.tsx` num nível com múltiplas telas, você perde o navigator.
-- **Grupos para separar áreas**: `(auth)`/`(app)` é o padrão para apps com login.
-- **Web + nativo divergem**: teste ambos; nem toda lib nativa tem shim web (ver
+- **The folder structure IS the navigation.** Refactoring routes = moving files; there is no central
+  table.
+- **Forgotten `_layout`**: without a `_layout.tsx` at a level with multiple screens, you lose the
+  navigator.
+- **Groups to separate areas**: `(auth)`/`(app)` is the standard for apps with login.
+- **Web + native diverge**: test both; not every native library has a web shim (see
   [universal-web-tv.md](universal-web-tv.md)).
-- **RSC/SSR ainda amadurecendo**: excelente para web/marketing, mas cheque status na doc antes de
-  apostar num app crítico.
-- **`KeyboardAvoidingView` pode simplesmente não funcionar no Android dentro de um `Stack`.**
-  Confirmado em produção: nem `behavior="height"` nem `behavior={undefined}` resolveram um composer
-  de chat sumindo atrás do teclado — a causa é que o Expo Router roda cada tela num Fragment nativo
-  via `react-native-screens` (native-stack), e esse Fragment não participa do resize de janela do
-  Android (`windowSoftInputMode=resize`) do jeito que uma Activity "pura" participaria. A correção
-  suportada oficialmente é a lib `react-native-keyboard-controller`
-  (`docs.expo.dev/guides/keyboard-handling.md`) — mas ela **não funciona no Expo Go**, exige
-  development build, então não é uma troca a fazer no meio de uma sessão de testes via Expo Go.
-  Alternativa que funciona em Expo Go e não depende de nenhum resize de SO/Fragment: **medir a
-  altura do teclado na mão** com `Keyboard.addListener('keyboardDidShow', e =>
-  e.endCoordinates.height)` (`keyboardWillShow` no iOS) e aplicar esse valor como `paddingBottom`
-  no container raiz da tela — sem `KeyboardAvoidingView` nenhum. Funciona igual em Expo Go e em
-  dev build, então não precisa trocar de novo quando o app migrar pra development build depois.
+- **RSC/SSR still maturing**: excellent for web/marketing, but check the doc status before betting a
+  critical app on it.
+- **`KeyboardAvoidingView` may simply not work on Android inside a `Stack`.** Confirmed in
+  production: neither `behavior="height"` nor `behavior={undefined}` fixed a chat composer hiding
+  behind the keyboard - the cause is that Expo Router runs each screen in a native Fragment through
+  `react-native-screens` (native-stack), and that Fragment does not take part in Android's window
+  resize (`windowSoftInputMode=resize`) the way a "pure" Activity would. The officially supported fix
+  is the `react-native-keyboard-controller` library (`docs.expo.dev/guides/keyboard-handling.md`) -
+  but it **does not work in Expo Go**, it needs a development build, so it is not a swap to make in
+  the middle of a testing session through Expo Go. An alternative that works in Expo Go and depends
+  on no OS/Fragment resize: **measure the keyboard height manually** with
+  `Keyboard.addListener('keyboardDidShow', e => e.endCoordinates.height)` (`keyboardWillShow` on iOS)
+  and apply that value as `paddingBottom` on the screen's root container - no `KeyboardAvoidingView`
+  at all. It works the same in Expo Go and in a dev build, so you do not need to switch again when
+  the app later migrates to a development build.

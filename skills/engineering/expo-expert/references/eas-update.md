@@ -1,32 +1,32 @@
-# EAS Update — OTA, runtime versions, channels e rollouts
+# EAS Update - OTA, runtime versions, channels and rollouts
 
-Doc-âncora: `eas-update/introduction.md`, `.../getting-started.md`, `.../how-it-works.md`,
+Anchor docs: `eas-update/introduction.md`, `.../getting-started.md`, `.../how-it-works.md`,
 `.../deployment.md`.
 
-## O que é
+## What it is
 
-EAS Update entrega **atualizações Over-The-Air (OTA)** do bundle JavaScript e assets sem passar
-pelas lojas. Só atualiza o que é JS/asset — **mudança em código nativo continua exigindo novo build**
-e nova submissão. É construído sobre a lib `expo-updates`.
+EAS Update delivers **Over-The-Air (OTA) updates** of the JavaScript bundle and assets without going
+through the stores. It only updates what is JS/assets - **a native code change still requires a new
+build** and a new submission. It is built on the `expo-updates` library.
 
 ```bash
 npx expo install expo-updates
 eas update:configure
-eas update --branch production --message "fix: corrige crash no checkout"
-eas update --auto     # infere branch a partir do contexto git
+eas update --branch production --message "fix: checkout crash"
+eas update --auto     # infers the branch from the git context
 ```
 
-## Runtime version — o conceito que mais gente erra
+## Runtime version - the concept most people get wrong
 
-O **runtime version** descreve a interface JS↔nativo definida pela camada nativa do app. Um update
-só roda num build se o **runtime version do build casar EXATAMENTE com o do update**.
+The **runtime version** describes the JS<->native interface defined by the app's native layer. An
+update only runs on a build if the **build's runtime version matches the update's EXACTLY**.
 
-Regra de ouro: **sempre que o layer nativo muda de forma que afeta a interface JS↔nativo (nova lib
-nativa, upgrade de SDK, mudança de config nativa), o `runtimeVersion` PRECISA mudar.** Se não mudar,
-um OTA vai cair em builds nativos incompatíveis e quebra o app em produção. Este é o footgun número
-um de OTA.
+Golden rule: **whenever the native layer changes in a way that affects the JS<->native interface (a
+new native library, an SDK upgrade, a native config change), `runtimeVersion` MUST change.** If it
+does not, an OTA lands on incompatible native builds and breaks the app in production. This is the
+number one OTA footgun.
 
-Configuração no `app.config`:
+Configuration in `app.config`:
 
 ```json
 {
@@ -36,23 +36,25 @@ Configuração no `app.config`:
 }
 ```
 
-Políticas de `runtimeVersion`:
-- **`fingerprint`** (recomendado moderno) — o EAS calcula um hash do estado nativo do projeto; muda
-  sozinho quando o nativo muda. Elimina o erro manual. (Ver `fingerprint` / `expo-updates`.)
-- **`appVersion`** — atrela ao `version` do app.
-- **`nativeVersion`** — atrela a `version` + build number.
-- **String literal** (ex.: `"1.0.0"`) — você controla manualmente; mais propenso a erro.
+`runtimeVersion` policies:
 
-## Channels e branches
+- **`fingerprint`** (the modern recommendation) - EAS computes a hash of the project's native state;
+  it changes by itself when the native side changes. Removes the manual error. (See `fingerprint` /
+  `expo-updates`.)
+- **`appVersion`** - ties it to the app's `version`.
+- **`nativeVersion`** - ties it to `version` + build number.
+- **String literal** (e.g. `"1.0.0"`) - you control it manually; more error-prone.
 
-Dois conceitos distintos que se ligam:
+## Channels and branches
 
-- **Channel** — um nome atribuído a **builds**, definido no `eas.json` (ex.: `production`,
-  `preview`, `staging`). É a etiqueta do binário.
-- **Branch** — um objeto no servidor EAS que contém uma **lista de updates** (o mais recente é o
-  ativo). Pense como um branch de git, mas de updates.
+Two distinct concepts that connect:
 
-Por padrão, um channel aponta para a branch de mesmo nome, mas o vínculo é editável:
+- **Channel** - a name assigned to **builds**, defined in `eas.json` (e.g. `production`, `preview`,
+  `staging`). It is the binary's label.
+- **Branch** - an object on the EAS server that holds a **list of updates** (the most recent one is
+  active). Think of it as a git branch, but for updates.
+
+By default a channel points to the branch of the same name, but the link is editable:
 
 ```bash
 eas channel:edit production --branch hotfix-2026-08
@@ -60,30 +62,31 @@ eas branch:list
 eas channel:list
 ```
 
-### Condições para um update rodar num build
+### Conditions for an update to run on a build
 
-As três precisam ser verdadeiras:
-1. **Plataforma** bate (Android ou iOS).
-2. **Runtime version** bate exatamente.
-3. O **channel** do build está ligado à **branch** que contém o update.
+All three must be true:
 
-O fluxo: `eas update` cria o bundle, sobe para uma branch; o `expo-updates` no dispositivo checa o
-manifesto e baixa o update (manifesto primeiro, depois os assets necessários) para builds cujo
-channel aponta àquela branch.
+1. **Platform** matches (Android or iOS).
+2. **Runtime version** matches exactly.
+3. The build's **channel** is linked to the **branch** holding the update.
 
-## Rollout e rollback
+The flow: `eas update` creates the bundle and uploads it to a branch; `expo-updates` on the device
+checks the manifest and downloads the update (manifest first, then the needed assets) for builds whose
+channel points to that branch.
 
-- **Rollout gradual**: publique o update com rollout percentual para expor a uma fração dos usuários
-  e aumentar aos poucos, observando métricas. (Ver `deployment.md` / opções de rollout.)
-- **Rollback**: como o vínculo channel↔branch é editável e a branch guarda o histórico de updates,
-  você **reverte apontando o channel para uma branch/estado anterior** ou republicando o update bom
-  — **sem** rebuildar o app. É a grande vantagem de OTA para resposta a incidentes.
-- **Channel surfing**: mover builds entre branches trocando os vínculos de channel permite promover
-  um mesmo binário de `staging` → `production` sem novo build.
+## Rollout and rollback
 
-## Padrão de deploy com builds
+- **Gradual rollout**: publish the update with a percentage rollout to expose it to a fraction of
+  users and increase it slowly while watching metrics. (See `deployment.md` / rollout options.)
+- **Rollback**: since the channel<->branch link is editable and the branch keeps the update history,
+  you **revert by pointing the channel to a previous branch/state** or by republishing the good
+  update - **without** rebuilding the app. That is OTA's big advantage for incident response.
+- **Channel surfing**: moving builds between branches by swapping channel links lets you promote the
+  same binary from `staging` -> `production` with no new build.
 
-`eas.json` liga build e update pelo `channel`:
+## Deployment pattern with builds
+
+`eas.json` links build and update through `channel`:
 
 ```json
 {
@@ -94,17 +97,18 @@ channel aponta àquela branch.
 }
 ```
 
-Assim, o binário de produção só recebe updates da branch de produção. Combine com
-[EAS Workflows](eas-build-submit-workflows.md) para automatizar `build → submit → update`.
+That way the production binary only receives updates from the production branch. Combine it with
+[EAS Workflows](eas-build-submit-workflows.md) to automate `build -> submit -> update`.
 
-## Gotchas de sênior
+## Senior gotchas
 
-- **OTA não substitui build para mudança nativa.** Adicionou lib nativa? Novo build + submit,
-  mesmo com EAS Update ligado.
-- **Runtime version desalinhado = crash silencioso** em quem já tem o app. Prefira a policy
-  `fingerprint` para não depender de disciplina humana.
-- **Regras das lojas**: OTA é permitido para correções e conteúdo, mas não para burlar a review de
-  mudanças substanciais de funcionalidade. Use com bom senso.
-- **`expo-updates` precisa estar instalado e configurado** no build, senão o app nunca busca updates.
-- **Teste o update no channel de preview antes de produção** — publique na branch `preview`, valide
-  num build `preview`, só então promova.
+- **OTA does not replace a build for a native change.** Added a native library? New build + submit,
+  even with EAS Update enabled.
+- **A misaligned runtime version = a silent crash** for people who already have the app. Prefer the
+  `fingerprint` policy so you do not depend on human discipline.
+- **Store rules**: OTA is allowed for fixes and content, but not to bypass review of substantial
+  feature changes. Use common sense.
+- **`expo-updates` must be installed and configured** in the build, otherwise the app never looks for
+  updates.
+- **Test the update on the preview channel before production** - publish to the `preview` branch,
+  validate on a `preview` build, and only then promote.

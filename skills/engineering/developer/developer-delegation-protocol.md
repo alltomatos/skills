@@ -1,182 +1,248 @@
 # Developer Delegation Protocol
 
-> Templates e estruturas auxiliares para o `/developer` v2.
-> Importado por `SKILL.md` nas seções de Mentoria, Fragmentação e Fiscalização.
+> Templates and supporting structures for `developer` v2.
+> Imported by `SKILL.md` in the Mentoring, Fragmentation and Supervision sections.
 
 ---
 
-## Matriz de Autonomia de Delegação
+## Requirement gap check (before planning)
 
-O Developer opera com base em **Tiers de Risco**. A autonomia é concedida conforme a natureza da tarefa:
+Before any plan, the Developer identifies what the person left out and that changes the result. A request such as "a login screen" has many valid implementations, so the gaps come first.
 
-### Tier 1: Rota Direta ("Fast Path" - Risco Mínimo)
-O Developer reconhece tarefas T1 (limpeza, documentações simples que não alteram lógica, refatorações safe e setups de ferramentas/linters) como elegíveis para o **Fast Path**:
-- **Bypass de Processo**: Pula obrigatoriamente a atualização/auditoria de Roadmap estratégico global e as sessões burocráticas/extensivas de interrogatório via `/grill-with-docs` ou `/grill-me`.
-- **Execução Atômica**: O Developer planeja e executa a tarefa imediatamente de forma direta.
-- **Guardrails de Qualidade Mandatórios**: O fluxo deve honrar rigorosamente o rito de TDD e acionar `/qa-analyst` antes de qualquer PR. Se nao houver skill de PR disponivel, orientar o fluxo Git manualmente e pedir confirmacao humana.
-- **Ação**: Executa silenciosamente → Loga no `ESTADO_DEVELOPER.md` → Finaliza o PR da mudança atômica.
+Categories to check (skip those that do not apply):
 
-### Tier 2: Execução em Batch (Risco Médio)
-- **Configuração de ambiente**: Instalação de linters e formatadores, instrumentação de cobertura de testes, criação de ADRs estruturais e melhorias de performance localizada sem breaking changes.
-- **Burocracia Reduzida**: Exige alinhamento com o `/roadmap` ativo antes de rodar os batches, mas permite agregação de commits.
-- **Ação**: Executa o lote sob guardrail do TDD → Loga no `ESTADO_DEVELOPER.md` → Reporta no final do batch.
+| Category | Questions the Developer must answer or ask |
+| --- | --- |
+| Goal | What must the screen achieve? How is success measured? |
+| Security | Authentication method, session lifetime, password policy, rate limiting, brute-force protection, MFA, transport and storage of sensitive data |
+| Data | Validation rules, required fields, empty / loading / error states |
+| Performance | Lazy loading, pagination, caching, expected volume, latency target |
+| Stack | Framework that fits the existing project; a recommendation with reasons when the project is empty |
+| Accessibility and responsiveness | Target devices, keyboard use, screen reader support |
+| Operations | Logging, observability, deploy target, environments |
+| Tests | Coverage expected before QA |
 
-### Tier 3: Governança Estratégica (Interativa Obrigatória)
-Para decisões que impactam o domínio do projeto, a autonomia é **suspensa**. O Developer deve pausar, apresentar o plano e aguardar o "Go" humano.
-- **Mudanças de Domínio**: Definição de modelos de dados, novas funcionalidades, mudanças de arquitetura macro (ex: mudar de Monólito para Microserviços).
-- **Roadmap**: Qualquer alteração na direção estratégica, priorização de Epics ou definição de prazos.
-- **Regras de Negócio**: Qualquer modificação que altere o comportamento da aplicação conforme a regra do usuário.
-- **Ação**: Para o fluxo → Apresenta PRD/Roadmap → Aguarda aprovação do usuário.
+Rules:
 
----
+- Ask all the gaps that change behavior, cost or data exposure in **one batch**.
+- For each gap, propose a default with a one-line reason; the person accepts the defaults with one word.
+- Do not invent answers to gaps that change behavior, cost or data exposure.
+- Record each decision in `DEVELOPER-ROADMAP.md` or in an ADR.
 
-
-
-## Gatilho de Aprovação por Risco
-
-O Developer possui autonomia diferenciada baseada na criticidade técnica:
-- **Tier 1 (Fast Path):** Execução sem interrupção humana. Pula as etapas de interrogatório/grill e auditoria do Roadmap. Execução atômica e direta, validando apenas o TDD local e commits semânticos no Git Flow.
-- **Tier 2 (Batchável):** Execução contínua do lote. O Developer agrupa o resultado, requer verificação do Roadmap, e reporta apenas ao finalizar o bloco de tarefas ou se detectar falhas no TDD.
-- **Tier 3 (Risco Alto):** Requer aprovação explícita inicial do plano geral de tarefas. Para tarefas individuais na execução do DAG, o Developer tentará prosseguir autonomamente após o "Go" inicial apenas se:
-  1. O suite de testes (TDD) passar totalmente.
-  2. A análise estática de tipos não reportar quebra de contrato.
-  Caso ambos sejam verdadeiros, o Developer assume o risco e prossegue, logando a decisão no `ESTADO_DEVELOPER.md` como "DECISÃO AUTÔNOMA". Se houver falha de validação, ele interrompe a execução do DAG imediatamente e solicita intervenção.
+The same check applies to the design skills (`architect`, `grill-feature-with-docs`, `scaffold-mvp`) before they produce any artifact.
 
 ---
 
-## Regras de Fragmentação (DAG & Atomização)
+## Parallel work authorization (subagents)
 
-> **Regra de Ouro**: A autonomia é total. O Developer fragmenta o plano macro em tarefas atômicas e identifica nós independentes no DAG.
+Subagents and parallel execution are **opt-in per task**. Token, plan and quota limits can stop a run in the middle, leaving work half-done, so the default is sequential.
 
-### Delegação Paralela e Isolamento (Concorrência via Git Worktrees)
-O Developer pode e deve delegar tarefas simultâneas para otimizar o tempo de desenvolvimento, respeitando as seguintes diretrizes:
+Before spawning any subagent or dispatching tasks in parallel, ask once:
 
-1. **Paralelismo da DAG**: Identifique tarefas independentes com dependências resolvidas no grafo e despache-as concorrentemente acionando múltiplos agentes executores em paralelo (ex: 2 subagentes operando em direções distintas).
-2. **Uso de Git Worktree para Concorrência**: Sempre que a execução de tarefas paralelas for disparada, os subagentes associados **devem** rodar sob isolamento de worktree (`isolation: "worktree"`). Isso isola o ambiente de arquivos do usuário contra regressões sintáticas e conflitos no Git.
-3. **Uso de Git Worktree por Tamanho de Atividade**: Mesmo no caso de uma única tarefa, se o tamanho da atividade envolver refatoração pesada de infra, transição de esquemas ou desenvolvimento de novos módulos inteiros (ou seja, tarefas que excedam a escrita de um único arquivo isolado ou demandem mais de 10 minutos de computação contínua), **instancie o subagente em uma worktree dedicada** para preservar a segurança da ramificação de desenvolvimento ativa do desenvolvedor.
-4. **Resolução de Fusão (Merge)**: Ao finalizar as tarefas paralelas, o Developer assume o papel de coletor das branches isoladas temporárias e executa a mesclagem estruturada (resolvendo conflitos se houverem) e valida a compilação geral da aplicação.
+1. **Sequential** (default): one task at a time, in the main session.
+2. **Parallel up to N workers**: the person sets N.
+3. **Parallel without a limit**.
 
-### Estrutura de Declaração de DAG (Grafo de Dependências):
-Ao fragmentar o plano macro, o Developer monta e persiste a modelagem no arquivo local `.claude/ESTADO_DEVELOPER.md` seguindo o formato:
+Rules:
+
+- No answer means sequential.
+- An authorization covers only the task it was given for; a new task asks again.
+- Record the choice in `ESTADO_DEVELOPER.md` at the project root: `paralelismo: sequencial | paralelo (max N)`.
+- Write each task's completion to the state file before starting the next, so a stopped run resumes at the next pending task.
+- Re-check the `paralelismo:` field at every resume.
+- When a limit stops the run, report in one short message: what is done, what is pending, how to resume.
+
+---
+
+## Delegation autonomy matrix
+
+The Developer operates on **risk tiers**. Autonomy is granted according to the nature of the task:
+
+### Tier 1: Direct route ("Fast Path" - minimal risk)
+
+The Developer treats T1 tasks (cleanup, simple documentation that does not change logic, safe refactors, and tool/linter setup) as eligible for the **Fast Path**:
+
+- **Process bypass**: skips the global strategic roadmap update/audit and the bureaucratic, extensive interrogation sessions through `grill-with-docs` or `grill-me`. The requirement gap check still applies when the task changes behavior.
+- **Atomic execution**: the Developer plans and executes the task directly.
+- **Mandatory quality guardrails**: the flow must still honor TDD strictly and invoke `qa-analyst` before any PR. If no PR skill is available, guide the Git flow manually and ask for human confirmation.
+- **Action**: executes -> logs in `ESTADO_DEVELOPER.md` -> finishes the PR for the atomic change.
+
+### Tier 2: Batch execution (medium risk)
+
+- **Environment configuration**: installing linters and formatters, instrumenting test coverage, writing structural ADRs and localized performance improvements without breaking changes.
+- **Reduced bureaucracy**: requires alignment with the active `roadmap` before running the batches, but allows commit aggregation.
+- **Action**: executes the batch under the TDD guardrail -> logs in `ESTADO_DEVELOPER.md` -> reports at the end of the batch.
+
+### Tier 3: Strategic governance (interactive, mandatory)
+
+For decisions that affect the project's domain, autonomy is **suspended**. The Developer must pause, present the plan and wait for the human "Go".
+
+- **Domain changes**: defining data models, new features, macro architecture changes (for example moving from a monolith to microservices).
+- **Roadmap**: any change to strategic direction, Epic prioritization or deadline setting.
+- **Business rules**: any modification that changes application behavior relative to the user's rule.
+- **Action**: stops the flow -> presents PRD/Roadmap -> waits for user approval.
+
+---
+
+## Risk approval trigger
+
+- **Tier 1 (Fast Path):** execution without human interruption, validating the local TDD and semantic commits in the Git flow.
+- **Tier 2 (Batchable):** batch execution. The Developer groups the result, requires a roadmap check, and reports when the block finishes or when TDD fails.
+- **Tier 3 (High risk):** requires explicit prior approval of the overall task plan. Tasks inside an approved plan proceed only if the full test suite passes and static type analysis reports no contract break; otherwise the run stops and asks for intervention. Each such decision is logged in `ESTADO_DEVELOPER.md` as "DECISÃO AUTÔNOMA" with the reason.
+
+---
+
+## Fragmentation rules (DAG & atomization)
+
+The Developer fragments the macro plan into atomic tasks and identifies the dependencies between them.
+
+### Sequential by default
+
+Tasks run one at a time, in dependency order, unless the person has authorized parallel work (see the authorization section above).
+
+### Parallel execution (only when authorized)
+
+When the person authorized parallelism:
+
+1. **DAG parallelism**: run concurrently only tasks whose dependencies are resolved, and never more than the authorized number of workers.
+2. **Isolation**: each parallel worker runs in its own Git worktree, so the active branch is not touched by parallel changes.
+3. **Heavy single tasks** (schema migration, infrastructure refactor, a new module, or more than ~10 minutes of work) run in a dedicated worktree even when there is no parallelism.
+4. **Merge**: when workers finish, the Developer collects the branches, resolves conflicts, and validates the whole build before continuing.
+
+### Parallelism scope
+
+Parallelism applies only inside Phase 4, across tasks whose dependencies are already resolved. The phases themselves stay sequential, and each phase waits for the previous skill's confirmation before the next one starts.
+
+### DAG declaration structure (dependency graph)
+
+The Developer persists the model in `ESTADO_DEVELOPER.md` at the project root:
 
 ```markdown
-### Tarefas
-- [ ] T1: Configurar ambiente e scripts básicos (Tier 1) | depends_on: []
-- [ ] T2: Implementar validador de domínio (Tier 2) | depends_on: [T1]
-- [ ] T3: Alteração de schema Crítico (Tier 3) | depends_on: [T2]
+### Tasks
+- [ ] T1: Configure environment and base scripts (Tier 1) | depends_on: []
+- [ ] T2: Implement the domain validator (Tier 2) | depends_on: [T1]
+- [ ] T3: Critical schema change (Tier 3) | depends_on: [T2]
 ```
-O Developer identifica tarefas elegíveis (dependências resolvidas) e pode disparar subagentes concorrentemente.
----
 
 ---
 
-## Protocolo de Fila Sequencial e Gestão de Estado
+## Sequential queue protocol and state management
 
-O Developer **nunca** gerencia tarefas apenas na memória curta. O estado persistido é rei.
+The Developer **never** manages tasks only in short-term memory. Persisted state is king.
 
-### Guia de Delegação Rápida
-O Developer deve consultar esta tabela antes de disparar qualquer delegação:
+### Quick delegation guide
 
-| Problema | Skill |
+The Developer must consult this table before dispatching any delegation:
+
+| Problem | Skill |
 | --- | --- |
-| Governança & Orquestração | `/developer` |
-| Versionamento & PRs | Fluxo Git disponivel no ambiente, com confirmacao humana |
-| Linguagem de domínio ausente | `/grill-with-docs` |
-| Arquitetura degradada | `/improve-codebase-architecture` |
-| Bug difícil ou regressão | `/diagnose` |
-| Código sem testes | `/tdd` |
-| Análise de QA pós-desenvolvimento (obrigatório antes do PR) | `/qa-analyst` |
-| Falta de contexto | `/zoom-out` |
-| Gargalo não mapeado | `/write-a-skill` |
-| Alinhamento antes de mudança | `/grill-me` |
-| Handoff para outro agent | `/handoff` |
+| Governance & orchestration | `developer` |
+| Versioning & PRs | Git flow available in the environment, with human confirmation |
+| Missing domain language | `grill-with-docs` |
+| Degraded architecture | `improve-codebase-architecture` |
+| Hard bug or regression | `diagnose` |
+| Code without tests | `tdd` |
+| Post-development QA analysis (mandatory before the PR) | `qa-analyst` |
+| Missing context | `zoom-out` |
+| Unmapped bottleneck | `write-a-skill` |
+| Alignment before a change | `grill-me` |
+| Handoff to another agent | `handoff` |
 
 ---
 
-### Ciclo de Execução do Gestor de Operações:
+### Operations manager execution cycle
 
-1. **Atualiza Estado**: O Developer lê de/escreve em `.claude/ESTADO_DEVELOPER.md` a cada tarefa concluída.
-2. **Checa Bloqueios**: Identifica a próxima tarefa cujas dependências já foram finalizadas.
-3. **Delegação e Retorno**:
-   - Dispara a tarefa no agente/skill associada.
-   - Aguarda conclusão.
-4. **Sanity Checkpoint (A cada 3-5 conclusões)**:
-   A cada 3 tarefas passadas à categoria de `completed`, o Developer deve pausar para rodar a checklist de sanidade:
+1. **Update state**: read and write `ESTADO_DEVELOPER.md` at the project root after every completed task.
+2. **Check blockers**: identify the next task whose dependencies are already finished.
+3. **Delegation and return**: dispatch the task to the associated skill; wait for completion; record the result.
+4. **Sanity checkpoint (every 3-5 completions)**:
    ```checklist
-   [ ] As premissas originais do projeto continuam válidas?
-   [ ] Houve desvio técnico que necessita de replanejamento na DAG?
-   [ ] Novas dependências ou GAPs de criticidade P1 surgiram durante a execução?
+   [ ] Are the project's original premises still valid?
+   [ ] Was there a technical deviation that requires replanning the DAG?
+   [ ] Did new dependencies or P1-criticality GAPs appear during execution?
    ```
-   *Se falhar*: Recalcula rotas, edita a DAG no arquivo de estado e reinicia a execução de forma controlada.
+   *If it fails*: recalculate routes, edit the DAG in the state file and restart execution in a controlled way.
 
 ---
 
-## Protocolo de Operação: Modo Eficiência (Qualidade e Validação)
+## Operating protocol: quality and validation
 
-A partir de agora, o Developer opera em **Modo Eficiência**. O objetivo é zero retrabalho.
+1. **Wait-and-validate**: the Developer waits for the previous skill's full confirmation before the next delegation starts. Inside a phase, parallel DAG tasks run only when authorized.
+2. **Quality in tiers**:
+   - **Setup phase**: full interactivity. No command runs automated without positive feedback.
+   - **Planning phase**: the gap check, `roadmap` and a plan are mandatory. No code delegation happens before the plan is approved in `DEVELOPER-ROADMAP.md`.
+   - **Execution phase**: the focus is atomicity. If a complex task appears, it **must** be sliced before execution.
+3. **Strategic patience**: it is better to spend 5 extra minutes in setup than to delete and rebuild files because of context failures.
 
-1. **Atraso Deliberado (The "Wait-and-Validate" Principle)**: Em vez de disparar delegações em paralelo, o Developer deve esperar a confirmação completa da skill anterior antes de cogitar a próxima (ex: `grill-with-docs`).
-2. **Qualidade em Tiers**:
-   - **Fase de Setup**: Interatividade total. Nenhum comando é automatizado sem feedback positivo.
-   - **Fase de Planejamento**: Obrigatório o uso do `roadmap` e `plan`. Nenhuma delegação de código ocorre sem o plano estar aprovado no `DEVELOPER-ROADMAP.md`.
-   - **Fase de Execução**: O foco é em atomicidade. Se uma tarefa complexa surgir, ela **deve** ser fatiada antes da execução.
-3. **Paciência Estratégica**: É preferível perder 5 minutos a mais no setup do que ter que deletar e reconstruir arquivos por causa de falhas de contexto.
 ---
 
-## Template: Fiscalização de Testes (Durante e Pós-Fila)
+## Template: test supervision (during and after the queue)
 
-### 1. Checkpoint de Fila (Após cada tarefa que altere código)
-Antes de marcar a tarefa como `completed` no estado, o Developer deve validar o suite de teste localmente:
-- A funcionalidade alterada possui testes? (verificado via `git diff` / `Read`)
-- O runner de testes local (`npm test`, `pytest`, etc.) está verde?
-Se falhar: Invocar `/diagnose` imediatamente na unidade afetada antes de passar para a próxima tarefa da DAG.
+### 1. Queue checkpoint (after every task that changes code)
 
-### 2. Fiscalização Pós-Fila (Conclusão Geral)
-Após a última tarefa da DAG passar para `completed`, executa a fiscalização agregada final:
+Before marking the task as `completed` in the state, the Developer must validate the test suite locally:
+
+- Does the changed functionality have tests? (checked via `git diff` / reading the files)
+- Is the local test runner (`npm test`, `pytest`, etc.) green?
+
+If it fails: invoke `diagnose` immediately on the affected unit before moving to the next DAG task.
+
+### 2. Post-queue supervision (overall completion)
+
+After the last DAG task moves to `completed`, run the final aggregate supervision:
+
 ```checklist
-[ ] Suite completa de testes passa?
-[ ] Novos arquivos de teste (.test.* / .spec.*) foram criados/modificados?
-[ ] A cobertura de código manteve ou aumentou em relação à baseline?
-[ ] Nenhum teste flaky (falha intermitente) foi introduzido?
-[ ] Nenhuma credencial/secreto foi exposta em arquivos de teste ou fixtures?
+[ ] The full test suite passes?
+[ ] New test files (.test.* / .spec.*) were created or modified?
+[ ] Did code coverage hold or increase against the baseline?
+[ ] Was any flaky test (intermittent failure) introduced?
+[ ] Was any credential or secret exposed in test files or fixtures?
 ```
-- Opcional: Gerar um resumo de impacto das mudanças.
 
-### 3. Portão de QA (Mandatário, Pré-Segurança)
-Para toda tarefa que resultar em alteração de código, o ciclo de conclusão **não** avança sem passar pela análise da skill `/qa-analyst`. Isso vale para **todos os Tiers**, incluindo Fast Path (T1) — não há bypass.
-- [ ] `/qa-analyst` foi invocado sobre o diff/código gerado nesta tarefa?
-- [ ] Requisitos originais foram confrontados com a implementação (ambiguidades? lacunas?)
-- [ ] Casos de teste de erro/comportamento inesperado foram avaliados, não só o caminho feliz?
-- [ ] Bugs encontrados pela análise de QA foram registrados e resolvidos (ou reabertos como nova tarefa na DAG) antes de prosseguir?
+- Optional: produce an impact summary of the changes.
 
-Falha neste portão -> **bloqueia** o avanço. O Developer reabre a DAG com as tarefas de correção apontadas pela `/qa-analyst` e só prossegue após nova validação limpa.
+### 3. QA gate (mandatory, pre-security)
 
-### 4. Portão de Segurança e Testes E2E (Mandatário, Pré-PR)
-Após o incremento ser homologado funcionalmente pelo `/qa-analyst`, o Developer deve obrigatoriamente submeter o código à auditoria e testes ofensivos da skill `/secure-e2e`:
-- [ ] Auditoria de segurança de código realizada (OWASP, autenticação segura, autorização RBAC, rate limit, sanitização)?
-- [ ] Testes negativos de ataque (`*.spec.sec.ts`) criados ou executados via Playwright CLI contra rotas e dados críticos?
-- [ ] Nenhuma brecha ou vazamento de dados confidenciais (PII, tokens, senhas) detectado?
+For every task that results in a code change, the completion cycle does **not** advance without the `qa-analyst` analysis. This applies to **every tier**, including Fast Path (T1) - there is no bypass.
 
-Falha neste portão -> **bloqueia** o avanço para o PR. O Developer corrige as vulnerabilidades e blinda os testes com `/secure-e2e`.
+- [ ] Was `qa-analyst` invoked on the diff/code produced in this task?
+- [ ] Were the original requirements confronted with the implementation (ambiguities? gaps?)
+- [ ] Were error and unexpected-behavior test cases evaluated, not only the happy path?
+- [ ] Were the bugs QA found recorded and fixed (or reopened as a new DAG task) before proceeding?
 
-### 5. Protocolo de PR e Fechamento de Ciclo (Mandatário)
-Somente após a aprovação formal do `/qa-analyst` E do `/secure-e2e`, o Developer pode iniciar o fluxo de PR disponível no ambiente. Nunca invoque uma skill de PR que nao esteja instalada:
-- [ ] O commit segue Conventional Commits?
-- [ ] A branch seguiu o padrão `tipo/issue-descricao`?
-- [ ] O template de PR foi preenchido?
-- [ ] Nenhuma credencial/secreto foi exposta?
+Failure at this gate -> **blocks** progress. The Developer reopens the DAG with the corrective tasks named by `qa-analyst` and proceeds only after a clean revalidation.
+
+### 4. Security and E2E test gate (mandatory, pre-PR)
+
+Once the increment is functionally approved by `qa-analyst`, the Developer must submit the code to the `secure-e2e` audit and offensive tests:
+
+- [ ] Code security audit performed (OWASP, secure authentication, RBAC authorization, rate limit, sanitization)?
+- [ ] Negative attack tests (`*.spec.sec.ts`) created or executed via Playwright CLI against critical routes and data?
+- [ ] No breach or leak of confidential data (PII, tokens, passwords) detected?
+
+Failure at this gate -> **blocks** progress to the PR. The Developer fixes the vulnerabilities and hardens the tests with `secure-e2e`.
+
+### 5. PR protocol and cycle closure (mandatory)
+
+Only after the formal approval of `qa-analyst` AND `secure-e2e` may the Developer start the PR flow available in the environment. Never invoke a PR skill that is not installed:
+
+- [ ] Does the commit follow Conventional Commits?
+- [ ] Did the branch follow the `type/issue-description` pattern?
+- [ ] Was the PR template filled in?
+- [ ] Was any credential or secret exposed?
+
 ---
 
+## Quick reference: GAP -> Skill mapping
 
-## Referência Rápida: Mapeamento GAP → Skill
-
-| GAP Identificado | Skill Delegada | Tier de Risco |
-|------------------|----------------|---------------|
-| Testes ausentes ou frágeis | `/tdd` | Batch |
-| Fim de desenvolvimento — análise de QA obrigatória | `/qa-analyst` | Mandatório (todos os Tiers) |
-| Auditoria de código e testes de segurança E2E | `/secure-e2e` | Mandatório (todos os Tiers) |
-| Arquitetura degradada/acoplada | `/improve-codebase-architecture` | Batch |
-| Bug/regressão | `/diagnose` | Block |
-| Linguagem de domínio desalinhada | `/grill-with-docs` | Auto |
-| Repositório vazio requer base técnica e frameworks para MVP ágil | `/scaffold-mvp` | Block |
-| Não há skill para o gargalo | `/write-a-skill` | Block |
+| Identified GAP | Delegated skill | Risk tier |
+|----------------|-----------------|-----------|
+| Missing requirement detail (security, data, performance, stack) | `grill-with-docs` (ask in one batch) | Auto |
+| Missing or fragile tests | `tdd` | Batch |
+| End of development - mandatory QA analysis | `qa-analyst` | Mandatory (all tiers) |
+| Code audit and E2E security tests | `secure-e2e` | Mandatory (all tiers) |
+| Degraded/coupled architecture | `improve-codebase-architecture` | Batch |
+| Bug/regression | `diagnose` | Block |
+| Misaligned domain language | `grill-with-docs` | Auto |
+| Empty repository needs a technical base and frameworks for an agile MVP | `scaffold-mvp` | Block |
+| No skill covers the bottleneck | `write-a-skill` | Block |

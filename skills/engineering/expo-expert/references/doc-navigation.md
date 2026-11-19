@@ -1,32 +1,33 @@
-# Navegação na documentação do Expo
+# Navigating the Expo documentation
 
-A doc do Expo é a fonte da verdade e é publicada em formato amigável a LLM. Dominar como buscar
-nela vale mais do que qualquer fato memorizado — os fatos mudam a cada SDK; o método não.
+The Expo docs are the source of truth and are published in an LLM-friendly format. Mastering how to
+search them is worth more than any memorized fact - the facts change with every SDK; the method does
+not.
 
-## Regras de ouro
+## Golden rules
 
-1. **Append `.md` a qualquer URL de doc** para receber markdown limpo (mesmo conteúdo, fração dos
-   tokens do HTML). Ex.: `https://docs.expo.dev/build/eas-json` → `https://docs.expo.dev/build/eas-json.md`.
-   `/index.md` também funciona. Alternativa: header `Accept: text/markdown`.
-2. **`https://docs.expo.dev/llms.txt`** (~54 kB) é o índice completo com URLs reais. Baixe quando
-   não souber onde um tópico mora, depois busque a página específica em `.md`.
-3. **Cheque a versão de SDK do projeto antes de responder** algo sensível a versão
-   (`package.json` → `dependencies.expo`). A resposta certa quase sempre depende dela.
-4. **Não há `llms-full.txt`.** O `llms.txt` + append `.md` são os mecanismos oficiais.
+1. **Append `.md` to any doc URL** to receive clean markdown (same content, a fraction of the HTML
+   tokens). Example: `https://docs.expo.dev/build/eas-json` -> `https://docs.expo.dev/build/eas-json.md`.
+   `/index.md` also works. Alternative: the `Accept: text/markdown` header.
+2. **`https://docs.expo.dev/llms.txt`** (~54 kB) is the full index with real URLs. Download it when
+   you do not know where a topic lives, then fetch the specific page as `.md`.
+3. **Check the project's SDK version before answering** anything version-sensitive
+   (`package.json` -> `dependencies.expo`). The right answer almost always depends on it.
+4. **There is no `llms-full.txt`.** `llms.txt` + the `.md` suffix are the official mechanisms.
 
-## Docs feitas para agentes de IA
+## Docs written for AI agents
 
-O Expo mantém uma seção dedicada a agentes/LLMs — leia quando o trabalho for sobre integrar IA no
-fluxo Expo, ou para alinhar seu comportamento com o que o Expo recomenda:
+Expo maintains a section dedicated to agents/LLMs - read it when the work is about integrating AI
+into the Expo flow, or to align your behavior with what Expo recommends:
 
-- `https://docs.expo.dev/agents.md` — visão geral "AI agents and Expo" (também descrito como o mapa da doc)
-- `https://docs.expo.dev/agents/claude.md` — Claude Code + Expo
+- `https://docs.expo.dev/agents.md` - "AI agents and Expo" overview (also described as the doc map)
+- `https://docs.expo.dev/agents/claude.md` - Claude Code + Expo
 - `https://docs.expo.dev/agents/codex.md` · `https://docs.expo.dev/agents/cursor.md`
-- `https://docs.expo.dev/skills.md` — Expo Skills para agentes
-- `https://docs.expo.dev/mcp.md` — Model Context Protocol com Expo
-- `https://docs.expo.dev/llms.md` — como agentes/LLMs devem consumir a doc
+- `https://docs.expo.dev/skills.md` - Expo Skills for agents
+- `https://docs.expo.dev/mcp.md` - Model Context Protocol with Expo
+- `https://docs.expo.dev/llms.md` - how agents/LLMs should consume the docs
 
-## Mapa de URLs por domínio (verbatim)
+## URL map by domain (verbatim)
 
 ### Development builds
 - `https://docs.expo.dev/develop/development-builds/introduction.md`
@@ -48,7 +49,7 @@ fluxo Expo, ou para alinhar seu comportamento com o que o Expo recomenda:
 - `https://docs.expo.dev/config-plugins/development-and-debugging.md`
 - `https://docs.expo.dev/config-plugins/patch-project.md`
 
-### Expo Modules API (nativo custom)
+### Expo Modules API (custom native)
 - `https://docs.expo.dev/modules/overview.md`
 - `https://docs.expo.dev/modules/get-started.md`
 - `https://docs.expo.dev/modules/native-module-tutorial.md`
@@ -85,12 +86,12 @@ fluxo Expo, ou para alinhar seu comportamento com o que o Expo recomenda:
 - `https://docs.expo.dev/router/advanced/stack.md`
 - `https://docs.expo.dev/router/advanced/authentication.md`
 
-### Nova Arquitetura / performance
+### New Architecture / performance
 - `https://docs.expo.dev/guides/new-architecture.md`
 - `https://docs.expo.dev/guides/react-compiler.md`
 
-## Quando o mapa não basta
+## When the map is not enough
 
-Se o tópico não estiver acima (ex.: uma API de `expo-*` específica, um guia novo, uma flag
-recente), baixe `llms.txt` e faça `grep` pelo termo — ele lista a página. Depois busque a página
-`.md`. Nunca "chute" URLs, nomes de flag ou números de SDK: confirme e cite.
+If the topic is not above (e.g. a specific `expo-*` API, a new guide, a recent flag), download
+`llms.txt` and `grep` for the term - it lists the page. Then fetch the `.md` page. Never "guess" URLs,
+flag names or SDK numbers: confirm and cite.

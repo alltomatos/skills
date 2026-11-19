@@ -1,119 +1,118 @@
-# Diagnóstico de máquina antes de recomendar build
+# Machine diagnosis before recommending a build
 
-Doc-âncora: `build/introduction.md`, `develop/development-builds/introduction.md`. Este arquivo não
-espelha uma página específica da doc — é o método para decidir **qual dos três caminhos de build**
-faz sentido *nesta* máquina, algo que a doc trata como dado (você escolhe) mas que na prática é
-limitado pelo SO, pelas ferramentas instaladas e pelos recursos disponíveis.
+Anchor docs: `build/introduction.md`, `develop/development-builds/introduction.md`. This file does
+not mirror a specific doc page - it is the method for deciding **which of the three build paths**
+makes sense *on this machine*, something the docs treat as a given (you choose) but that in practice
+is limited by the OS, the installed tools and the available resources.
 
-## Quando rodar este diagnóstico
+## When to run this diagnosis
 
-**Sempre que a tarefa envolver decidir *como* buildar, rodar ou testar o app** — não para perguntas
-puramente conceituais (explicar o que é um config plugin não precisa disso). Gatilhos típicos: o
-usuário pede pra rodar `expo run:ios`/`run:android`, perguntar "como eu testo isso", pedir ajuda
-pra configurar o ambiente, ou você está prestes a recomendar um comando de build. Rode o
-diagnóstico **antes** de sugerir o comando, não depois — recomendar `expo run:ios` pra alguém no
-Windows e só descobrir o problema na execução é o erro que este passo existe para evitar.
+**Whenever the task involves deciding *how* to build, run or test the app** - not for purely
+conceptual questions (explaining what a config plugin is does not need it). Typical triggers: the
+user asks to run `expo run:ios`/`run:android`, asks "how do I test this", asks for help setting up
+the environment, or you are about to recommend a build command. Run the diagnosis **before**
+suggesting the command, not after - recommending `expo run:ios` to someone on Windows and only
+discovering the problem at execution time is the mistake this step exists to prevent.
 
-## Por que a máquina importa
+## Why the machine matters
 
-Os três caminhos de build (ver [cng-config-plugins.md](cng-config-plugins.md) e
-[eas-build-submit-workflows.md](eas-build-submit-workflows.md)) têm requisitos de hardware/SO bem
-diferentes:
+The three build paths (see [cng-config-plugins.md](cng-config-plugins.md) and
+[eas-build-submit-workflows.md](eas-build-submit-workflows.md)) have very different hardware/OS
+requirements:
 
-| Caminho | Requisito |
+| Path | Requirement |
 |---|---|
-| **Local — iOS** (`expo run:ios`) | **Exclusivamente macOS** com Xcode. Não existe forma de compilar um `.ipa` localmente no Windows ou Linux — isso é limitação da Apple, não do Expo. |
-| **Local — Android** (`expo run:android`) | Qualquer SO (Windows/macOS/Linux), mas precisa de JDK + Android SDK/Studio instalados, e de RAM/disco livres — o Gradle é pesado. |
-| **EAS Build (cloud)** | Nenhum requisito de toolchain local — roda no servidor da Expo. Só precisa de conta EAS e internet. É o único caminho que sempre funciona, independente da máquina. |
-| **EAS local build** (`eas build --local`) | Mesmos requisitos de toolchain do build local da plataforma alvo (Xcode pra iOS, Android SDK pra Android) — só muda a orquestração, não o requisito de SO. |
+| **Local - iOS** (`expo run:ios`) | **macOS only**, with Xcode. There is no way to compile an `.ipa` locally on Windows or Linux - that is an Apple limitation, not an Expo one. |
+| **Local - Android** (`expo run:android`) | Any OS (Windows/macOS/Linux), but it needs JDK + Android SDK/Studio installed, plus free RAM/disk - Gradle is heavy. |
+| **EAS Build (cloud)** | No local toolchain requirement - it runs on Expo's servers. Only needs an EAS account and internet. It is the only path that always works, regardless of the machine. |
+| **EAS local build** (`eas build --local`) | Same toolchain requirements as the local build of the target platform (Xcode for iOS, Android SDK for Android) - only the orchestration changes, not the OS requirement. |
 
-## Checklist de diagnóstico
+## Diagnosis checklist
 
-Rode isto (adapte ao shell disponível — PowerShell no Windows, bash no macOS/Linux) e reporte o que
-encontrar antes de recomendar um caminho:
+Run this (adapt to the available shell - PowerShell on Windows, bash on macOS/Linux) and report what
+you find before recommending a path:
 
 ```bash
-# Sistema operacional — decide de cara se build local de iOS é sequer possível
+# Operating system - decides up front whether a local iOS build is even possible
 uname -a          # macOS/Linux
-# no Windows (PowerShell): $PSVersionTable.OS  ou  systeminfo | findstr /B /C:"OS Name"
+# on Windows (PowerShell): $PSVersionTable.OS  or  systeminfo | findstr /B /C:"OS Name"
 
-# Toolchain base
+# Base toolchain
 node -v
 npx expo --version
-eas --version         # se ausente: npm install -g eas-cli
-eas whoami             # logado no EAS? build cloud precisa disso
+eas --version         # if missing: npm install -g eas-cli
+eas whoami             # logged into EAS? cloud builds need this
 
-# Toolchain Android (qualquer SO)
+# Android toolchain (any OS)
 java -version
-echo $ANDROID_HOME    # ou: $env:ANDROID_HOME no PowerShell
+echo $ANDROID_HOME    # or: $env:ANDROID_HOME on PowerShell
 adb --version
 
-# Toolchain iOS (só relevante se o SO já é macOS)
+# iOS toolchain (only relevant if the OS is already macOS)
 xcodebuild -version
 pod --version
 
-# Recursos livres — Gradle/Xcode consomem bastante
+# Free resources - Gradle/Xcode are heavy consumers
 df -h .                # Linux/macOS
 # Windows (PowerShell): Get-PSDrive C
 ```
 
-Não presuma o SO do usuário pela sua própria execução — se você está rodando em uma máquina
-diferente da do usuário (ou eles vão executar o comando na máquina deles), pergunte ou confirme
-antes de recomendar um caminho que só funciona num SO específico.
+Do not assume the user's OS from where you happen to be running - if you are running on a different
+machine from the user's (or they will run the command on theirs), ask or confirm before recommending
+a path that only works on a specific OS.
 
-## Matriz de decisão
+## Decision matrix
 
-| Situação | Recomendação |
+| Situation | Recommendation |
 |---|---|
-| **Windows ou Linux, precisa de build iOS** | **EAS Build (cloud) é a única opção.** Não existe alternativa local — não tente contornar. |
-| **Windows/Linux, build Android, sem Android Studio/JDK instalados** | Recomende **EAS Build (cloud)** primeiro — evita o usuário instalar ~10GB de toolchain só pra um build. Ofereça o caminho local como opção *se* ele já for fazer trabalho nativo recorrente (ver [native-modules.md](native-modules.md)). |
-| **Windows/Linux, build Android, com Android Studio/JDK já instalados** | `npx expo run:android` local é viável — mais rápido pra iteração (sem fila de build na nuvem). |
-| **macOS, com Xcode e Android Studio instalados** | Build local viável nas duas plataformas — bom para quem itera bastante. |
-| **macOS, só com Xcode (sem Android Studio)** | iOS local, Android via EAS Build cloud (ou instale o Android SDK se o trabalho for recorrente). |
-| **Máquina com pouca RAM livre (menos de ~8GB) ou pouco disco (menos de ~20GB livre)** | Prefira **EAS Build cloud** mesmo com toolchain instalado — Gradle/Xcode local costuma travar ou degradar o resto da máquina em ambientes apertados. |
-| **CI, sandbox, container, ou qualquer ambiente sem GUI persistente** | **EAS Build cloud** sempre — build local nativo pressupõe ambiente interativo/persistente. |
-| **Só precisa iterar em JS/lógica, sem lib nativa nova** | Nem build local nem cloud — `npx expo start` com Expo Go (se não há código nativo custom) ou o dev build já instalado resolve, sem gastar fila nem toolchain. |
+| **Windows or Linux, needs an iOS build** | **EAS Build (cloud) is the only option.** There is no local alternative - do not try to work around it. |
+| **Windows/Linux, Android build, with no Android Studio/JDK installed** | Recommend **EAS Build (cloud)** first - it saves the user from installing ~10GB of toolchain just for one build. Offer the local path as an option *if* they will be doing recurring native work (see [native-modules.md](native-modules.md)). |
+| **Windows/Linux, Android build, with Android Studio/JDK already installed** | Local `npx expo run:android` is viable - faster to iterate (no cloud build queue). |
+| **macOS, with Xcode and Android Studio installed** | Local builds are viable on both platforms - good for people who iterate a lot. |
+| **macOS, with only Xcode (no Android Studio)** | Local iOS, Android through EAS Build cloud (or install the Android SDK if the work is recurring). |
+| **Machine with little free RAM (under ~8GB) or little disk (under ~20GB free)** | Prefer **EAS Build cloud** even with the toolchain installed - local Gradle/Xcode tends to stall or degrade the rest of the machine in tight environments. |
+| **CI, sandbox, container, or any environment without a persistent GUI** | **EAS Build cloud** always - a local native build assumes an interactive/persistent environment. |
+| **Only needs to iterate on JS/logic, no new native library** | Neither local nor cloud - `npx expo start` with Expo Go (when there is no custom native code) or the already-installed dev build is enough, without spending build queue or toolchain. |
 
-## Conectividade do dispositivo físico (Expo Go / dev build via LAN)
+## Physical device connectivity (Expo Go / dev build over LAN)
 
-Rodar `npx expo start` e escanear o QR no celular assume que o celular consegue alcançar o Metro na
-porta 8081 (ou a que estiver ativa) do computador. Quando o app carrega o bundle uma vez mas depois
-falha em reconectar, ou nunca conecta, siga esta ordem de diagnóstico (validada em produção — cada
-uma destas foi uma hipótese descartada até achar a real):
+Running `npx expo start` and scanning the QR on the phone assumes the phone can reach Metro on port
+8081 (or whichever is active) on the computer. When the app loads the bundle once but then fails to
+reconnect, or never connects, follow this diagnosis order (validated in production - each one of
+these was a hypothesis ruled out until the real one was found):
 
-1. **O terminal que iniciou `expo start` é não-interativo** (ex.: harness de agente, CI)? Nesse
-   caso o Metro não imprime o QR/URL `exp://` completo — só "Waiting on http://localhost:8081". Pra
-   descobrir a URL real, pegue o IP da máquina (`ipconfig`/`ifconfig`) e monte `exp://<ip>:8081` na
-   mão, ou peça pro usuário rodar o comando ele mesmo num terminal interativo.
-2. **Firewall do SO bloqueando a porta?** Confira antes de assumir — no Windows,
-   `Get-NetConnectionProfile` mostra se a rede Wi-Fi está classificada como "Public" (regras de
-   firewall por app costumam já cobrir isso, mas confira `Get-NetFirewallRule` pelo executável
-   exato do Node em uso — gerenciadores de versão como nvm-windows trocam o caminho do `node.exe`,
-   e uma regra antiga apontando pro caminho errado não vale). **Mas não presuma que é o firewall** —
-   confirme testando (`Get-NetTCPConnection -LocalPort 8081` mostra se algo está de fato escutando;
-   se o firewall estiver *desligado* e ainda assim não conectar, o problema é outro).
-3. **Isolamento de cliente no roteador/AP.** Se o firewall está confirmadamente desligado, a porta
-   está escutando em todas as interfaces, e mesmo assim zero pacote chega no Metro (confirme
-   olhando o log do Metro — nenhuma linha de bundle request aparece), suspeite de **AP/client
-   isolation** no roteador — comum em CPEs de operadora e redes com "5G"/hotspot no nome. Isso
-   bloqueia comunicação direta entre dispositivos na mesma rede Wi-Fi mesmo com firewall de host
-   desligado, e não tem workaround do lado do app.
-4. **Tunnel (`expo start --tunnel`, via `@expo/ngrok`) costuma estar quebrado hoje** — o ngrok
-   mudou a API pra exigir authtoken/conta em versões recentes, e a integração do Expo não foi
-   atualizada. Erro típico: `TypeError: Cannot read properties of undefined (reading 'body')`. Não
-   perca tempo tentando consertar isso — pule direto pra alternativa 5.
-5. **Tailscale (ou outra VPN mesh) é o fallback mais confiável** quando a rede local tem isolamento
-   de AP e o tunnel do Expo está quebrado: conecte computador e celular no mesmo tailnet, rode
-   `expo start` normalmente (ele escuta em todas as interfaces, incluindo a do Tailscale), e no
-   Expo Go use "Enter URL manually" com `exp://<ip-tailscale>:8081` em vez de escanear o QR (que
-   mostraria o IP da LAN, não o do Tailscale).
+1. **Is the terminal that started `expo start` non-interactive** (e.g. an agent harness, CI)? In
+   that case Metro does not print the full QR/`exp://` URL - only "Waiting on http://localhost:8081".
+   To find the real URL, get the machine's IP (`ipconfig`/`ifconfig`) and build `exp://<ip>:8081` by
+   hand, or ask the user to run the command themselves in an interactive terminal.
+2. **Is the OS firewall blocking the port?** Check before assuming - on Windows,
+   `Get-NetConnectionProfile` shows whether the Wi-Fi network is classified as "Public" (per-app
+   firewall rules usually cover this already, but check `Get-NetFirewallRule` for the exact Node
+   executable in use - version managers such as nvm-windows change the `node.exe` path, and an old
+   rule pointing to the wrong path does not apply). **But do not assume it is the firewall** -
+   confirm by testing (`Get-NetTCPConnection -LocalPort 8081` shows whether something is actually
+   listening; if the firewall is *off* and it still does not connect, the problem is elsewhere).
+3. **Client isolation on the router/AP.** If the firewall is confirmed off, the port is listening on
+   all interfaces, and still zero packets reach Metro (confirm by looking at the Metro log - no
+   bundle request line appears), suspect **AP/client isolation** on the router - common on carrier
+   CPEs and networks with "5G"/hotspot in the name. It blocks direct communication between devices
+   on the same Wi-Fi even with the host firewall off, and there is no app-side workaround.
+4. **Tunnel (`expo start --tunnel`, via `@expo/ngrok`) is usually broken today** - ngrok changed its
+   API to require an authtoken/account in recent versions, and Expo's integration was not updated.
+   Typical error: `TypeError: Cannot read properties of undefined (reading 'body')`. Do not waste
+   time trying to fix it - go straight to alternative 5.
+5. **Tailscale (or another mesh VPN) is the most reliable fallback** when the local network has AP
+   isolation and Expo's tunnel is broken: connect the computer and the phone to the same tailnet,
+   run `expo start` normally (it listens on all interfaces, including Tailscale's), and in Expo Go
+   use "Enter URL manually" with `exp://<tailscale-ip>:8081` instead of scanning the QR (which would
+   show the LAN IP, not the Tailscale one).
 
-## Como comunicar a recomendação
+## How to communicate the recommendation
 
-Não jogue a matriz inteira pro usuário — diga o diagnóstico e a conclusão prática em 2-3 frases:
-*"Você está no Windows sem Android Studio instalado. Pra esse caso o caminho mais rápido é EAS
-Build na nuvem (`eas build --profile development --platform android`), sem precisar instalar o
-SDK Android. Se você for mexer bastante em código nativo, aí vale instalar o Android Studio pra
-buildar local e iterar mais rápido — me avisa se quiser esse caminho."* Dê a opção, não imponha —
-o usuário pode ter motivo pra preferir o caminho mais pesado (ex.: já tem tudo instalado por outro
-projeto).
+Do not dump the whole matrix on the user - state the diagnosis and the practical conclusion in 2-3
+sentences: *"You are on Windows without Android Studio installed. For this case the fastest path is
+EAS Build in the cloud (`eas build --profile development --platform android`), with no need to
+install the Android SDK. If you will be working a lot on native code, then it is worth installing
+Android Studio to build locally and iterate faster - tell me if you want that path."* Offer the
+option, do not impose it - the user may have a reason to prefer the heavier path (e.g. it is already
+installed for another project).
