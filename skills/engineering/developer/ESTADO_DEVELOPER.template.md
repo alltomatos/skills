@@ -11,7 +11,7 @@
 - **iniciado_em**: `YYYY-MM-DD HH:MM:SS`
 - **fase_atual**: `Phase 3` | `Phase 4` | `Phase 5`
 - **repositorio**: `<repo-name>`
-- **paralelismo**: `sequencial` | `paralelo (max N)` | `paralelo (sem limite)` — the person's answer to the parallel-work question for this task. Empty or missing means `sequencial`. Covers only this task.
+- **paralelismo**: `sequencial` | `paralelo (max N)` | `paralelo sem limite` — the person's answer to the parallel-work question for this task. Empty or missing means `sequencial`. Covers only this task.
 - **limite_atingido**: `none` | `<date> - <what is done / pending / how to resume>` — filled when a token, plan or quota limit stops the run.
 
 ---
