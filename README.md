@@ -9,6 +9,8 @@
 
 # Skills for Real Engineers (Fork)
 
+[English](README.md) | [Português (Brasil)](README.pt-BR.md)
+
 [![skills.sh](https://skills.sh/b/alltomatos/skills)](https://skills.sh/alltomatos/skills)
 
 This repository is a fork of [mattpocock/skills](https://github.com/mattpocock/skills). All credit for the original design and architecture goes to **Matt Pocock** and the contributors of the original project.
